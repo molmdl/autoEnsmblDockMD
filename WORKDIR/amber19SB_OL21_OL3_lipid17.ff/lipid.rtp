@@ -1,0 +1,1994 @@
+[ bondedtypes ] 
+; Column 1 : default bondtype
+; Column 2 : default angletype
+; Column 3 : default proper dihedraltype
+; Column 4 : default improper dihedraltype
+; Column 5 : This controls the generation of dihedrals from the bonding.
+;            All possible dihedrals are generated automatically. A value of
+;            1 here means that all these are retained. A value of
+;            0 here requires generated dihedrals be removed if
+;              * there are any dihedrals on the same central atoms
+;                specified in the residue topology, or
+;              * there are other identical generated dihedrals
+;                sharing the same central atoms, or
+;              * there are other generated dihedrals sharing the
+;                same central bond that have fewer hydrogen atoms
+; Column 6 : number of neighbors to exclude from non-bonded interactions
+; Column 7 : 1 = generate 1,4 interactions between pairs of hydrogen atoms
+;            0 = do not generate such
+; Column 8 : 1 = remove proper dihedrals if found centered on the same
+;                bond as an improper dihedral
+;            0 = do not generate such
+; bonds  angles  dihedrals  impropers all_dihedrals nrexcl HH14 RemoveDih 
+     1       1          9        4        1           3      1     0 
+                
+                        
+[ LAL1 ]
+ [ atoms ]
+     C112           cD_l      -0.11853400      1     
+     H12R           hL_l       0.02580900      2     
+     H12S           hL_l       0.02580900      3     
+     H12T           hL_l       0.02580900      4   
+     C111           cD_l       0.02332000      5     
+     H11R           hL_l       0.00827600      6     
+     H11S           hL_l       0.00827600      7     
+     C110           cD_l      -0.01957500      8     
+     H10R           hL_l       0.01516300      9     
+     H10S           hL_l       0.01516300     10     
+     C19            cD_l      -0.02197500     11    
+     H9R            hL_l       0.00586900     12    
+     H9S            hL_l       0.00586900     13    
+     C18            cD_l      -0.02087900     14    
+     H8R            hL_l       0.01038500     15    
+     H8S            hL_l       0.01038500     16    
+     C17            cD_l      -0.01927900     17    
+     H7R            hL_l       0.01120700     18    
+     H7S            hL_l       0.01120700     19    
+     C16            cD_l      -0.01963100     20    
+     H6R            hL_l       0.01023600     21    
+     H6S            hL_l       0.01023600     22    
+     C15            cD_l      -0.01573500     23    
+     H5R            hL_l       0.00955100     24    
+     H5S            hL_l       0.00955100     25    
+     C14            cD_l      -0.02407800     26    
+     H4R            hL_l       0.02058000     27    
+     H4S            hL_l       0.02058000     28    
+     C13            cD_l       0.00151000     29    
+     H3R            hL_l       0.01910800     30    
+     H3S            hL_l       0.01910800     31    
+     C12            cD_l      -0.17215900     32    
+     H2R            hL_l       0.05441800     33    
+     H2S            hL_l       0.05441800     34    
+	  
+ [ bonds ]
+     C12       +C11  
+     C13       C12   
+     C14       C13   
+     C15       C14   
+     C16       C15   
+     C17       C16   
+     C18       C17   
+     C19       C18   
+     C110      C19   
+     C111      C110  
+     C112      C111  
+     C12       H2S   
+     C12       H2R   
+     C13       H3R   
+     C13       H3S   
+     C14       H4S   
+     C14       H4R   
+     C15       H5S   
+     C15       H5R   
+     C16       H6S   
+     C16       H6R   
+     C17       H7S   
+     C17       H7R   
+     C18       H8S   
+     C18       H8R   
+     C19       H9S   
+     C19       H9R   
+     C110      H10S  
+     C110      H10R  
+     C111      H11S  
+     C111      H11R  
+     C112      H12R  
+     C112      H12S  
+     H12T      C112  
+
+ [ impropers ]
+     C12       +O12      +C11      +O11  
+
+
+[ MY1 ]
+ [ atoms ]
+     C114           cD_l      -0.11171300      1
+     H14R           hL_l       0.02551100      2
+     H14S           hL_l       0.02551100      3
+     H14T           hL_l       0.02551100      4	 
+     C113           cD_l       0.01746300      5
+     H13R           hL_l       0.00753100      6
+     H13S           hL_l       0.00753100      7
+     C112           cD_l      -0.02809400      8
+     H12R           hL_l       0.01720800      9
+     H12S           hL_l       0.01720800     10
+     C111           cD_l      -0.03178700     11
+     H11R           hL_l       0.01267700     12
+     H11S           hL_l       0.01267700     13
+     C110           cD_l      -0.02102500     14
+     H10R           hL_l       0.01003700     15
+     H10S           hL_l       0.01003700     16
+     C19            cD_l      -0.01465300     17
+     H9R            hL_l       0.01017200     18
+     H9S            hL_l       0.01017200     19
+     C18            cD_l      -0.02645100     20
+     H8R            hL_l       0.01124100     21
+     H8S            hL_l       0.01124100     22
+     C17            cD_l      -0.00438600     23
+     H7R            hL_l       0.00683300     24
+     H7S            hL_l       0.00683300     25
+     C16            cD_l      -0.02781200     26
+     H6R            hL_l       0.01151100     27
+     H6S            hL_l       0.01151100     28
+     C15            cD_l      -0.01652100     29
+     H5R            hL_l       0.01057300     30
+     H5S            hL_l       0.01057300     31
+     C14            cD_l      -0.02695400     32
+     H4R            hL_l       0.02043100     33
+     H4S            hL_l       0.02043100     34
+     C13            cD_l      -0.00243500     35
+     H3R            hL_l       0.01885900     36
+     H3S            hL_l       0.01885900     37
+     C12            cD_l      -0.16420000     38
+     H2R            hL_l       0.05394400     39
+     H2S            hL_l       0.05394400     40
+
+ [ bonds ]
+     C12       +C11 
+     C13       C12  
+     C14       C13  
+     C15       C14  
+     C16       C15  
+     C17       C16  
+     C18       C17  
+     C19       C18  
+     C110      C19  
+     C111      C110 
+     C112      C111 
+     C113      C112 
+     C114      C113 
+     C12       H2S  
+     C12       H2R  
+     C13       H3S  
+     C13       H3R  
+     C14       H4S  
+     C14       H4R  
+     C15       H5R  
+     C15       H5S  
+     C16       H6R  
+     C16       H6S  
+     C17       H7R  
+     C17       H7S  
+     C18       H8S  
+     C18       H8R  
+     C19       H9R  
+     C19       H9S  
+     C110      H10S 
+     C110      H10R 
+     C111      H11R 
+     C111      H11S 
+     C112      H12S 
+     C112      H12R 
+     C113      H13R 
+     C113      H13S 
+     C114      H14R 
+     C114      H14S 
+     H14T      C114 
+
+ [ impropers ]
+     C12       +O12      +C11      +O11 
+
+
+[ PA1 ]
+ [ atoms ]
+     C116           cD_l      -0.12544700      1
+     H16R           hL_l       0.02904600      2
+     H16S           hL_l       0.02904600      3
+     H16T           hL_l       0.02904600      4
+     C115           cD_l       0.01397500      5
+     H15R           hL_l       0.00929200      6
+     H15S           hL_l       0.00929200      7
+     C114           cD_l      -0.02008600      8
+     H14R           hL_l       0.01592900      9
+     H14S           hL_l       0.01592900     10
+     C113           cD_l      -0.03309600     11
+     H13R           hL_l       0.01462100     12
+     H13S           hL_l       0.01462100     13
+     C112           cD_l      -0.02763300     14
+     H12R           hL_l       0.01136800     15
+     H12S           hL_l       0.01136800     16
+     C111           cD_l      -0.02520600     17
+     H11R           hL_l       0.01433400     18
+     H11S           hL_l       0.01433400     19
+     C110           cD_l      -0.02883100     20
+     H10R           hL_l       0.01469100     21
+     H10S           hL_l       0.01469100     22
+     C19            cD_l      -0.03047200     23
+     H9R            hL_l       0.01389700     24
+     H9S            hL_l       0.01389700     25
+     C18            cD_l      -0.01579300     26
+     H8R            hL_l       0.00906700     27
+     H8S            hL_l       0.00906700     28
+     C17            cD_l      -0.01963000     29
+     H7R            hL_l       0.01104100     30
+     H7S            hL_l       0.01104100     31
+     C16            cD_l      -0.02442700     32
+     H6R            hL_l       0.01333400     33
+     H6S            hL_l       0.01333400     34
+     C15            cD_l      -0.02938700     35
+     H5R            hL_l       0.01676300     36
+     H5S            hL_l       0.01676300     37
+     C14            cD_l      -0.03009900     38
+     H4R            hL_l       0.02087700     39
+     H4S            hL_l       0.02087700     40
+     C13            cD_l      -0.00488200     41
+     H3R            hL_l       0.01900700     42
+     H3S            hL_l       0.01900700     43
+     C12            cD_l      -0.14925900     44
+     H2R            hL_l       0.04734500     45
+     H2S            hL_l       0.04734500     46
+
+ [ bonds ]
+     C12       +C11   
+     C13       C12    
+     C14       C13    
+     C15       C14    
+     C16       C15    
+     C17       C16    
+     C18       C17    
+     C19       C18    
+     C110      C19    
+     C111      C110   
+     C112      C111   
+     C113      C112   
+     C114      C113   
+     C115      C114   
+     C116      C115   
+     C12       H2R    
+     C12       H2S    
+     C13       H3R    
+     C13       H3S    
+     C14       H4R    
+     C14       H4S    
+     C15       H5R    
+     C15       H5S    
+     C16       H6R    
+     C16       H6S    
+     C17       H7R    
+     C17       H7S    
+     C18       H8R    
+     C18       H8S    
+     C19       H9R    
+     C19       H9S    
+     C110      H10R   
+     C110      H10S   
+     C111      H11R   
+     C111      H11S   
+     C112      H12R   
+     C112      H12S   
+     C113      H13R   
+     C113      H13S   
+     C114      H14R   
+     C114      H14S   
+     C115      H15R   
+     C115      H15S   
+     C116      H16R   
+     C116      H16S   
+     C116      H16T   
+	 
+ [ impropers ]
+     C12       +O12      +C11      +O11 
+	 
+	 
+[ OL1 ]
+ [ atoms ]
+     C118           cD_l      -0.11729000      1
+     H18R           hL_l       0.02662700      2
+     H18S           hL_l       0.02662700      3
+     H18T           hL_l       0.02662700      4
+     C117           cD_l       0.00868400      5
+     H17R           hL_l       0.01002600      6
+     H17S           hL_l       0.01002600 	   7
+     C116           cD_l      -0.01248800      8
+     H16R           hL_l       0.01365900      9
+     H16S           hL_l       0.01365900	  10
+     C115           cD_l      -0.02324700     11
+     H15R           hL_l       0.01040300     12
+     H15S           hL_l       0.01040300 	  13
+     C114           cD_l      -0.02484900     14
+     H14R 	        hL_l       0.00857200     15
+     H14S           hL_l       0.00857200 	  16
+     C113           cD_l      -0.01825700     17
+     H13R           hL_l       0.01380000     18
+     H13S           hL_l       0.01380000 	  19
+     C112           cD_l      -0.02635300     20
+     H12R           hL_l       0.01971700     21
+     H12S           hL_l       0.01971700 	  22
+     C111           cD_l       0.02905900     23
+     H11R           hL_l       0.03353100     24
+     H11S           hL_l       0.03353100 	  25
+     C110           cB_l      -0.23928400     26
+     H10R           hB_l       0.12687800 	  27
+     C19            cB_l      -0.24422800     28
+     H9R            hB_l       0.13151200 	  29
+     C18            cD_l       0.03177500     30
+     H8R            hL_l       0.03268500     31
+     H8S            hL_l       0.03268500 	  32
+     C17            cD_l      -0.01749500     33
+     H7R            hL_l       0.01959800     34
+     H7S            hL_l       0.01959800 	  35
+     C16            cD_l      -0.02378900     36
+     H6R            hL_l       0.00926600     37
+     H6S            hL_l       0.00926600 	  38
+     C15            cD_l      -0.01669200     39
+     H5R            hL_l       0.00869000     40
+     H5S            hL_l       0.00869000 	  41
+     C14            cD_l      -0.02296000     42
+     H4R            hL_l       0.01813400     43
+     H4S            hL_l       0.01813400 	  44
+     C13            cD_l       0.00161900     45
+     H3R            hL_l       0.01952900     46
+     H3S            hL_l       0.01952900 	  47
+     C12            cD_l      -0.14341800     48
+     H2R            hL_l       0.04286000     49
+     H2S            hL_l       0.04286000 	  50
+	 
+ [ bonds ]	 
+     C12       +C11   
+     C13       C12    
+     C14       C13    
+     C15       C14    
+     C16       C15    
+     C17       C16    
+     C18       C17    
+     C19       C18    
+     C110      C19    
+     C111      C110   
+     C112      C111   
+     C113      C112   
+     C114      C113   
+     C115      C114   
+     C116      C115   
+     C117      C116   
+     C118      C117  
+     C12       H2R     
+     C12       H2S     
+     C13       H3R     
+     C13       H3S   
+     C14       H4R     
+     C14       H4S     	 
+     C15       H5R     
+     C15       H5S  	 
+     C16       H6R     
+     C16       H6S   
+     C17       H7R     
+     C17       H7S    	 
+     C18       H8R     
+     C18       H8S  
+     C19       H9R     	 
+     C110      H10R   	 
+     C111      H11R    
+     C111      H11S   
+     C112      H12R    
+     C112      H12S    	 
+     C113      H13R    
+     C113      H13S   	 
+     C114      H14R    
+     C114      H14S   
+     C115      H15R    	 
+     C115      H15S   
+     C116      H16R    	 
+     C116      H16S   
+     C117      H17R    	 
+     C117      H17S    	 
+     C118      H18R    	 
+     C118      H18S    	 
+     C118      H18T    	 
+	 
+ [ impropers ] 
+     C12       +O12      +C11      +O11    	 
+     C19       C111      C110      H10R     
+     C110      C18       C19       H9R      
+
+ 
+[ ST1 ]
+ [ atoms ]
+     C118           cD_l      -0.12006800      1 
+     H18R           hL_l       0.02793800      2 
+     H18S           hL_l       0.02793800      3 
+     H18T           hL_l       0.02793800      4 
+     C117           cD_l       0.02066500      5 
+     H17R           hL_l       0.00848300      6 
+     H17S           hL_l       0.00848300      7 
+     C116           cD_l      -0.02765400      8 
+     H16R           hL_l       0.01562700      9 
+     H16S           hL_l       0.01562700     10 
+     C115           cD_l      -0.03244400     11
+     H15R           hL_l       0.01025300     12
+     H15S           hL_l       0.01025300     13
+     C114           cD_l      -0.01348900     14
+     H14R           hL_l       0.01007300     15
+     H14S           hL_l       0.01007300     16
+     C113           cD_l      -0.01159000     17
+     H13R           hL_l       0.00602200     18
+     H13S           hL_l       0.00602200     19
+     C112           cD_l      -0.01915300     20
+     H12R           hL_l       0.00819800     21
+     H12S           hL_l       0.00819800     22
+     C111           cD_l      -0.01709300     23
+     H11R           hL_l       0.01020600     24
+     H11S           hL_l       0.01020600     25
+     C110           cD_l      -0.02641800     26
+     H10R           hL_l       0.01082500     27
+     H10S           hL_l       0.01082500     28
+     C19            cD_l      -0.01799700     29
+     H9R            hL_l       0.00959500     30
+     H9S            hL_l       0.00959500     31
+     C18            cD_l      -0.01462300     32
+     H8R            hL_l       0.00732600     33
+     H8S            hL_l       0.00732600     34
+     C17            cD_l      -0.01946900     35
+     H7R            hL_l       0.00929200     36
+     H7S            hL_l       0.00929200     37
+     C16            cD_l      -0.03762700     38
+     H6R            hL_l       0.01774000     39
+     H6S            hL_l       0.01774000     40
+     C15            cD_l      -0.01344300     41
+     H5R            hL_l       0.00819100     42
+     H5S            hL_l       0.00819100     43
+     C14            cD_l      -0.05979200     44
+     H4R            hL_l       0.02424100     45
+     H4S            hL_l       0.02424100     46
+     C13            cD_l      -0.00012800     47
+     H3R            hL_l       0.01388600     48
+     H3S            hL_l       0.01388600     49
+     C12            cD_l      -0.11702000     50
+     H2R            hL_l       0.05180700     51
+     H2S            hL_l       0.05180700     52
+	 
+ [ bonds ]	   
+     C12       +C11     	 
+     C13       C12      	 
+     C14       C13      	 
+     C15       C14      	 
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C117      C116     
+     C118      C117     
+     C12       H2R      
+     C12       H2S      
+     C13       H3S      
+     C13       H3R      
+     C14       H4R      
+     C14       H4S      
+     C15       H5S      
+     C15       H5R      
+     C16       H6R      
+     C16       H6S      
+     C17       H7S      
+     C17       H7R      
+     C18       H8R      
+     C18       H8S      
+     C19       H9S      
+     C19       H9R      
+     C110      H10R     
+     C110      H10S     
+     C111      H11S     
+     C111      H11R     
+     C112      H12R     
+     C112      H12S     
+     C113      H13S     
+     C113      H13R     
+     C114      H14R     
+     C114      H14S     
+     C115      H15S     
+     C115      H15R     
+     C116      H16R     
+     C116      H16S     
+     C117      H17S     
+     C117      H17R     
+     C118      H18T     
+     C118      H18S     
+     C118      H18R     
+	 
+ [ impropers ] 
+     C12       +O12      +C11      +O11    
+
+
+[ AR1 ]
+ [ atoms ]	 
+     C120           cD_l      -0.10930200      1     
+     H20R           hL_l       0.02372300      2      
+     H20S           hL_l       0.02372300      3      
+     H20T           hL_l       0.02372300      4  
+     C119           cD_l       0.02495700      5      
+     H19R           hL_l       0.00542600      6      
+     H19S           hL_l       0.00542600      7      
+     C118           cD_l      -0.01977200      8     
+     H18R           hL_l       0.01421800      9      
+     H18S           hL_l       0.01421800     10      
+     C117           cD_l      -0.02839800     11     
+     H17R           hL_l       0.01958100     12      
+     H17S           hL_l       0.01958100     13 
+     C116           cD_l       0.03910000     14      
+     H16R           hL_l       0.02884800     15      
+     H16S           hL_l       0.02884800     16      
+     C115           cB_l      -0.24414900     17     
+     H15R           hB_l       0.13279300     18      
+     C114           cB_l      -0.22476900     19     
+     H14R           hB_l       0.12961600     20      
+     C113           cD_l       0.05819700     21      
+     H13R           hL_l       0.06135000     22      
+     H13S           hL_l       0.06135000     23      
+     C112           cB_l      -0.22016400     24     
+     H12R           hB_l       0.13198600     25      
+     C111           cB_l      -0.22870400     26     
+     H11R           hB_l       0.13134100     27      
+     C110           cD_l       0.09540600     28      
+     H10R           hL_l       0.05114000     29      
+     H10S           hL_l       0.05114000     30      
+     C19            cB_l      -0.22869400     31     
+     H9R            hB_l       0.13216700     32      
+     C18            cB_l      -0.22852700     33     
+     H8R            hB_l       0.13473500     34      
+     C17            cD_l       0.05578400     35      
+     H7R            hL_l       0.06277500     36      
+     H7S            hL_l       0.06277500     37      
+     C16            cB_l      -0.20678600     38     
+     H6R            hB_l       0.12985800     39      
+     C15            cB_l      -0.26789000     40     
+     H5R            hB_l       0.14357700     41      
+     C14            cD_l       0.03138200     42      
+     H4R            hL_l       0.03870800     43      
+     H4S            hL_l       0.03870800     44      
+     C13            cD_l       0.02562600     45      
+     H3R            hL_l       0.02511700     46      
+     H3S            hL_l       0.02511700     47      
+     C12            cD_l      -0.12393500     48     
+     H2R            hL_l       0.02453400     49      
+     H2S            hL_l       0.02453400     50      
+
+ [ bonds ]	   
+     C12       +C11     
+     C13       C12      
+     C14       C13      
+     C15       C14      
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C116      C117     
+     C117      C118 
+     C118      C119 
+     C119      C120
+     C12       H2R      
+     C12       H2S      
+     C13       H3R      
+     C13       H3S      
+     C14       H4R      
+     C14       H4S      
+     C15       H5R      
+     C16       H6R      
+     C17       H7R      
+     C17       H7S      
+     C18       H8R      
+     C19       H9R      
+     C110      H10R     
+     C110      H10S     
+     C111      H11R     
+     C112      H12R     
+     C113      H13R     
+     C113      H13S     
+     C114      H14R     
+     C115      H15R     
+     C116      H16R     
+     C116      H16S     
+     C117      H17R     
+     C117      H17S   
+     C118      H18R     
+     C118      H18S       
+     C119      H19R     
+     C119      H19S     
+     C120      H20R     
+     C120      H20S     
+     C120      H20T     
+
+ [ impropers ] 
+     C12       +O12      +C11      +O11       
+     C16       C14       C15       H5R     
+     C15       C17       C16       H6R     
+     C19       C17       C18       H8R   
+     C18       C110      C19       H9R   
+     C112      C110      C111      H11R  
+     C111      C113      C112      H12R  
+     C115      C113      C114      H14R  
+     C114      C116      C115      H15R  
+
+
+[ DHA1 ]
+ [ atoms ]	
+     C122           cD_l      -0.10891300      1 
+     H22R           hL_l       0.02596800      2 
+     H22S           hL_l       0.02596800      3 
+     H22T           hL_l       0.02596800      4 
+     C121           cD_l       0.12202200      5 
+     H21R           hL_l       0.01004200      6 
+     H21S           hL_l       0.01004200      7 
+     C120           cB_l      -0.24021600      8 
+     H20R           hB_l       0.13304800      9 
+     C119           cB_l      -0.24683300     10
+     H19R           hB_l       0.13632300     11
+     C118           cD_l       0.09271800     12
+     H18R           hL_l       0.05322700     13
+     H18S           hL_l       0.05322700     14
+     C117           cB_l      -0.21649900     15
+     H17R           hB_l       0.13212100     16
+     C116           cB_l      -0.23389700     17
+     H16R           hB_l       0.13381200     18
+     C115           cD_l       0.06921500     19
+     H15R           hL_l       0.05834100     20
+     H15S           hL_l       0.05834100     21
+     C114           cB_l      -0.24041900     22
+     H14R           hB_l       0.13833700     23
+     C113           cB_l      -0.21866800     24
+     H13R           hB_l       0.13157500     25
+     C112           cD_l       0.08524500     26
+     H12R           hL_l       0.05342200     27
+     H12S           hL_l       0.05342200     28
+     C111           cB_l      -0.24120500     29
+     H11R           hB_l       0.13630800     30
+     C110           cB_l      -0.22143300     31
+     H10R           hB_l       0.13362800     32
+     C19            cD_l       0.08904300     33
+     H9R            hL_l       0.05425500     34
+     H9S            hL_l       0.05425500     35
+     C18            cB_l      -0.22625400     36
+     H8R            hB_l       0.12814700     37
+     C17            cB_l      -0.22089500     38
+     H7R            hB_l       0.13986300     39
+     C16            cD_l       0.06033700     40
+     H6R            hL_l       0.06351500     41
+     H6S            hL_l       0.06351500     42
+     C15            cB_l      -0.21484500     43
+     H5R            hB_l       0.13250400     44
+     C14            cB_l      -0.28705900     45
+     H4R            hB_l       0.15403800     46
+     C13            cD_l       0.12099900     47
+     H3R            hL_l       0.02609700     48
+     H3S            hL_l       0.02609700     49
+     C12            cD_l      -0.14293600     50
+     H2R            hL_l       0.03754400     51
+     H2S            hL_l       0.03754400     52
+
+ [ bonds ]	   
+     C12       +C11 
+     C13       C12      
+     C14       C13      
+     C15       C14      
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C117      C116     
+     C118      C117  
+     C119      C118  
+     C120      C119 
+     C121      C120    
+     C122      C121    
+     C12       H2R      
+     C12       H2S  
+     C13       H3R      
+     C13       H3S    
+     C14       H4R      
+     C15       H5R    
+     C16       H6R      
+     C16       H6S 
+     C17       H7R      
+     C18       H8R 
+     C19       H9R      
+     C19       H9S      
+     C110      H10R     
+     C111      H11R     
+     C112      H12R     
+     C112      H12S     
+     C113      H13R     
+     C114      H14R     
+     C115      H15R     
+     C115      H15S     
+     C116      H16R  
+     C117      H17R     
+     C118      H18R     
+     C118      H18S     
+     C119      H19R  
+     C120      H20R  
+     C121      H21R     
+     C121      H21S 
+     C122      H22R     
+     C122      H22S     
+     C122      H22T     
+    
+ [ impropers ] 
+     C12       +O12      +C11      +O11    
+     C15       C13       C14       H4R         
+     C14       C16       C15       H5R     
+     C18       C16       C17       H7R         
+     C17       C19       C18       H8R  
+     C111      C19       C110      H10R         
+     C110      C112      C111      H11R   
+     C114      C112      C113      H13R    
+     C113      C115      C114      H14R  
+     C117      C115      C116      H16R
+     C116      C118      C117      H17R
+     C120      C118      C119      H19R  
+     C119      C121      C120      H20R       
+
+  
+[ PC ]
+ [ atoms ]	  
+     C1            cA_l       -0.00209100       1
+     HR            hE_l        0.11928300       2
+     HS            hE_l        0.11928300       3
+     O11           oS_l       -0.42490500       4		 
+     C11           cC_l        0.79885900       5
+     O12           oC_l       -0.62753700       6
+     C2            cA_l        0.08107600       7
+     HX            hE_l        0.13124600       8
+     O21           oS_l       -0.39092900       9		 
+     C21           cC_l        0.78755800      10 
+     O22           oC_l       -0.62555100      11
+     C3            cA_l        0.09556500      12
+     HA            hE_l        0.06908900      13
+     HB            hE_l        0.06908900      14
+     O31           oT_l       -0.44568200      15
+     P31           pA_l        1.07656400      16
+     O32           oT_l       -0.44568200      17
+     O33           oP_l       -0.79309200      18
+     O34           oP_l       -0.79309200      19
+     C31           cA_l        0.36306300      20
+     H1A           hE_l        0.01345800      21
+     H1B           hE_l        0.01345800      22
+     C32           cA_l       -0.28232600      23
+     H2A           hX_l        0.16485800      24
+     H2B           hX_l        0.16485800      25
+     N31           nA_l        0.19855400      26
+     C33           cA_l       -0.39598200      27
+     H3A           hX_l        0.19477500      28
+     H3B           hX_l        0.19477500      29
+     H3C           hX_l        0.19477500      30
+     C34           cA_l       -0.39598200      31
+     H4A           hX_l        0.19477500      32
+     H4B           hX_l        0.19477500      33
+     H4C           hX_l        0.19477500      34
+     C35           cA_l       -0.39598200      35
+     H5A           hX_l        0.19477500      36
+     H5B           hX_l        0.19477500      37
+     H5C           hX_l        0.19477500      38
+
+ [ bonds ]	   
+     C1        O11 
+     O11       C11  	 
+     C11       O12    
+     C1        C2     
+     C2        O21   
+     O21       C21    	 
+     C21       O22    
+     C21       +C12   
+     C2        C3     
+     C3        O31    
+     O31       P31    
+     P31       O32    
+     P31       O33    
+     P31       O34    
+     O32       C31    
+     C31       C32  
+     C32       N31  
+     N31       C33    
+     N31       C34    
+     N31       C35    
+     C1        HR     
+     C1        HS     
+     C2        HX     
+     C3        HA     
+     C3        HB     
+     C31       H1A    
+     C31       H1B    
+     C32       H2A    
+     C32       H2B   
+     C33       H3A    
+     C33       H3B    
+     C33       H3C    
+     C34       H4A    
+     C34       H4B    
+     C34       H4C  
+     C35       H5A    
+     C35       H5B    
+     C35       H5C    
+  
+ [ impropers ] 
+     +C12      O22       C21       O21
+
+
+[ PE ]
+ [ atoms ]	  
+     C1            cA_l        0.00996900     1
+     HR            hE_l        0.11570000     2
+     HS            hE_l        0.11570000 	  3
+     O11           oS_l       -0.42596000     4
+     C11           cC_l        0.78535500     5
+     O12           oC_l       -0.62059000     6
+     C2            cA_l        0.13787400     7
+     HX            hE_l        0.12454800     8
+     O21           oS_l       -0.41234700     9
+     C21           cC_l        0.79280700    10
+     O22           oC_l       -0.62415800	 11
+     C3            cA_l       -0.05589300    12
+     HA            hE_l        0.10866400    13
+     HB            hE_l        0.10866400    14
+     O31           oT_l       -0.38758500    15
+     P31           pA_l        1.07048400    16
+     O32           oT_l       -0.38758500	 17
+     O33           oP_l       -0.80062600    18
+     O34           oP_l       -0.80062600	 19
+     C31           cA_l       -0.00401200    20
+     H1A           hE_l        0.10168400    21
+     H1B           hE_l        0.10168400    22
+     C32           cA_l        0.08821700    23
+     H2A           hX_l        0.09043500    24
+     H2B           hX_l        0.09043500    25
+     N31           nA_l       -0.35095200    26
+     HN1A          hN_l        0.34270400    27
+     HN1B          hN_l        0.34270400    28
+     HN1C          hN_l        0.34270400    29
+
+ [ bonds ]	                                
+     C1        O11                          
+     O11       C11  	                    
+     C11       O12                          
+     C1        C2     
+     C2        O21   
+     O21       C21    	 
+     C21       O22    
+     C21       +C12   
+     C2        C3     
+     C3        O31    
+     O31       P31    
+     P31       O32    
+     P31       O33    
+     P31       O34    
+     O32       C31    
+     C31       C32  
+     C32       N31  
+     C1        HR     
+     C1        HS     
+     C2        HX     
+     C3        HA     
+     C3        HB     
+     C31       H1A    
+     C31       H1B    
+     C32       H2A    
+     C32       H2B   
+     N31       HN1A
+     N31       HN1B
+     N31       HN1C
+
+ [ impropers ] 
+     +C12      O22       C21       O21
+	 
+	 
+[ PS ]
+ [ atoms ]		 
+     C1             cA_l       0.01866800     1
+     HR             hE_l       0.11407100     2
+     HS             hE_l       0.11407100 	  3
+     O11            oS_l      -0.42488200 	  4
+     C11            cC_l       0.78666600  	  5
+     O12            oC_l      -0.62287000 	  6
+     C2             cA_l       0.12788300     7
+     HX             hE_l       0.11572100	  8
+     O21            oS_l      -0.40521200     9
+     C21            cC_l       0.79882200    10
+     O22            oC_l      -0.62847100 	 11
+     C3             cA_l      -0.01181500    12
+     HA             hE_l       0.10107100    13
+     HB             hE_l       0.10107100    14
+     O31            oT_l      -0.40571900    15
+     P31            pA_l       1.07449400    16
+     O32            oT_l      -0.40571900    17
+     O33            oP_l      -0.79966400    18
+     O34            oP_l      -0.79966400    19
+     C31            cA_l       0.07841900    20
+     H1A            hE_l       0.07100100    21
+     H1B            hE_l       0.07100100    22
+     C32            cA_l      -0.06875000    23
+     H2A            hX_l       0.10375200    24
+     N31            nA_l      -0.36104900    25
+     HN1A           hN_l       0.33888800    26
+     HN1B           hN_l       0.33888800    27
+     HN1C           hN_l       0.33888800    28
+     C33            cC_l       0.81401000    29
+     O35            oO_l      -0.78678500    30
+     O36            oO_l      -0.78678500    31
+
+ [ bonds ]	                                 
+     C1        O11                           
+     O11       C11  	 
+     C11       O12    
+     C1        C2     
+     C2        O21   
+     O21       C21    	 
+     C21       O22    
+     C21       +C12   
+     C2        C3     
+     C3        O31    
+     O31       P31    
+     P31       O32    
+     P31       O33    
+     P31       O34    
+     O32       C31    
+     C31       C32  
+     C32       N31  
+     C32       C33
+     C33       O35
+     C33       O36
+     C1        HR     
+     C1        HS     
+     C2        HX     
+     C3        HA     
+     C3        HB     
+     C31       H1A    
+     C31       H1B    
+     C32       H2A    
+     N31       HN1A
+     N31       HN1B
+     N31       HN1C
+
+ [ impropers ] 
+     +C12      O22       C21       O21
+	 
+	 
+[ PGR ]
+ [ atoms ]			 
+     C1             cA_l       0.01290900     1 	 
+     HR             hE_l       0.10302000  	  2
+     HS             hE_l       0.10302000     3
+     O11            oS_l      -0.40468900 	  4
+     C11            cC_l       0.77585500  	  5
+     O12            oC_l      -0.61513600 	  6
+     C2             cA_l       0.16560500     7
+     HX             hE_l       0.11639300     8
+     O21            oS_l      -0.39342700     9
+     C21            cC_l       0.74640400    10
+     O22            oC_l      -0.60792300    11
+     C3             cA_l       0.00661800    12
+     HA             hE_l       0.09185600    13
+     HB             hE_l       0.09185600    14
+     O31            oT_l      -0.44276100    15
+     P31            pA_l       1.14995000    16
+     O32            oT_l      -0.45105300    17
+     O33            oP_l      -0.81598700    18
+     O34            oP_l      -0.81598700    19
+     C31            cA_l       0.06949800    20
+     H1A            hE_l       0.05916900    21
+     H1B            hE_l       0.05916900    22
+     C32            cA_l       0.21956200    23
+     H2A            hE_l       0.02961800    24
+     O35            oH_l      -0.65402500    25
+     HO5A           hO_l       0.41392600    26
+     C33            cA_l       0.09722500    27
+     H3A            hE_l       0.05812100    28
+     H3B            hE_l       0.05812100    29
+     O36            oH_l      -0.63386100    30
+     HO6A           hO_l       0.40695600    31
+
+ [ bonds ]	                                 
+     C1        O11                           
+     O11       C11  	 
+     C11       O12    
+     C1        C2     
+     C2        O21   
+     O21       C21    	 
+     C21       O22    
+     C21       +C12   
+     C2        C3     
+     C3        O31    
+     O31       P31    
+     P31       O32    
+     P31       O33    
+     P31       O34    
+     O32       C31    
+     C31       C32  
+     C32       O35
+     C32       C33 	 
+     C33       O36	 
+     C1        HR     
+     C1        HS     
+     C2        HX     
+     C3        HA     
+     C3        HB     
+     C31       H1A    
+     C31       H1B    
+     C32       H2A 
+     O35       HO5A  	 
+     C33       H3A
+     C33       H3B
+     O36       HO6A	 
+
+ [ impropers ] 
+     +C12      O22       C21       O21
+	 
+	 
+[ PH- ]
+ [ atoms ]		 
+     C1             cA_l       0.04513700  	  1
+     HR             hE_l       0.10203900  	  2
+     HS             hE_l       0.10203900     3
+     O11            oS_l      -0.44361500 	  4
+     C11            cC_l       0.80449800  	  5
+     O12            oC_l      -0.62868500 	  6	 
+     C2             cA_l       0.17185500  	  7
+     HX             hE_l       0.10901700  	  8
+     O21            oS_l      -0.44596500     9
+     C21            cC_l       0.81151700    10
+     O22            oC_l      -0.63217300    11
+     C3             cA_l       0.02750800  	 12
+     HA             hE_l       0.07878800  	 13
+     HB             hE_l       0.07878800  	 14
+     O31            oT_l      -0.46997100 	 15
+     P31            pA_l       1.22159000    16
+     O32            oH_l      -0.64287900    17
+     HO2A           hO_l       0.38833800    18
+     O33            oP_l      -0.83891300    19
+     O34            oP_l      -0.83891300    20
+
+ [ bonds ]	                                 
+     C1        O11                           
+     O11       C11  	 
+     C11       O12    
+     C1        C2     
+     C2        O21   
+     O21       C21    	 
+     C21       O22    
+     C21       +C12   
+     C2        C3     
+     C3        O31    
+     O31       P31    
+     P31       O32    
+     P31       O33    
+     P31       O34    
+     C1        HR     
+     C1        HS     
+     C2        HX     
+     C3        HA     
+     C3        HB     
+     O32       HO2A 
+
+ [ impropers ] 
+     +C12      O22       C21       O21
+
+	 
+[ LAL2 ]
+ [ atoms ]
+     C112           cD_l      -0.11853400      1     
+     H12R           hL_l       0.02580900      2     
+     H12S           hL_l       0.02580900      3     
+     H12T           hL_l       0.02580900      4   
+     C111           cD_l       0.02332000      5     
+     H11R           hL_l       0.00827600      6     
+     H11S           hL_l       0.00827600      7     
+     C110           cD_l      -0.01957500      8     
+     H10R           hL_l       0.01516300      9     
+     H10S           hL_l       0.01516300     10     
+     C19            cD_l      -0.02197500     11    
+     H9R            hL_l       0.00586900     12    
+     H9S            hL_l       0.00586900     13    
+     C18            cD_l      -0.02087900     14    
+     H8R            hL_l       0.01038500     15    
+     H8S            hL_l       0.01038500     16    
+     C17            cD_l      -0.01927900     17    
+     H7R            hL_l       0.01120700     18    
+     H7S            hL_l       0.01120700     19    
+     C16            cD_l      -0.01963100     20    
+     H6R            hL_l       0.01023600     21    
+     H6S            hL_l       0.01023600     22    
+     C15            cD_l      -0.01573500     23    
+     H5R            hL_l       0.00955100     24    
+     H5S            hL_l       0.00955100     25    
+     C14            cD_l      -0.02407800     26    
+     H4R            hL_l       0.02058000     27    
+     H4S            hL_l       0.02058000     28    
+     C13            cD_l       0.00151000     29    
+     H3R            hL_l       0.01910800     30    
+     H3S            hL_l       0.01910800     31    
+     C12            cD_l      -0.17215900     32    
+     H2R            hL_l       0.05441800     33    
+     H2S            hL_l       0.05441800     34    
+	  
+ [ bonds ]
+     C13       C12   
+     C14       C13   
+     C15       C14   
+     C16       C15   
+     C17       C16   
+     C18       C17   
+     C19       C18   
+     C110      C19   
+     C111      C110  
+     C112      C111  
+     C12       H2S   
+     C12       H2R   
+     C13       H3R   
+     C13       H3S   
+     C14       H4S   
+     C14       H4R   
+     C15       H5S   
+     C15       H5R   
+     C16       H6S   
+     C16       H6R   
+     C17       H7S   
+     C17       H7R   
+     C18       H8S   
+     C18       H8R   
+     C19       H9S   
+     C19       H9R   
+     C110      H10S  
+     C110      H10R  
+     C111      H11S  
+     C111      H11R  
+     C112      H12R  
+     C112      H12S  
+     H12T      C112  
+
+
+[ MY2 ]
+ [ atoms ]
+     C114           cD_l      -0.11171300      1
+     H14R           hL_l       0.02551100      2
+     H14S           hL_l       0.02551100      3
+     H14T           hL_l       0.02551100      4	 
+     C113           cD_l       0.01746300      5
+     H13R           hL_l       0.00753100      6
+     H13S           hL_l       0.00753100      7
+     C112           cD_l      -0.02809400      8
+     H12R           hL_l       0.01720800      9
+     H12S           hL_l       0.01720800     10
+     C111           cD_l      -0.03178700     11
+     H11R           hL_l       0.01267700     12
+     H11S           hL_l       0.01267700     13
+     C110           cD_l      -0.02102500     14
+     H10R           hL_l       0.01003700     15
+     H10S           hL_l       0.01003700     16
+     C19            cD_l      -0.01465300     17
+     H9R            hL_l       0.01017200     18
+     H9S            hL_l       0.01017200     19
+     C18            cD_l      -0.02645100     20
+     H8R            hL_l       0.01124100     21
+     H8S            hL_l       0.01124100     22
+     C17            cD_l      -0.00438600     23
+     H7R            hL_l       0.00683300     24
+     H7S            hL_l       0.00683300     25
+     C16            cD_l      -0.02781200     26
+     H6R            hL_l       0.01151100     27
+     H6S            hL_l       0.01151100     28
+     C15            cD_l      -0.01652100     29
+     H5R            hL_l       0.01057300     30
+     H5S            hL_l       0.01057300     31
+     C14            cD_l      -0.02695400     32
+     H4R            hL_l       0.02043100     33
+     H4S            hL_l       0.02043100     34
+     C13            cD_l      -0.00243500     35
+     H3R            hL_l       0.01885900     36
+     H3S            hL_l       0.01885900     37
+     C12            cD_l      -0.16420000     38
+     H2R            hL_l       0.05394400     39
+     H2S            hL_l       0.05394400     40
+
+ [ bonds ]
+     C13       C12  
+     C14       C13  
+     C15       C14  
+     C16       C15  
+     C17       C16  
+     C18       C17  
+     C19       C18  
+     C110      C19  
+     C111      C110 
+     C112      C111 
+     C113      C112 
+     C114      C113 
+     C12       H2S  
+     C12       H2R  
+     C13       H3S  
+     C13       H3R  
+     C14       H4S  
+     C14       H4R  
+     C15       H5R  
+     C15       H5S  
+     C16       H6R  
+     C16       H6S  
+     C17       H7R  
+     C17       H7S  
+     C18       H8S  
+     C18       H8R  
+     C19       H9R  
+     C19       H9S  
+     C110      H10S 
+     C110      H10R 
+     C111      H11R 
+     C111      H11S 
+     C112      H12S 
+     C112      H12R 
+     C113      H13R 
+     C113      H13S 
+     C114      H14R 
+     C114      H14S 
+     H14T      C114 
+
+
+[ PA2 ]
+ [ atoms ]
+     C116           cD_l      -0.12544700      1
+     H16R           hL_l       0.02904600      2
+     H16S           hL_l       0.02904600      3
+     H16T           hL_l       0.02904600      4
+     C115           cD_l       0.01397500      5
+     H15R           hL_l       0.00929200      6
+     H15S           hL_l       0.00929200      7
+     C114           cD_l      -0.02008600      8
+     H14R           hL_l       0.01592900      9
+     H14S           hL_l       0.01592900     10
+     C113           cD_l      -0.03309600     11
+     H13R           hL_l       0.01462100     12
+     H13S           hL_l       0.01462100     13
+     C112           cD_l      -0.02763300     14
+     H12R           hL_l       0.01136800     15
+     H12S           hL_l       0.01136800     16
+     C111           cD_l      -0.02520600     17
+     H11R           hL_l       0.01433400     18
+     H11S           hL_l       0.01433400     19
+     C110           cD_l      -0.02883100     20
+     H10R           hL_l       0.01469100     21
+     H10S           hL_l       0.01469100     22
+     C19            cD_l      -0.03047200     23
+     H9R            hL_l       0.01389700     24
+     H9S            hL_l       0.01389700     25
+     C18            cD_l      -0.01579300     26
+     H8R            hL_l       0.00906700     27
+     H8S            hL_l       0.00906700     28
+     C17            cD_l      -0.01963000     29
+     H7R            hL_l       0.01104100     30
+     H7S            hL_l       0.01104100     31
+     C16            cD_l      -0.02442700     32
+     H6R            hL_l       0.01333400     33
+     H6S            hL_l       0.01333400     34
+     C15            cD_l      -0.02938700     35
+     H5R            hL_l       0.01676300     36
+     H5S            hL_l       0.01676300     37
+     C14            cD_l      -0.03009900     38
+     H4R            hL_l       0.02087700     39
+     H4S            hL_l       0.02087700     40
+     C13            cD_l      -0.00488200     41
+     H3R            hL_l       0.01900700     42
+     H3S            hL_l       0.01900700     43
+     C12            cD_l      -0.14925900     44
+     H2R            hL_l       0.04734500     45
+     H2S            hL_l       0.04734500     46
+
+ [ bonds ] 
+     C13       C12    
+     C14       C13    
+     C15       C14    
+     C16       C15    
+     C17       C16    
+     C18       C17    
+     C19       C18    
+     C110      C19    
+     C111      C110   
+     C112      C111   
+     C113      C112   
+     C114      C113   
+     C115      C114   
+     C116      C115   
+     C12       H2R    
+     C12       H2S    
+     C13       H3R    
+     C13       H3S    
+     C14       H4R    
+     C14       H4S    
+     C15       H5R    
+     C15       H5S    
+     C16       H6R    
+     C16       H6S    
+     C17       H7R    
+     C17       H7S    
+     C18       H8R    
+     C18       H8S    
+     C19       H9R    
+     C19       H9S    
+     C110      H10R   
+     C110      H10S   
+     C111      H11R   
+     C111      H11S   
+     C112      H12R   
+     C112      H12S   
+     C113      H13R   
+     C113      H13S   
+     C114      H14R   
+     C114      H14S   
+     C115      H15R   
+     C115      H15S   
+     C116      H16R   
+     C116      H16S   
+     C116      H16T   
+	 
+	 
+[ OL2 ]
+ [ atoms ]
+     C118           cD_l      -0.11729000      1
+     H18R           hL_l       0.02662700      2
+     H18S           hL_l       0.02662700      3
+     H18T           hL_l       0.02662700      4
+     C117           cD_l       0.00868400      5
+     H17R           hL_l       0.01002600      6
+     H17S           hL_l       0.01002600 	   7
+     C116           cD_l      -0.01248800      8
+     H16R           hL_l       0.01365900      9
+     H16S           hL_l       0.01365900	  10
+     C115           cD_l      -0.02324700     11
+     H15R           hL_l       0.01040300     12
+     H15S           hL_l       0.01040300 	  13
+     C114           cD_l      -0.02484900     14
+     H14R 	        hL_l       0.00857200     15
+     H14S           hL_l       0.00857200 	  16
+     C113           cD_l      -0.01825700     17
+     H13R           hL_l       0.01380000     18
+     H13S           hL_l       0.01380000 	  19
+     C112           cD_l      -0.02635300     20
+     H12R           hL_l       0.01971700     21
+     H12S           hL_l       0.01971700 	  22
+     C111           cD_l       0.02905900     23
+     H11R           hL_l       0.03353100     24
+     H11S           hL_l       0.03353100 	  25
+     C110           cB_l      -0.23928400     26
+     H10R           hB_l       0.12687800 	  27
+     C19            cB_l      -0.24422800     28
+     H9R            hB_l       0.13151200 	  29
+     C18            cD_l       0.03177500     30
+     H8R            hL_l       0.03268500     31
+     H8S            hL_l       0.03268500 	  32
+     C17            cD_l      -0.01749500     33
+     H7R            hL_l       0.01959800     34
+     H7S            hL_l       0.01959800 	  35
+     C16            cD_l      -0.02378900     36
+     H6R            hL_l       0.00926600     37
+     H6S            hL_l       0.00926600 	  38
+     C15            cD_l      -0.01669200     39
+     H5R            hL_l       0.00869000     40
+     H5S            hL_l       0.00869000 	  41
+     C14            cD_l      -0.02296000     42
+     H4R            hL_l       0.01813400     43
+     H4S            hL_l       0.01813400 	  44
+     C13            cD_l       0.00161900     45
+     H3R            hL_l       0.01952900     46
+     H3S            hL_l       0.01952900 	  47
+     C12            cD_l      -0.14341800     48
+     H2R            hL_l       0.04286000     49
+     H2S            hL_l       0.04286000 	  50
+	 
+ [ bonds ]	 
+     C13       C12    
+     C14       C13    
+     C15       C14    
+     C16       C15    
+     C17       C16    
+     C18       C17    
+     C19       C18    
+     C110      C19    
+     C111      C110   
+     C112      C111   
+     C113      C112   
+     C114      C113   
+     C115      C114   
+     C116      C115   
+     C117      C116   
+     C118      C117  
+     C12       H2R     
+     C12       H2S     
+     C13       H3R     
+     C13       H3S   
+     C14       H4R     
+     C14       H4S     	 
+     C15       H5R     
+     C15       H5S  	 
+     C16       H6R     
+     C16       H6S   
+     C17       H7R     
+     C17       H7S    	 
+     C18       H8R     
+     C18       H8S  
+     C19       H9R     	 
+     C110      H10R   	 
+     C111      H11R    
+     C111      H11S   
+     C112      H12R    
+     C112      H12S    	 
+     C113      H13R    
+     C113      H13S   	 
+     C114      H14R    
+     C114      H14S   
+     C115      H15R    	 
+     C115      H15S   
+     C116      H16R    	 
+     C116      H16S   
+     C117      H17R    	 
+     C117      H17S    	 
+     C118      H18R    	 
+     C118      H18S    	 
+     C118      H18T    	 
+	 
+ [ impropers ] 
+     C19       C111      C110      H10R     
+     C110      C18       C19       H9R      
+
+ 
+[ ST2 ]
+ [ atoms ]
+     C118           cD_l      -0.12006800      1 
+     H18R           hL_l       0.02793800      2 
+     H18S           hL_l       0.02793800      3 
+     H18T           hL_l       0.02793800      4 
+     C117           cD_l       0.02066500      5 
+     H17R           hL_l       0.00848300      6 
+     H17S           hL_l       0.00848300      7 
+     C116           cD_l      -0.02765400      8 
+     H16R           hL_l       0.01562700      9 
+     H16S           hL_l       0.01562700     10 
+     C115           cD_l      -0.03244400     11
+     H15R           hL_l       0.01025300     12
+     H15S           hL_l       0.01025300     13
+     C114           cD_l      -0.01348900     14
+     H14R           hL_l       0.01007300     15
+     H14S           hL_l       0.01007300     16
+     C113           cD_l      -0.01159000     17
+     H13R           hL_l       0.00602200     18
+     H13S           hL_l       0.00602200     19
+     C112           cD_l      -0.01915300     20
+     H12R           hL_l       0.00819800     21
+     H12S           hL_l       0.00819800     22
+     C111           cD_l      -0.01709300     23
+     H11R           hL_l       0.01020600     24
+     H11S           hL_l       0.01020600     25
+     C110           cD_l      -0.02641800     26
+     H10R           hL_l       0.01082500     27
+     H10S           hL_l       0.01082500     28
+     C19            cD_l      -0.01799700     29
+     H9R            hL_l       0.00959500     30
+     H9S            hL_l       0.00959500     31
+     C18            cD_l      -0.01462300     32
+     H8R            hL_l       0.00732600     33
+     H8S            hL_l       0.00732600     34
+     C17            cD_l      -0.01946900     35
+     H7R            hL_l       0.00929200     36
+     H7S            hL_l       0.00929200     37
+     C16            cD_l      -0.03762700     38
+     H6R            hL_l       0.01774000     39
+     H6S            hL_l       0.01774000     40
+     C15            cD_l      -0.01344300     41
+     H5R            hL_l       0.00819100     42
+     H5S            hL_l       0.00819100     43
+     C14            cD_l      -0.05979200     44
+     H4R            hL_l       0.02424100     45
+     H4S            hL_l       0.02424100     46
+     C13            cD_l      -0.00012800     47
+     H3R            hL_l       0.01388600     48
+     H3S            hL_l       0.01388600     49
+     C12            cD_l      -0.11702000     50
+     H2R            hL_l       0.05180700     51
+     H2S            hL_l       0.05180700     52
+	 
+ [ bonds ]	     	 
+     C13       C12      	 
+     C14       C13      	 
+     C15       C14      	 
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C117      C116     
+     C118      C117     
+     C12       H2R      
+     C12       H2S      
+     C13       H3S      
+     C13       H3R      
+     C14       H4R      
+     C14       H4S      
+     C15       H5S      
+     C15       H5R      
+     C16       H6R      
+     C16       H6S      
+     C17       H7S      
+     C17       H7R      
+     C18       H8R      
+     C18       H8S      
+     C19       H9S      
+     C19       H9R      
+     C110      H10R     
+     C110      H10S     
+     C111      H11S     
+     C111      H11R     
+     C112      H12R     
+     C112      H12S     
+     C113      H13S     
+     C113      H13R     
+     C114      H14R     
+     C114      H14S     
+     C115      H15S     
+     C115      H15R     
+     C116      H16R     
+     C116      H16S     
+     C117      H17S     
+     C117      H17R     
+     C118      H18T     
+     C118      H18S     
+     C118      H18R     
+
+
+[ AR2 ]
+ [ atoms ]	 
+     C120           cD_l      -0.10930200      1     
+     H20R           hL_l       0.02372300      2      
+     H20S           hL_l       0.02372300      3      
+     H20T           hL_l       0.02372300      4  
+     C119           cD_l       0.02495700      5      
+     H19R           hL_l       0.00542600      6      
+     H19S           hL_l       0.00542600      7      
+     C118           cD_l      -0.01977200      8     
+     H18R           hL_l       0.01421800      9      
+     H18S           hL_l       0.01421800     10      
+     C117           cD_l      -0.02839800     11     
+     H17R           hL_l       0.01958100     12      
+     H17S           hL_l       0.01958100     13 
+     C116           cD_l       0.03910000     14      
+     H16R           hL_l       0.02884800     15      
+     H16S           hL_l       0.02884800     16      
+     C115           cB_l      -0.24414900     17     
+     H15R           hB_l       0.13279300     18      
+     C114           cB_l      -0.22476900     19     
+     H14R           hB_l       0.12961600     20      
+     C113           cD_l       0.05819700     21      
+     H13R           hL_l       0.06135000     22      
+     H13S           hL_l       0.06135000     23      
+     C112           cB_l      -0.22016400     24     
+     H12R           hB_l       0.13198600     25      
+     C111           cB_l      -0.22870400     26     
+     H11R           hB_l       0.13134100     27      
+     C110           cD_l       0.09540600     28      
+     H10R           hL_l       0.05114000     29      
+     H10S           hL_l       0.05114000     30      
+     C19            cB_l      -0.22869400     31     
+     H9R            hB_l       0.13216700     32      
+     C18            cB_l      -0.22852700     33     
+     H8R            hB_l       0.13473500     34      
+     C17            cD_l       0.05578400     35      
+     H7R            hL_l       0.06277500     36      
+     H7S            hL_l       0.06277500     37      
+     C16            cB_l      -0.20678600     38     
+     H6R            hB_l       0.12985800     39      
+     C15            cB_l      -0.26789000     40     
+     H5R            hB_l       0.14357700     41      
+     C14            cD_l       0.03138200     42      
+     H4R            hL_l       0.03870800     43      
+     H4S            hL_l       0.03870800     44      
+     C13            cD_l       0.02562600     45      
+     H3R            hL_l       0.02511700     46      
+     H3S            hL_l       0.02511700     47      
+     C12            cD_l      -0.12393500     48     
+     H2R            hL_l       0.02453400     49      
+     H2S            hL_l       0.02453400     50      
+
+ [ bonds ]	   
+     C13       C12      
+     C14       C13      
+     C15       C14      
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C116      C117     
+     C117      C118 
+     C118      C119 
+     C119      C120
+     C12       H2R      
+     C12       H2S      
+     C13       H3R      
+     C13       H3S      
+     C14       H4R      
+     C14       H4S      
+     C15       H5R      
+     C16       H6R      
+     C17       H7R      
+     C17       H7S      
+     C18       H8R      
+     C19       H9R      
+     C110      H10R     
+     C110      H10S     
+     C111      H11R     
+     C112      H12R     
+     C113      H13R     
+     C113      H13S     
+     C114      H14R     
+     C115      H15R     
+     C116      H16R     
+     C116      H16S     
+     C117      H17R     
+     C117      H17S   
+     C118      H18R     
+     C118      H18S       
+     C119      H19R     
+     C119      H19S     
+     C120      H20R     
+     C120      H20S     
+     C120      H20T     
+
+ [ impropers ]   
+     C16       C14       C15       H5R     
+     C15       C17       C16       H6R     
+     C19       C17       C18       H8R   
+     C18       C110      C19       H9R   
+     C112      C110      C111      H11R  
+     C111      C113      C112      H12R  
+     C115      C113      C114      H14R  
+     C114      C116      C115      H15R  
+
+
+[ DHA2 ]
+ [ atoms ]	
+     C122           cD_l      -0.10891300      1 
+     H22R           hL_l       0.02596800      2 
+     H22S           hL_l       0.02596800      3 
+     H22T           hL_l       0.02596800      4 
+     C121           cD_l       0.12202200      5 
+     H21R           hL_l       0.01004200      6 
+     H21S           hL_l       0.01004200      7 
+     C120           cB_l      -0.24021600      8 
+     H20R           hB_l       0.13304800      9 
+     C119           cB_l      -0.24683300     10
+     H19R           hB_l       0.13632300     11
+     C118           cD_l       0.09271800     12
+     H18R           hL_l       0.05322700     13
+     H18S           hL_l       0.05322700     14
+     C117           cB_l      -0.21649900     15
+     H17R           hB_l       0.13212100     16
+     C116           cB_l      -0.23389700     17
+     H16R           hB_l       0.13381200     18
+     C115           cD_l       0.06921500     19
+     H15R           hL_l       0.05834100     20
+     H15S           hL_l       0.05834100     21
+     C114           cB_l      -0.24041900     22
+     H14R           hB_l       0.13833700     23
+     C113           cB_l      -0.21866800     24
+     H13R           hB_l       0.13157500     25
+     C112           cD_l       0.08524500     26
+     H12R           hL_l       0.05342200     27
+     H12S           hL_l       0.05342200     28
+     C111           cB_l      -0.24120500     29
+     H11R           hB_l       0.13630800     30
+     C110           cB_l      -0.22143300     31
+     H10R           hB_l       0.13362800     32
+     C19            cD_l       0.08904300     33
+     H9R            hL_l       0.05425500     34
+     H9S            hL_l       0.05425500     35
+     C18            cB_l      -0.22625400     36
+     H8R            hB_l       0.12814700     37
+     C17            cB_l      -0.22089500     38
+     H7R            hB_l       0.13986300     39
+     C16            cD_l       0.06033700     40
+     H6R            hL_l       0.06351500     41
+     H6S            hL_l       0.06351500     42
+     C15            cB_l      -0.21484500     43
+     H5R            hB_l       0.13250400     44
+     C14            cB_l      -0.28705900     45
+     H4R            hB_l       0.15403800     46
+     C13            cD_l       0.12099900     47
+     H3R            hL_l       0.02609700     48
+     H3S            hL_l       0.02609700     49
+     C12            cD_l      -0.14293600     50
+     H2R            hL_l       0.03754400     51
+     H2S            hL_l       0.03754400     52
+
+ [ bonds ]	   
+     C13       C12      
+     C14       C13      
+     C15       C14      
+     C16       C15      
+     C17       C16      
+     C18       C17      
+     C19       C18      
+     C110      C19      
+     C111      C110     
+     C112      C111     
+     C113      C112     
+     C114      C113     
+     C115      C114     
+     C116      C115     
+     C117      C116     
+     C118      C117  
+     C119      C118  
+     C120      C119 
+     C121      C120    
+     C122      C121    
+     C12       H2R      
+     C12       H2S  
+     C13       H3R      
+     C13       H3S    
+     C14       H4R      
+     C15       H5R    
+     C16       H6R      
+     C16       H6S 
+     C17       H7R      
+     C18       H8R 
+     C19       H9R      
+     C19       H9S      
+     C110      H10R     
+     C111      H11R     
+     C112      H12R     
+     C112      H12S     
+     C113      H13R     
+     C114      H14R     
+     C115      H15R     
+     C115      H15S     
+     C116      H16R  
+     C117      H17R     
+     C118      H18R     
+     C118      H18S     
+     C119      H19R  
+     C120      H20R  
+     C121      H21R     
+     C121      H21S 
+     C122      H22R     
+     C122      H22S     
+     C122      H22T     
+    
+ [ impropers ] 
+     C15       C13       C14       H4R         
+     C14       C16       C15       H5R     
+     C18       C16       C17       H7R         
+     C17       C19       C18       H8R  
+     C111      C19       C110      H10R         
+     C110      C112      C111      H11R   
+     C114      C112      C113      H13R    
+     C113      C115      C114      H14R  
+     C117      C115      C116      H16R
+     C116      C118      C117      H17R
+     C120      C118      C119      H19R  
+     C119      C121      C120      H20R       
+
+
+[ CHL ]
+ [ atoms ]	       
+     C1             cA_l      -0.03169100      1
+     H11            hA_l       0.00938000      2     
+     H12            hA_l       0.00938000      3
+     C2             cA_l      -0.08813000      4
+     H21            hA_l       0.04462500      5
+     H22            hA_l       0.04462500      6
+     C3             cA_l       0.29355300      7
+     H31            hE_l       0.02961100      8
+     C4             cA_l      -0.16221800      9
+     H41            hA_l       0.09003600     10
+     H42            hA_l       0.09003600     11
+     C5             cB_l      -0.13949500     12
+     C6             cB_l      -0.20819000     13
+     H61            hB_l       0.12282800     14
+     C7             cA_l      -0.06989700     15
+     H71            hA_l       0.04791900     16
+     H72            hA_l       0.04791900     17
+     C8             cA_l      -0.01139000     18            
+     H81            hA_l       0.07289100     19
+     C9             cA_l       0.01960900     20
+     H91            hA_l       0.02928900     21
+     C10            cA_l       0.07911200     22
+     C11            cA_l      -0.06636500     23
+     H111           hA_l       0.03008500     24
+     H112           hA_l       0.03008500     25
+     C12            cA_l      -0.06497300     26
+     H121           hA_l       0.01035200     27
+     H122           hA_l       0.01035200     28
+     C13            cA_l       0.05740700     29
+     C14            cA_l       0.00583000     30
+     H141           hA_l       0.03155700     31
+     C15            cA_l      -0.10197700     32
+     H151           hA_l       0.02645800     33
+     H152           hA_l       0.02645800     34
+     C16            cA_l      -0.09206400     35
+     H161           hA_l       0.03333500     36
+     H162           hA_l       0.03333500     37
+     C17            cA_l       0.03239800     38
+     H171           hA_l       0.01659000     39
+     C18            cA_l      -0.11504900     40
+     H181           hA_l       0.02454100     41
+     H182           hA_l       0.02454100     42
+     H183           hA_l       0.02454100     43
+     C19            cA_l      -0.10806400     44
+     H191           hA_l       0.03399000     45
+     H192           hA_l       0.03399000     46
+     H193           hA_l       0.03399000     47
+     C20            cD_l       0.04426800     48
+     H201           hL_l       0.02095100     49
+     C21            cD_l      -0.15462100     50
+     H211           hL_l       0.03627400     51
+     H212           hL_l       0.03627400     52
+     H213           hL_l       0.03627400     53
+     C22            cD_l      -0.03903300     54
+     H221           hL_l       0.00835900     55
+     H222           hL_l       0.00835900     56
+     C23            cD_l      -0.02846000     57
+     H231           hL_l       0.01574200     58
+     H232           hL_l       0.01574200     59
+     C24            cD_l      -0.12559600     60
+     H241           hL_l       0.04011000     61
+     H242           hL_l       0.04011000     62
+     C25            cD_l       0.21244600     63
+     H251           hL_l      -0.00246600     64
+     C26            cD_l      -0.25777600     65
+     H261           hL_l       0.05798200     66
+     H262           hL_l       0.05798200     67
+     H263           hL_l       0.05798200     68
+     C27            cD_l      -0.25777600     69
+     H271           hL_l       0.05798200     70
+     H272           hL_l       0.05798200     71
+     H273           hL_l       0.05798200     72
+     O1             oH_l      -0.70302200     73
+     HO1            hO_l       0.41480400     74
+
+ [ bonds ]	   
+     C1        C2     
+     C2        C3     	 
+     C3        O1    	   	 
+     C3        C4    	 
+     C4        C5 
+     C5        C6     	 
+     C6        C7     
+     C7        C8     
+     C8        C9   
+     C9        C10    
+     C1        C10
+     C10       C19   
+     C5        C10   
+     C9        C11    
+     C11       C12    	 
+     C12       C13    	 
+     C13       C14    	
+     C13       C18    	 
+     C8        C14    
+     C14       C15    
+     C15       C16    
+     C16       C17  
+     C13       C17   
+     C17       C20    
+     C20       C21    
+     C20       C22    
+     C22       C23    
+     C23       C24   
+     C24       C25    
+	 C25       C26    
+     C25       C27    	 
+     C1        H11    
+     C1        H12    
+     C2        H21    
+     C2        H22    
+     C3        H31    
+     O1        HO1  
+     C4        H41    
+     C4        H42    
+     C6        H61    
+     C7        H71    
+     C7        H72    
+     C8        H81    
+     C9        H91    
+     C11       H111   
+     C11       H112   
+     C12       H121   
+     C12       H122   
+     C14       H141   
+     C15       H151   
+     C15       H152   
+     C16       H161   
+     C16       H162   
+     C17       H171   
+     C18       H181   
+     C18       H182   
+     C18       H183  
+     C19       H191   
+     C19       H192   
+     C19       H193   
+     C20       H201   
+     C21       H211   
+     C21       H212   
+     C21       H213   
+     C22       H221   
+     C22       H222   
+     C23       H231   
+     C23       H232  
+     C24       H241   
+     C24       H242
+     C25       H251  
+     C26       H261   
+     C26       H262   
+     C26       H263   	 
+     C27       H271   
+     C27       H272   
+     C27       H273   
+
+ [ impropers ] 
+     C4        C10       C5        C6 
+     C7        C5        C6        H61   
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+

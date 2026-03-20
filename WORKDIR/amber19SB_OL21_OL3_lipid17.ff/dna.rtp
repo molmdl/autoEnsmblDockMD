@@ -1,0 +1,1228 @@
+[ bondedtypes ]
+; Col 1: Type of bond
+; Col 2: Type of angles
+; Col 3: Type of proper dihedrals
+; Col 4: Type of improper dihedrals
+; Col 5: Generate all dihedrals if 1, only heavy atoms of 0.
+; Col 6: Number of excluded neighbors for nonbonded interactions
+; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1
+; Col 8: Remove impropers over the same bond as a proper if it is 1
+; bonds  angles  dihedrals  impropers all_dihedrals nrexcl HH14 RemoveDih
+     1       1          9          4        1         3      1     0
+
+                 
+; 5' (XXF), 3' (XXT), non-terminal (XX), and monomer (XXN) nuc's 
+
+
+
+[ DA5 ]
+ [ atoms ]
+     H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754         4
+     H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d       0.0431         9
+     H1'            H2_d       0.1838        10
+     N9             N&_d      -0.0268        11
+     C8             C2_d       0.1607        12
+     H8             H5_d       0.1877        13
+     N7             NB_d      -0.6175        14
+     C5             CB_d       0.0725        15
+     C6             CA_d       0.6897        16
+     N6             N2_d      -0.9123        17
+     H61             H_d       0.4167        18
+     H62             H_d       0.4167        19
+     N1             NC_d      -0.7624        20
+     C2             CQ_d       0.5716        21
+     H2             H5_d       0.0598        22
+     N3             NC_d      -0.7417        23
+     C4             CB_d       0.3800        24
+     C3'            C7_d       0.0713        25
+     H3'            H1_d       0.0985        26
+     C2'            CT_d      -0.0854        27
+     H2'1           HC_d       0.0718        28
+     H2'2           HC_d       0.0718        29
+     O3'            OS_d      -0.5232        30
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        N6
+     C6        N1
+     N6        H61
+     N6        H62
+     N1        C2
+     C2        H2
+     C2        N3
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+ [ impropers ]
+     N9        N7        C8        H8
+     C5        N6        C6        N1 
+     C6        H62       N6        H61 
+     N1        N3        C2        H2 
+ 
+[ DA ]
+ [ atoms ]
+     P               P_d       1.1659         1
+     O1P            O2_d      -0.7761         2
+     O2P            O2_d      -0.7761         3
+     O5'            OS_d      -0.4954         4
+     C5'            CJ_d      -0.0069         5
+     H5'1           H1_d       0.0754         6
+     H5'2           H1_d       0.0754         7
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d       0.0431        11
+     H1'            H2_d       0.1838        12
+     N9             N&_d      -0.0268        13
+     C8             C2_d       0.1607        14
+     H8             H5_d       0.1877        15
+     N7             NB_d      -0.6175        16
+     C5             CB_d       0.0725        17
+     C6             CA_d       0.6897        18
+     N6             N2_d      -0.9123        19
+     H61             H_d       0.4167        20
+     H62             H_d       0.4167        21
+     N1             NC_d      -0.7624        22
+     C2             CQ_d       0.5716        23
+     H2             H5_d       0.0598        24
+     N3             NC_d      -0.7417        25
+     C4             CB_d       0.3800        26
+     C3'            C7_d       0.0713        27
+     H3'            H1_d       0.0985        28
+     C2'            CT_d      -0.0854        29
+     H2'1           HC_d       0.0718        30
+     H2'2           HC_d       0.0718        31
+     O3'            OS_d      -0.5232        32
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        N6
+     C6        N1
+     N6        H61
+     N6        H62
+     N1        C2
+     C2        H2
+     C2        N3
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     -O3'      P
+ [ impropers ]
+	 N9        N7        C8        H8 
+     C5        N6        C6        N1 
+     C6        H62       N6        H61
+     N1        N3        C2        H2 
+	 
+	 
+[ DA3 ]
+ [ atoms ]
+     P               P_d       1.1659         1   
+     O1P            O2_d      -0.7761         2   
+     O2P            O2_d      -0.7761         3   
+     O5'            OS_d      -0.4954         4    
+     C5'            CJ_d      -0.0069         5   
+     H5'1           H1_d       0.0754         6   
+     H5'2           H1_d       0.0754         7   
+     C4'            CT_d       0.1629         8   
+     H4'            H1_d       0.1176         9   
+     O4'            OS_d      -0.3691        10   
+     C1'            CT_d       0.0431        11   
+     H1'            H2_d       0.1838        12   
+     N9             N&_d      -0.0268        13   
+     C8             C2_d       0.1607        14   
+     H8             H5_d       0.1877        15   
+     N7             NB_d      -0.6175        16   
+     C5             CB_d       0.0725        17   
+     C6             CA_d       0.6897        18   
+     N6             N2_d      -0.9123        19   
+     H61             H_d       0.4167        20   
+     H62             H_d       0.4167        21   
+     N1             NC_d      -0.7624        22   
+     C2             CQ_d       0.5716        23   
+     H2             H5_d       0.0598        24   
+     N3             NC_d      -0.7417        25   
+     C4             CB_d       0.3800        26   
+     C3'            C7_d       0.0713        27   
+     H3'            H1_d       0.0985        28   
+     C2'            CT_d      -0.0854        29   
+     H2'1           HC_d       0.0718        30   
+     H2'2           HC_d       0.0718        31   
+     O3'            OH_d      -0.6549        32   
+     H3T            HO_d       0.4396        33  
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        N6
+     C6        N1
+     N6        H61
+     N6        H62
+     N1        C2
+     C2        H2
+     C2        N3
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+     -O3'      P
+ [ impropers ]
+	 N9        N7        C8        H8 
+     C5        N6        C6        N1 
+     C6        H62       N6        H61
+     N1        N3        C2        H2 
+	 
+[ DAN ]
+ [ atoms ]
+     H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754    	  4
+     H5'2           H1_d       0.0754    	  5
+     C4'            CT_d       0.1629    	  6
+     H4'            H1_d       0.1176    	  7
+     O4'            OS_d      -0.3691    	  8
+     C1'            CT_d       0.0431         9
+     H1'            H2_d       0.1838        10
+     N9             N&_d      -0.0268        11
+     C8             C2_d       0.1607        12
+     H8             H5_d       0.1877        13
+     N7             NB_d      -0.6175        14
+     C5             CB_d       0.0725        15
+     C6             CA_d       0.6897        16
+     N6             N2_d      -0.9123        17
+     H61             H_d       0.4167        18
+     H62             H_d       0.4167        19
+     N1             NC_d      -0.7624        20
+     C2             CQ_d       0.5716        21
+     H2             H5_d       0.0598        22
+     N3             NC_d      -0.7417        23
+     C4             CB_d       0.3800        24
+     C3'            C7_d       0.0713        25
+     H3'            H1_d       0.0985        26
+     C2'            CT_d      -0.0854        27
+     H2'1           HC_d       0.0718        28
+     H2'2           HC_d       0.0718        29
+     O3'            OH_d      -0.6549        30
+     H3T            HO_d       0.4396        31
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        N6
+     C6        N1
+     N6        H61
+     N6        H62
+     N1        C2
+     C2        H2
+     C2        N3
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+ [ impropers ]
+ 	 N9        N7        C8        H8 
+     C5        N6        C6        N1 
+     C6        H62       N6        H61
+     N1        N3        C2        H2 
+	 
+	 
+	 
+	 
+[ DT5 ]
+ [ atoms ]	 
+     H5T            HO_d       0.4422         1 
+     O5'            OH_d      -0.6318         2 
+     C5'            CJ_d      -0.0069         3 
+     H5'1           H1_d       0.0754         4
+     H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d       0.0680         9
+     H1'            H2_d       0.1804        10
+     N1             N&_d      -0.0239        11
+     C6             CM_d      -0.2209        12
+     H6             H4_d       0.2607        13
+     C5             CM_d       0.0025        14
+     C7             CT_d      -0.2269        15
+     H71            HC_d       0.0770        16
+     H72            HC_d       0.0770        17
+     H73            HC_d       0.0770        18
+     C4              C_d       0.5194        19
+     O4              O_d      -0.5563        20
+     N3             NA_d      -0.4340        21
+     H3              H_d       0.3420        22
+     C2              C_d       0.5677        23
+     O2              O_d      -0.5881        24
+     C3'            C7_d       0.0713        25
+     H3'            H1_d       0.0985        26
+     C2'            CT_d      -0.0854        27
+     H2'1           HC_d       0.0718        28
+     H2'2           HC_d       0.0718        29
+     O3'            OS_d      -0.5232        30
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        C7
+     C5        C4
+     C7        H71
+     C7        H72
+     C7        H73
+     C4        O4
+     C4        N3
+     N3        H3
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+ [ impropers ]
+     C2        C6        N1        C1'
+     N1        C5        C6        H6 
+     C4        C6        C5        C7 
+     C5        N3        C4        O4 
+     C4        C2        N3        H3 
+     N1        N3        C2        O2 
+	 
+[ DT ]
+ [ atoms ]
+     P               P_d       1.1659         1
+     O1P            O2_d      -0.7761         2
+     O2P            O2_d      -0.7761         3
+     O5'            OS_d      -0.4954         4
+     C5'            CJ_d      -0.0069         5
+     H5'1           H1_d       0.0754         6 
+     H5'2           H1_d       0.0754         7 
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d       0.0680        11
+     H1'            H2_d       0.1804        12
+     N1             N&_d      -0.0239        13
+     C6             CM_d      -0.2209        14
+     H6             H4_d       0.2607        15
+     C5             CM_d       0.0025        16
+     C7             CT_d      -0.2269        17
+     H71            HC_d       0.0770        18
+     H72            HC_d       0.0770        19
+     H73            HC_d       0.0770        20
+     C4              C_d       0.5194        21
+     O4              O_d      -0.5563        22
+     N3             NA_d      -0.4340        23
+     H3              H_d       0.3420        24
+     C2              C_d       0.5677        25
+     O2              O_d      -0.5881        26
+     C3'            C7_d       0.0713        27
+     H3'            H1_d       0.0985        28
+     C2'            CT_d      -0.0854        29
+     H2'1           HC_d       0.0718        30
+     H2'2           HC_d       0.0718        31
+     O3'            OS_d      -0.5232        32
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        C7
+     C5        C4
+     C7        H71
+     C7        H72
+     C7        H73
+     C4        O4
+     C4        N3
+     N3        H3
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     -O3'      P	 
+ [ impropers ]
+     C2        C6        N1        C1'
+     N1        C5        C6        H6 
+     C4        C6        C5        C7 
+     C5        N3        C4        O4 
+     C4        C2        N3        H3 
+     N1        N3        C2        O2  
+	 
+[ DT3 ]
+ [ atoms ]	
+     P               P_d       1.1659         1
+     O1P            O2_d      -0.7761         2
+     O2P            O2_d      -0.7761         3
+     O5'            OS_d      -0.4954         4
+     C5'            CJ_d      -0.0069         5
+     H5'1           H1_d       0.0754         6
+     H5'2           H1_d       0.0754         7
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d       0.0680        11
+     H1'            H2_d       0.1804        12
+     N1             N&_d      -0.0239        13
+     C6             CM_d      -0.2209        14
+     H6             H4_d       0.2607    	 15
+     C5             CM_d       0.0025        16
+     C7             CT_d      -0.2269        17
+     H71            HC_d       0.0770        18
+     H72            HC_d       0.0770        19
+     H73            HC_d       0.0770        20
+     C4              C_d       0.5194        21
+     O4              O_d      -0.5563        22
+     N3             NA_d      -0.4340        23
+     H3              H_d       0.3420        24
+     C2              C_d       0.5677        25
+     O2              O_d      -0.5881        26
+     C3'            C7_d       0.0713        27
+     H3'            H1_d       0.0985        28
+     C2'            CT_d      -0.0854        29
+     H2'1           HC_d       0.0718        30
+     H2'2           HC_d       0.0718        31
+     O3'            OH_d      -0.6549        32
+     H3T            HO_d       0.4396        33
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        C7
+     C5        C4
+     C7        H71
+     C7        H72
+     C7        H73
+     C4        O4
+     C4        N3
+     N3        H3
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+     -O3'      P
+ [ impropers ]
+     C2        C6        N1        C1'
+     N1        C5        C6        H6 
+     C4        C6        C5        C7 
+     C5        N3        C4        O4 
+     C4        C2        N3        H3 
+     N1        N3        C2        O2  
+
+[ DTN ]
+ [ atoms ]
+     H5T            HO_d       0.4422         1     
+     O5'            OH_d      -0.6318         2     
+     C5'            CJ_d      -0.0069         3     
+     H5'1           H1_d       0.0754         4     
+     H5'2           H1_d       0.0754         5     
+     C4'            CT_d       0.1629         6     
+     H4'            H1_d       0.1176         7     
+     O4'            OS_d      -0.3691         8     
+     C1'            CT_d       0.0680         9     
+     H1'            H2_d       0.1804        10     
+     N1             N&_d      -0.0239        11     
+     C6             CM_d      -0.2209        12     
+     H6             H4_d       0.2607        13     
+     C5             CM_d       0.0025        14     
+     C7             CT_d      -0.2269        15     
+     H71            HC_d       0.0770        16     
+     H72            HC_d       0.0770        17     
+     H73            HC_d       0.0770        18     
+     C4              C_d       0.5194        19     
+     O4              O_d      -0.5563        20     
+     N3             NA_d      -0.4340        21      
+     H3              H_d       0.3420        22      
+     C2              C_d       0.5677        23      
+     O2              O_d      -0.5881        24      
+     C3'            C7_d       0.0713        25      
+     H3'            H1_d       0.0985        26     
+     C2'            CT_d      -0.0854        27     
+     H2'1           HC_d       0.0718        28     
+     H2'2           HC_d       0.0718        29     
+     O3'            OH_d      -0.6549        30     
+     H3T            HO_d       0.4396        31   
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        C7
+     C5        C4
+     C7        H71
+     C7        H72
+     C7        H73
+     C4        O4
+     C4        N3
+     N3        H3
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+ [ impropers ]
+     C2        C6        N1        C1'
+     N1        C5        C6        H6 
+     C4        C6        C5        C7 
+     C5        N3        C4        O4 
+     C4        C2        N3        H3 
+     N1        N3        C2        O2  
+
+
+[ DG5 ]
+ [ atoms ]
+     H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754         4
+     H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d       0.0358         9
+     H1'            H2_d       0.1746        10
+     N9             N&_d       0.0577        11
+     C8             CK_d       0.0736        12
+     H8             H5_d       0.1997        13
+     N7             NB_d      -0.5725        14
+     C5             CB_d       0.1991        15
+     C6              C_d       0.4918        16
+     O6              O_d      -0.5699        17
+     N1             NA_d      -0.5053        18
+     H1              H_d       0.3520        19
+     C2             CA_d       0.7432        20
+     N2             N2_d      -0.9230        21
+     H21             H_d       0.4235        22
+     H22             H_d       0.4235        23
+     N3             NC_d      -0.6636        24
+     C4             CB_d       0.1814        25
+     C3'            C7_d       0.0713        26
+     H3'            H1_d       0.0985        27
+     C2'            CT_d      -0.0854        28
+     H2'1           HC_d       0.0718        29
+     H2'2           HC_d       0.0718        30
+     O3'            OS_d      -0.5232        31
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        O6
+     C6        N1
+     N1        H1
+     N1        C2
+     C2        N2
+     C2        N3
+     N2        H21
+     N2        H22
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+ [ impropers ]
+     C4        C8        N9        C1'
+     N9        N7        C8        H8 
+     C5        N1        C6        O6 
+     C6        C2        N1        H1 
+     N2        N1        C2        N3 
+     C2        H22       N2        H21
+
+
+[ DG ]
+ [ atoms ]
+     P               P_d       1.1659         1
+     O1P            O2_d      -0.7761         2
+     O2P            O2_d      -0.7761         3
+     O5'            OS_d      -0.4954         4
+     C5'            CJ_d      -0.0069         5
+     H5'1           H1_d       0.0754         6
+     H5'2           H1_d       0.0754         7
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d       0.0358        11
+     H1'            H2_d       0.1746        12
+     N9             N&_d       0.0577        13
+     C8             CK_d       0.0736        14
+     H8             H5_d       0.1997        15
+     N7             NB_d      -0.5725        16
+     C5             CB_d       0.1991 	     17
+     C6              C_d       0.4918        18
+     O6              O_d      -0.5699        19
+     N1             NA_d      -0.5053        20
+     H1              H_d       0.3520        21
+     C2             CA_d       0.7432        22
+     N2             N2_d       -0.923        23
+     H21             H_d       0.4235        24
+     H22             H_d       0.4235        25
+     N3             NC_d      -0.6636        26
+     C4             CB_d       0.1814        27
+     C3'            C7_d       0.0713        28
+     H3'            H1_d       0.0985        29
+     C2'            CT_d      -0.0854        30
+     H2'1           HC_d       0.0718        31
+     H2'2           HC_d       0.0718        32
+     O3'            OS_d      -0.5232        33
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        O6
+     C6        N1
+     N1        H1
+     N1        C2
+     C2        N2
+     C2        N3
+     N2        H21
+     N2        H22
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     -O3'      P
+ [ impropers ]
+     C4        C8        N9        C1'
+     N9        N7        C8        H8 
+     C5        N1        C6        O6 
+     C6        C2        N1        H1 
+     N2        N1        C2        N3 
+     C2        H22       N2        H21
+
+[ DG3 ]
+ [ atoms ]
+	 P               P_d       1.1659         1
+     O1P            O2_d      -0.7761         2
+     O2P            O2_d      -0.7761         3
+     O5'            OS_d      -0.4954         4
+     C5'            CJ_d      -0.0069         5
+     H5'1           H1_d       0.0754         6
+     H5'2           H1_d       0.0754         7
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d       0.0358        11
+     H1'            H2_d       0.1746        12
+     N9             N&_d       0.0577        13
+     C8             CK_d       0.0736        14
+     H8             H5_d       0.1997        15
+     N7             NB_d      -0.5725        16
+     C5             CB_d       0.1991        17
+     C6              C_d       0.4918        18
+     O6              O_d      -0.5699        19
+     N1             NA_d      -0.5053        20
+     H1              H_d       0.3520        21
+     C2             CA_d       0.7432        22
+     N2             N2_d      -0.9230        23
+     H21             H_d       0.4235        24
+     H22             H_d       0.4235        25
+     N3             NC_d      -0.6636        26
+     C4             CB_d       0.1814        27
+     C3'            C7_d       0.0713        28
+     H3'            H1_d       0.0985        29
+     C2'            CT_d      -0.0854        30
+     H2'1           HC_d       0.0718        31
+     H2'2           HC_d       0.0718        32
+     O3'            OH_d      -0.6549        33
+     H3T            HO_d       0.4396        34
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        O6
+     C6        N1
+     N1        H1
+     N1        C2
+     C2        N2
+     C2        N3
+     N2        H21
+     N2        H22
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+    -O3'       P
+ [ impropers ]
+     C4        C8        N9        C1'
+     N9        N7        C8        H8 
+     C5        N1        C6        O6 
+     C6        C2        N1        H1 
+     N2        N1        C2        N3 
+     C2        H22       N2        H21
+
+[ DGN ]
+ [ atoms ]
+	 H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754         4
+	 H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d       0.0358         9
+     H1'            H2_d       0.1746        10
+     N9             N&_d       0.0577        11
+     C8             CK_d       0.0736        12
+     H8             H5_d       0.1997        13
+     N7             NB_d      -0.5725        14
+     C5             CB_d       0.1991        15
+     C6              C_d       0.4918        16
+     O6              O_d      -0.5699        17
+     N1             NA_d      -0.5053        18
+     H1              H_d       0.3520        19
+     C2             CA_d       0.7432        20
+     N2             N2_d      -0.9230        21
+     H21             H_d       0.4235        22
+     H22             H_d       0.4235        23
+     N3             NC_d      -0.6636        24
+     C4             CB_d       0.1814        25
+     C3'            C7_d       0.0713        26
+     H3'            H1_d       0.0985        27
+     C2'            CT_d      -0.0854        28
+     H2'1           HC_d       0.0718        29
+     H2'2           HC_d       0.0718        30
+     O3'            OH_d      -0.6549        31
+     H3T            HO_d       0.4396        32
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N9
+     C1'       C2'
+     N9        C8
+     N9        C4
+     C8        H8
+     C8        N7
+     N7        C5
+     C5        C6
+     C5        C4
+     C6        O6
+     C6        N1
+     N1        H1
+     N1        C2
+     C2        N2
+     C2        N3
+     N2        H21
+     N2        H22
+     N3        C4
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+ [ impropers ]
+     C4        C8        N9        C1'
+     N9        N7        C8        H8 
+     C5        N1        C6        O6 
+     C6        C2        N1        H1 
+     N2        N1        C2        N3 
+     C2        H22       N2        H21
+	 
+	 
+	 
+[ DC5 ]
+ [ atoms ]	 
+	 H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754         4
+     H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d      -0.0116         9
+     H1'            H2_d       0.1963        10
+     N1             N&_d      -0.0339        11
+     C6             C1_d      -0.0183        12
+     H6             H4_d       0.2293        13
+     C5             C1_d      -0.5222        14
+     H5             HA_d       0.1863        15
+     C4             CA_d       0.8439        16
+     N4             N2_d      -0.9773        17
+     H41             H_d       0.4314        18
+     H42             H_d       0.4314        19
+     N3             NC_d      -0.7748        20
+     C2              C_d       0.7959        21
+     O2              O_d      -0.6548        22
+     C3'            C7_d       0.0713        23
+     H3'            H1_d       0.0985        24
+     C2'            CT_d      -0.0854        25
+     H2'1           HC_d       0.0718        26
+     H2'2           HC_d       0.0718        27
+     O3'            OS_d      -0.5232        28
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        H5
+     C5        C4
+     C4        N4
+     C4        N3
+     N4        H41
+     N4        H42
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+ [ impropers ]
+     C2        C6        N1        C1'	 
+     N1        C5        C6        H6 	 
+     C6        C4        C5        H5 
+     C5        N4        C4        N3 
+     C4        H42       N4        H41
+     N1        N3        C2        O2
+	 
+[ DC ]
+ [ atoms ]
+     P               P_d       1.1659 	      1
+     O1P            O2_d      -0.7761 	      2
+     O2P            O2_d      -0.7761 	      3
+     O5'            OS_d      -0.4954 	      4
+     C5'            CJ_d      -0.0069 	      5
+     H5'1           H1_d       0.0754         6
+     H5'2           H1_d       0.0754         7
+     C4'            CT_d       0.1629         8
+     H4'            H1_d       0.1176         9
+     O4'            OS_d      -0.3691        10
+     C1'            CT_d      -0.0116        11
+     H1'            H2_d       0.1963        12
+     N1             N&_d      -0.0339        13
+     C6             C1_d      -0.0183        14
+     H6             H4_d       0.2293        15
+     C5             C1_d      -0.5222        16
+     H5             HA_d       0.1863        17
+     C4             CA_d       0.8439        18
+     N4             N2_d      -0.9773        19
+     H41             H_d       0.4314        20
+     H42             H_d       0.4314        21
+     N3             NC_d      -0.7748        22
+     C2              C_d       0.7959        23
+     O2              O_d      -0.6548        24
+     C3'            C7_d       0.0713        25
+     H3'            H1_d       0.0985        26
+     C2'            CT_d      -0.0854        27
+     H2'1           HC_d       0.0718        28
+     H2'2           HC_d       0.0718        29
+     O3'            OS_d      -0.5232        30
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        H5
+     C5        C4
+     C4        N4
+     C4        N3
+     N4        H41
+     N4        H42
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     -O3'      P
+ [ impropers ]
+     C2        C6        N1        C1'	 
+     N1        C5        C6        H6 	 
+     C6        C4        C5        H5 
+     C5        N4        C4        N3 
+     C4        H42       N4        H41
+     N1        N3        C2        O2
+	 
+[ DC3 ]
+ [ atoms ]
+	 P               P_d       1.1659         1
+	 O1P            O2_d      -0.7761         2
+	 O2P            O2_d      -0.7761         3
+	 O5'            OS_d      -0.4954         4
+	 C5'            CJ_d      -0.0069         5
+	 H5'1           H1_d       0.0754         6
+	 H5'2           H1_d       0.0754         7
+	 C4'            CT_d       0.1629         8
+	 H4'            H1_d       0.1176         9
+	 O4'            OS_d      -0.3691        10
+	 C1'            CT_d      -0.0116        11
+	 H1'            H2_d       0.1963        12
+	 N1             N&_d      -0.0339        13
+     C6             C1_d      -0.0183        14
+     H6             H4_d       0.2293        15
+     C5             C1_d      -0.5222        16
+     H5             HA_d       0.1863        17
+     C4             CA_d       0.8439        18
+     N4             N2_d      -0.9773        19
+     H41             H_d       0.4314        20
+     H42             H_d       0.4314        21
+     N3             NC_d      -0.7748        22
+     C2              C_d       0.7959        23
+     O2              O_d      -0.6548        24
+     C3'            C7_d       0.0713        25
+     H3'            H1_d       0.0985        26
+     C2'            CT_d      -0.0854        27
+     H2'1           HC_d       0.0718        28
+     H2'2           HC_d       0.0718        29
+     O3'            OH_d      -0.6549        30
+     H3T            HO_d       0.4396        31
+ [ bonds ]
+     P         O1P
+     P         O2P
+     P         O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        H5
+     C5        C4
+     C4        N4
+     C4        N3
+     N4        H41
+     N4        H42
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+     -O3'      P
+ [ impropers ]
+     C2        C6        N1        C1'	 
+     N1        C5        C6        H6 	 
+     C6        C4        C5        H5 
+     C5        N4        C4        N3 
+     C4        H42       N4        H41
+     N1        N3        C2        O2
+
+[ DCN ]
+ [ atoms ]
+     H5T            HO_d       0.4422         1
+     O5'            OH_d      -0.6318         2
+     C5'            CJ_d      -0.0069         3
+     H5'1           H1_d       0.0754         4
+     H5'2           H1_d       0.0754         5
+     C4'            CT_d       0.1629         6
+     H4'            H1_d       0.1176         7
+     O4'            OS_d      -0.3691         8
+     C1'            CT_d      -0.0116         9
+     H1'            H2_d       0.1963        10
+     N1             N&_d      -0.0339        11
+     C6             C1_d      -0.0183        12
+     H6             H4_d       0.2293        13
+     C5             C1_d      -0.5222        14
+     H5             HA_d       0.1863        15
+     C4             CA_d       0.8439        16
+     N4             N2_d      -0.9773        17
+     H41             H_d       0.4314        18
+     H42             H_d       0.4314        19
+     N3             NC_d      -0.7748        20
+     C2              C_d       0.7959        21
+     O2              O_d      -0.6548        22
+     C3'            C7_d       0.0713        23
+     H3'            H1_d       0.0985        24
+     C2'            CT_d      -0.0854        25
+     H2'1           HC_d       0.0718        26
+     H2'2           HC_d       0.0718        27
+     O3'            OH_d      -0.6549        28
+     H3T            HO_d       0.4396        29
+ [ bonds ]
+     H5T       O5'
+     O5'       C5'
+     C5'       H5'1
+     C5'       H5'2
+     C5'       C4'
+     C4'       H4'
+     C4'       O4'
+     C4'       C3'
+     O4'       C1'
+     C1'       H1'
+     C1'       N1
+     C1'       C2'
+     N1        C6
+     N1        C2
+     C6        H6
+     C6        C5
+     C5        H5
+     C5        C4
+     C4        N4
+     C4        N3
+     N4        H41
+     N4        H42
+     N3        C2
+     C2        O2
+     C3'       H3'
+     C3'       C2'
+     C3'       O3'
+     C2'       H2'1
+     C2'       H2'2
+     O3'       H3T
+ [ impropers ]
+     C2        C6        N1        C1'	 
+     N1        C5        C6        H6 	 
+     C6        C4        C5        H5 
+     C5        N4        C4        N3 
+     C4        H42       N4        H41
+     N1        N3        C2        O2
+	 
+	 
+	 
+	 

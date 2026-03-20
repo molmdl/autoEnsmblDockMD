@@ -1,0 +1,623 @@
+[ bondtypes ]
+;i        j         func      b0                   kb
+ C_r       C_r       1         0.152500             259408.00          ;Junmei et al, 1999 
+ C_r       CA_r      1         0.140900             392459.20          ;JCC,7,(1986),230; (not used any more in TYR) 
+ C_r       CB_r      1         0.141900             374049.60          ;JCC,7,(1986),230; GUA 
+ C_r       CS_r      1         0.144400             343088.00          ;JCC,7,(1986),230; THY,URA 
+ C_r       CT_r      1         0.152200             265265.60          ;JCC,7,(1986),230; AA 
+ C_r       N&_r      1         0.138300             354803.20          ;JCC,7,(1986),230; CYT,URA 
+ C_r       NA_r      1         0.138800             349782.40          ;JCC,7,(1986),230; GUA.URA 
+ C_r       NC_r      1         0.135800             382417.60          ;JCC,7,(1986),230; CYT 
+ C_r       O_r       1         0.122900             476976.00          ;JCC,7,(1986),230; AA,CYT,GUA,THY,URA 
+ C_r       O2_r      1         0.125000             548940.80          ;JCC,7,(1986),230; GLU,ASP 
+ C_r       OH_r      1         0.136400             376560.00          ;JCC,7,(1986),230; (not used any more for TYR) 
+ C_r       OS_r      1         0.132300             376560.00          ;Junmei et al, 1999 
+ C_r       H4_r      1         0.108000             307105.60          ;Junmei et al, 1999 
+ C_r       H5_r      1         0.108000             307105.60          ;Junmei et al, 1999 
+ CA_r      CA_r      1         0.140000             392459.20          ;JCC,7,(1986),230; BENZENE,PHE,TRP,TYR 
+ CA_r      CB_r      1         0.140400             392459.20          ;JCC,7,(1986),230; ADE,TRP 
+ CA_r      CS_r      1         0.143300             357313.60          ;JCC,7,(1986),230; CYT 
+ CA_r      CT_r      1         0.151000             265265.60          ;JCC,7,(1986),230; PHE,TYR 
+ CA_r      HA_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; PHE,TRP,TYR 
+ CA_r      H4_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; no assigned 
+ CA_r      N2_r      1         0.134000             402500.80          ;JCC,7,(1986),230; ARG,CYT,GUA 
+ CA_r      NA_r      1         0.138100             357313.60          ;JCC,7,(1986),230; GUA 
+ CA_r      NC_r      1         0.133900             404174.40          ;JCC,7,(1986),230; ADE,CYT,GUA 
+ CA_r      OH_r      1         0.136400             376560.00          ;substituted for C-OH in tyr 
+ CB_r      CB_r      1         0.137000             435136.00          ;JCC,7,(1986),230; ADE,GUA 
+ CB_r      N&_r      1         0.137400             364844.80          ;JCC,7,(1986),230; ADE,GUA 
+ CB_r      NB_r      1         0.139100             346435.20          ;JCC,7,(1986),230; ADE,GUA 
+ CB_r      NC_r      1         0.135400             385764.80          ;JCC,7,(1986),230; ADE,GUA 
+ CP_r      H5_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; ADE,GUA 
+ CP_r      N&_r      1         0.137100             368192.00          ;JCC,7,(1986),230; ADE,GUA 
+ CP_r      NB_r      1         0.130400             442667.20          ;JCC,7,(1986),230; ADE,GUA 
+ CS_r      CS_r      1         0.135000             459403.20          ;JCC,7,(1986),230; CYT,THY,URA 
+ CS_r      CT_r      1         0.151000             265265.60          ;JCC,7,(1986),230; THY 
+ CS_r      HA_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; CYT,URA 
+ CS_r      H4_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; CYT,URA 
+ CS_r      H5_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; not assigned 
+ CS_r      N&_r      1         0.136500             374886.40          ;JCC,7,(1986),230; CYT,THY,URA 
+ CS_r      OS_r      1         0.124000             401664.00          ;Junmei et al, 1999 
+ CQ_r      H5_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; ADE 
+ CQ_r      NC_r      1         0.132400             420073.60          ;JCC,7,(1986),230; ADE 
+ CT_r      CT_r      1         0.152600             259408.00          ;JCC,7,(1986),230; AA, SUGARS 
+ CT_r      H1_r      1         0.109000             284512.00          ;changed from 331 bsd on NMA nmodes; AA, RIBOSE 
+ CT_r      H2_r      1         0.109000             284512.00          ;changed from 331 bsd on NMA nmodes; SUGARS 
+ CT_r      N&_r      1         0.147500             282001.60          ;JCC,7,(1986),230; ADE,CYT,GUA,THY,URA 
+ CT_r      N2_r      1         0.146300             282001.60          ;JCC,7,(1986),230; ARG 
+ CT_r      OH_r      1         0.141000             267776.00          ;JCC,7,(1986),230; SUGARS 
+ CT_r      OS_r      1         0.141000             267776.00          ;JCC,7,(1986),230; NUCLEIC ACIDS 
+ O2_r      P_r       1         0.148000             439320.00          ;JCC,7,(1986),230; NA PHOSPHATES 
+ OH_r      P_r       1         0.161000             192464.00          ;JCC,7,(1986),230; NA PHOSPHATES 
+ OS_r      P_r       1         0.161000             192464.00          ;JCC,7,(1986),230; NA PHOSPHATES 
+ NA_r      P_r       1         0.184000             209200.00          ;phosphohistidine 
+ H_r       N2_r      1         0.101000             363171.20          ;JCC,7,(1986),230; ADE,CYT,GUA,ARG 
+ H_r       N&_r      1         0.101000             363171.20          ;for plain unmethylated bases ADE,CYT,GUA,ARG 
+ H_r       NA_r      1         0.101000             363171.20          ;JCC,7,(1986),230; GUA,URA,HIS 
+ HO_r      OH_r      1         0.096000             462750.40          ;JCC,7,(1986),230; SUGARS,SER,TYR 
+ HO_r      OS_r      1         0.096000             462750.40          ;JCC,7,(1986),230; NUCLEOTIDE ENDS 
+ CI_r      H1_r      1         0.109000             284512.00          ;parmbsc0 
+ CI_r      CT_r      1         0.152600             259408.00          ;parmbsc0 
+ CI_r      OS_r      1         0.141000             267776.00          ;parmbsc0 
+ CI_r      OH_r      1         0.141000             267776.00          ;parmbsc0 
+ C5_r      H5_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; ADE,GUA 
+ C5_r      N&_r      1         0.137100             368192.00          ;JCC,7,(1986),230; ADE,GUA 
+ C5_r      NB_r      1         0.130400             442667.20          ;JCC,7,(1986),230; ADE,GUA 
+ C_r       C4_r      1         0.144400             343088.00          ;JCC,7,(1986),230; THY,URA 
+ C4_r      CA_r      1         0.143300             357313.60          ;JCC,7,(1986),230; CYT 
+ C4_r      C4_r      1         0.135000             459403.20          ;JCC,7,(1986),230; CYT,THY,URA 
+ C4_r      CT_r      1         0.151000             265265.60          ;JCC,7,(1986),230; THY 
+ C4_r      HA_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; CYT,URA 
+ C4_r      H4_r      1         0.108000             307105.60          ;changed from 340. bsd on C6H6 nmodes; CYT,URA 
+ C4_r      N&_r      1         0.136500             374886.40          ;JCC,7,(1986),230; CYT,THY,URA 
+
+
+
+[ angletypes ]
+;i        j         k         func      th0                cth
+C_r       C_r       O_r       1         120.00             669.440000           ;Junmei et al, 1999 acrolein 
+C_r       C_r       OH_r      1         120.00             669.440000           ;Junmei et al, 1999 
+CA_r      C_r       CA_r      1         120.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; AA 
+CA_r      C_r       OH_r      1         120.00             585.760000           ;AA (not used in tyr) 
+CA_r      C_r       OS_r      1         120.00             585.760000           ;phosphotyrosine 
+CB_r      C_r       NA_r      1         111.30             585.760000           ;NA 
+CB_r      C_r       O_r       1         128.80             669.440000           ; 
+CS_r      C_r       NA_r      1         114.10             585.760000           ; 
+CS_r      C_r       O_r       1         125.30             669.440000           ; 
+CT_r      C_r       O_r       1         120.40             669.440000           ; 
+CT_r      C_r       O2_r      1         117.00             585.760000           ; 
+CT_r      C_r       CT_r      1         117.00             527.184000           ;Junmei et al, 1999 
+CT_r      C_r       OS_r      1         115.00             669.440000           ;Junmei et al, 1999 
+CT_r      C_r       OH_r      1         110.00             669.440000           ;Junmei et al, 1999 
+N&_r      C_r       NA_r      1         115.40             585.760000           ; 
+N&_r      C_r       NC_r      1         118.60             585.760000           ; 
+N&_r      C_r       O_r       1         120.90             669.440000           ; 
+NA_r      C_r       O_r       1         120.60             669.440000           ; 
+NC_r      C_r       O_r       1         122.50             669.440000           ; 
+O_r       C_r       O_r       1         126.00             669.440000           ;AA COO- terminal residues 
+O_r       C_r       OH_r      1         120.00             669.440000           ;(check with Junmei for: theta0:120.0?) 
+O_r       C_r       OS_r      1         125.00             669.440000           ;Junmei et al, 1999 
+O2_r      C_r       O2_r      1         126.00             669.440000           ;AA GLU            (SCH JPC 79,2379) 
+C_r       C_r       H4_r      1         120.00             418.400000           ;Junmei et al, 1999 
+CS_r      C_r       H4_r      1         115.00             418.400000           ;Junmei et al, 1999 
+CT_r      C_r       H4_r      1         115.00             418.400000           ;Junmei et al, 1999 
+H4_r      C_r       O_r       1         120.00             418.400000           ;Junmei et al, 1999 
+H4_r      C_r       OH_r      1         120.00             418.400000           ;Junmei et al, 1999 
+H5_r      C_r       O_r       1         119.00             418.400000           ;Junmei et al, 1999 
+H5_r      C_r       OH_r      1         107.00             418.400000           ;Junmei et al, 1999 
+H5_r      C_r       OS_r      1         107.00             418.400000           ;Junmei et al, 1999 
+C_r       CA_r      CA_r      1         120.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes 
+C_r       CA_r      HA_r      1         120.00             418.400000           ;AA (not used in tyr) 
+CA_r      CA_r      CA_r      1         120.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes 
+CA_r      CA_r      CB_r      1         120.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes 
+CA_r      CA_r      CT_r      1         120.00             585.760000           ; 
+CA_r      CA_r      HA_r      1         120.00             418.400000           ; 
+CA_r      CA_r      H4_r      1         120.00             418.400000           ; 
+CA_r      CA_r      OH_r      1         120.00             585.760000           ;replacement in tyr 
+CB_r      CA_r      HA_r      1         120.00             418.400000           ; 
+CB_r      CA_r      H4_r      1         120.00             418.400000           ; 
+CB_r      CA_r      N2_r      1         123.50             585.760000           ; 
+CB_r      CA_r      NC_r      1         117.30             585.760000           ; 
+CS_r      CA_r      N2_r      1         120.10             585.760000           ; 
+CS_r      CA_r      NC_r      1         121.50             585.760000           ; 
+NA_r      CA_r      NC_r      1         123.30             585.760000           ; 
+N2_r      CA_r      NA_r      1         116.00             585.760000           ; 
+N2_r      CA_r      NC_r      1         119.30             585.760000           ; 
+N2_r      CA_r      N2_r      1         120.00             585.760000           ;AA arg 
+C_r       CB_r      CB_r      1         119.20             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA gua 
+C_r       CB_r      NB_r      1         130.00             585.760000           ; 
+CA_r      CB_r      CB_r      1         117.30             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA ade 
+CA_r      CB_r      NB_r      1         132.40             585.760000           ; 
+CB_r      CB_r      N&_r      1         106.20             585.760000           ; 
+CB_r      CB_r      NB_r      1         110.40             585.760000           ; 
+CB_r      CB_r      NC_r      1         127.70             585.760000           ; 
+N&_r      CB_r      NC_r      1         126.20             585.760000           ; 
+H5_r      CP_r      N&_r      1         123.05             418.400000           ; 
+H5_r      CP_r      NB_r      1         123.05             418.400000           ; 
+N&_r      CP_r      NB_r      1         113.90             585.760000           ; 
+C_r       CS_r      CS_r      1         120.70             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA thy 
+C_r       CS_r      CT_r      1         119.70             585.760000           ; 
+C_r       CS_r      HA_r      1         119.70             418.400000           ; 
+C_r       CS_r      H4_r      1         119.70             418.400000           ; 
+CA_r      CS_r      CS_r      1         117.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA cyt 
+CA_r      CS_r      HA_r      1         123.30             418.400000           ; 
+CA_r      CS_r      H4_r      1         123.30             418.400000           ; 
+CS_r      CS_r      HA_r      1         119.70             418.400000           ; 
+CS_r      CS_r      H4_r      1         119.70             418.400000           ; 
+CS_r      CS_r      N&_r      1         121.20             585.760000           ; 
+CS_r      CS_r      OS_r      1         125.00             669.440000           ;Junmei et al, 1999 
+H4_r      CS_r      N&_r      1         119.10             418.400000           ; 
+H4_r      CS_r      OS_r      1         113.00             418.400000           ;Junmei et al, 1999 
+HA_r      CS_r      HA_r      1         120.00             292.880000           ;Junmei et al, 1999 
+CT_r      CS_r      HA_r      1         120.00             418.400000           ;Junmei et al, 1999 
+NC_r      CQ_r      NC_r      1         129.10             585.760000           ; 
+H5_r      CQ_r      NC_r      1         115.45             418.400000           ; 
+H1_r      CT_r      H1_r      1         109.50             292.880000           ; 
+H1_r      CT_r      N&_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+H1_r      CT_r      OH_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+H1_r      CT_r      OS_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+CS_r      CT_r      H1_r      1         109.50             418.400000           ;Junmei et al, 1999 
+H1_r      CT_r      N2_r      1         109.50             418.400000           ;AA arg     changed based on NMA nmodes 
+H2_r      CT_r      H2_r      1         109.50             292.880000           ;AA lys 
+H2_r      CT_r      N&_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+H2_r      CT_r      OS_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+C_r       CT_r      H1_r      1         109.50             418.400000           ;AA general  changed based on NMA nmodes 
+C_r       CT_r      CT_r      1         111.10             527.184000           ;AA general 
+C_r       CT_r      OS_r      1         109.50             502.080000           ;Junmei et al, 1999 
+CS_r      CT_r      CT_r      1         111.00             527.184000           ;Junmei et al, 1999 (last change: Mar24,99) 
+CS_r      CT_r      OS_r      1         109.50             418.400000           ;Junmei et al, 1999 
+CT_r      CT_r      CT_r      1         109.50             334.720000           ; 
+CT_r      CT_r      H1_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+CT_r      CT_r      H2_r      1         109.50             418.400000           ;changed based on NMA nmodes 
+CT_r      CT_r      N&_r      1         109.50             418.400000           ; 
+CT_r      CT_r      OH_r      1         109.50             418.400000           ; 
+CT_r      CT_r      OS_r      1         109.50             418.400000           ; 
+CA_r      CT_r      CT_r      1         114.00             527.184000           ;AA phe tyr          (SCH JPC  79,2379) 
+CT_r      CT_r      N2_r      1         111.20             669.440000           ;AA arg             (JCP 76, 1439) 
+OS_r      CT_r      OS_r      1         101.00             1338.880000          ;Junmei et al, 1999 
+N&_r      CT_r      OS_r      1         109.50             418.400000           ; 
+C_r       N&_r      CS_r      1         121.60             585.760000           ; 
+C_r       N&_r      CT_r      1         117.60             585.760000           ; 
+C_r       N&_r      H_r       1         119.20             418.400000           ;changed based on NMA nmodes 
+CB_r      N&_r      CP_r      1         105.40             585.760000           ; 
+CB_r      N&_r      CT_r      1         125.80             585.760000           ; 
+CB_r      N&_r      H_r       1         125.80             418.400000           ;for unmethylated n.a. bases,chngd bsd NMA nmodes 
+CP_r      N&_r      CT_r      1         128.80             585.760000           ; 
+CP_r      N&_r      H_r       1         128.80             418.400000           ;for unmethylated n.a. bases,chngd bsd NMA nmodes 
+CS_r      N&_r      CT_r      1         121.20             585.760000           ; 
+CS_r      N&_r      H_r       1         121.20             418.400000           ;for unmethylated n.a. bases,chngd bsd NMA nmodes 
+CA_r      N2_r      H_r       1         120.00             418.400000           ; 
+CA_r      N2_r      CT_r      1         123.20             418.400000           ;AA arg 
+CT_r      N2_r      H_r       1         118.40             418.400000           ;AA arg 
+H_r       N2_r      H_r       1         120.00             292.880000           ; 
+C_r       NA_r      C_r       1         126.40             585.760000           ; 
+C_r       NA_r      CA_r      1         125.20             585.760000           ; 
+C_r       NA_r      H_r       1         116.80             418.400000           ;changed based on NMA nmodes 
+CA_r      NA_r      H_r       1         118.00             418.400000           ;changed based on NMA nmodes 
+CB_r      NB_r      CP_r      1         103.80             585.760000           ; 
+C_r       NC_r      CA_r      1         120.50             585.760000           ; 
+CA_r      NC_r      CB_r      1         112.20             585.760000           ; 
+CA_r      NC_r      CQ_r      1         118.60             585.760000           ; 
+CB_r      NC_r      CQ_r      1         111.00             585.760000           ; 
+C_r       OH_r      HO_r      1         113.00             418.400000           ;(not used in tyr anymore) 
+CA_r      OH_r      HO_r      1         113.00             418.400000           ;replacement in tyr 
+CT_r      OH_r      HO_r      1         108.50             460.240000           ; 
+HO_r      OH_r      P_r       1         108.50             376.560000           ; 
+C_r       OS_r      CT_r      1         117.00             502.080000           ;Junmei et al, 1999 
+CS_r      OS_r      CT_r      1         117.00             502.080000           ;Junmei et al, 1999 
+CT_r      OS_r      CT_r      1         109.50             502.080000           ; 
+CT_r      OS_r      P_r       1         120.50             836.800000           ; 
+C_r       OS_r      P_r       1         120.50             836.800000           ;phosphotyrosine 
+P_r       OS_r      P_r       1         120.50             836.800000           ; 
+O2_r      P_r       OH_r      1         108.23             376.560000           ; 
+O2_r      P_r       O2_r      1         119.90             1171.520000          ; 
+O2_r      P_r       OS_r      1         108.23             836.800000           ; 
+OH_r      P_r       OS_r      1         102.60             376.560000           ; 
+OS_r      P_r       OS_r      1         102.60             376.560000           ; 
+CT_r      CI_r      H1_r      1         109.50             418.400000           ;parmbsc0 
+H1_r      CI_r      H1_r      1         109.50             292.880000           ;parmbsc0 
+CI_r      CT_r      H1_r      1         109.50             418.400000           ;parmbsc0 
+CI_r      CT_r      OS_r      1         109.50             418.400000           ;parmbsc0 
+CI_r      CT_r      CT_r      1         109.50             334.720000           ;parmbsc0 
+H1_r      CI_r      OS_r      1         109.50             418.400000           ;parmbsc0 
+CT_r      CI_r      OS_r      1         109.50             418.400000           ;parmbsc0 
+CI_r      OS_r      P_r       1         120.50             836.800000           ;parmbsc0 
+H1_r      CI_r      OH_r      1         109.50             418.400000           ;parmbsc0 
+CT_r      CI_r      OH_r      1         109.50             418.400000           ;parmbsc0 
+CI_r      OH_r      HO_r      1         108.50             460.240000           ;parmbsc0 
+H5_r      C5_r      N&_r      1         123.05             418.400000           ; 
+H5_r      C5_r      NB_r      1         123.05             418.400000           ; 
+N&_r      C5_r      NB_r      1         113.90             585.760000           ; 
+C5_r      N&_r      CB_r      1         105.40             585.760000           ; 
+C5_r      N&_r      CT_r      1         128.80             585.760000           ; 
+C5_r      NB_r      CB_r      1         103.80             585.760000           ; 
+C4_r      C_r       NA_r      1         114.10             585.760000           ; 
+C4_r      C_r       O_r       1         125.30             669.440000           ; 
+C4_r      CA_r      N2_r      1         120.10             585.760000           ; 
+C4_r      CA_r      NC_r      1         121.50             585.760000           ; 
+C_r       C4_r      C4_r      1         120.70             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA thy 
+C_r       C4_r      CT_r      1         119.70             585.760000           ; 
+C_r       C4_r      HA_r      1         119.70             418.400000           ; 
+C_r       C4_r      H4_r      1         119.70             418.400000           ; 
+C4_r      C4_r      CA_r      1         117.00             527.184000           ;changed from 85.0  bsd on C6H6 nmodes; NA cyt 
+CA_r      C4_r      HA_r      1         123.30             418.400000           ; 
+CA_r      C4_r      H4_r      1         123.30             418.400000           ; 
+C4_r      C4_r      CT_r      1         119.70             585.760000           ; 
+C4_r      C4_r      HA_r      1         119.70             418.400000           ; 
+C4_r      C4_r      H4_r      1         119.70             418.400000           ; 
+C4_r      C4_r      N&_r      1         121.20             585.760000           ; 
+H4_r      C4_r      N&_r      1         119.10             418.400000           ; 
+C4_r      CT_r      H1_r      1         109.50             418.400000           ;Junmei et al, 1999 
+C_r       N&_r      C4_r      1         121.60             585.760000           ; 
+C4_r      N&_r      CT_r      1         121.20             585.760000           ; 
+
+
+
+
+[ dihedraltypes ]
+;i        j         k         l         func      Phi0           k                   mul
+ X         X         C_r       O_r       4         180.00         43.9320000000       2              ;JCC,7,(1986),230 
+ X         O2_r      C_r       O2_r      4         180.00         43.9320000000       2              ;JCC,7,(1986),230 
+ X         X         N2_r      H_r       4         180.00         4.1840000000        2              ;JCC,7,(1986),230 
+ X         X         NA_r      H_r       4         180.00         4.1840000000        2              ;JCC,7,(1986),230 
+ X         N2_r      CA_r      N2_r      4         180.00         43.9320000000       2              ;JCC,7,(1986),230 
+ X         X         CA_r      HA_r      4         180.00         4.6024000000        2              ;bsd.on C6H6 nmodes 
+ X         X         CQ_r      H5_r      4         180.00         4.6024000000        2              ; 
+ X         X         CP_r      H5_r      4         180.00         4.6024000000        2              ; 
+ X         X         CS_r      H4_r      4         180.00         4.6024000000        2              ; 
+ X         X         CS_r      HA_r      4         180.00         4.6024000000        2              ; 
+ X         X         CA_r      H4_r      4         180.00         4.6024000000        2              ;bsd.on C6H6 nmodes 
+ X         X         CA_r      H5_r      4         180.00         4.6024000000        2              ;bsd.on C6H6 nmodes 
+ X         X         C5_r      H5_r      4         180.00         4.6024000000        2              ; 
+ X         X         C4_r      H4_r      4         180.00         4.6024000000        2              ; 
+ X         X         C4_r      HA_r      4         180.00         4.6024000000        2              ; 
+ CB_r      CP_r      N&_r      CT_r      4         180.00         4.1840000000        2              ; 
+ C_r       CS_r      N&_r      CT_r      4         180.00         4.1840000000        2              ;dac guess, 9/94 
+ CT_r      O_r       C_r       OH_r      4         180.00         43.9320000000       2              ; 
+ CA_r      CA_r      CA_r      CT_r      4         180.00         4.6024000000        2              ; 
+ C_r       CS_r      CS_r      CT_r      4         180.00         4.6024000000        2              ;dac guess, 9/94 
+ CS_r      N2_r      CA_r      NC_r      4         180.00         4.6024000000        2              ;dac guess, 9/94 
+ CB_r      N2_r      CA_r      NC_r      4         180.00         4.6024000000        2              ;dac, 10/94 
+ N2_r      NA_r      CA_r      NC_r      4         180.00         4.6024000000        2              ;dac, 10/94 
+ CA_r      CA_r      C_r       OH_r      4         180.00         4.6024000000        2              ;(not used in tyr!) 
+ CA_r      CA_r      CA_r      OH_r      4         180.00         4.6024000000        2              ;in tyr 
+ H5_r      O_r       C_r       OH_r      4         180.00         4.6024000000        2              ;Junmei et al.1999 
+ H5_r      O_r       C_r       OS_r      4         180.00         4.6024000000        2              ; 
+ CS_r      CT_r      CS_r      HA_r      4         180.00         4.6024000000        2              ;Junmei et al.1999 
+ CS_r      H4_r      C_r       O_r       4         180.00         4.6024000000        2              ;Junmei et al.1999 
+ CB_r      C5_r      N&_r      CT_r      4         180.00         4.1840000000        2              ; 
+ C_r       C4_r      N&_r      CT_r      4         180.00         4.1840000000        2              ;dac guess, 9/94 
+ C_r       C4_r      C4_r      CT_r      4         180.00         4.6024000000        2              ;dac guess, 9/94 
+ C4_r      N2_r      CA_r      NC_r      4         180.00         4.6024000000        2              ;dac guess, 9/94 
+ CA_r      CA_r      C_r       OS_r      4         180.00         4.6024000000        2              ;phosphotyrosine 
+
+
+
+
+[ dihedraltypes ]
+;i        j         k         l         func      Phi0                k                   mul
+ X         C_r       C_r       X         9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ X         C_r       C_r       X         9         180.000000          15.1670000000       2              ;Junmei et al, 1999 
+ X         C_r       C_r       X         9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ X         C_r       C_r       X         9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ X         C_r       CA_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C_r       CA_r      X         9         180.000000          15.1670000000       2              ;intrpol.bsd.on C6H6 
+ X         C_r       CA_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C_r       CA_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C_r       CB_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C_r       CB_r      X         9         180.000000          12.5520000000       2              ;intrpol.bsd.on C6H6 
+ X         C_r       CB_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C_r       CB_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C_r       CS_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C_r       CS_r      X         9         180.000000          9.1002000000        2              ;intrpol.bsd.on C6H6 
+ X         C_r       CS_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C_r       CS_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C_r       CT_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C_r       CT_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         C_r       CT_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C_r       CT_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C_r       N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C_r       N&_r      X         9         180.000000          6.0668000000        2              ;JCC,7,(1986),230 
+ X         C_r       N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C_r       N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C_r       NA_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C_r       NA_r      X         9         180.000000          5.6484000000        2              ;JCC,7,(1986),230 
+ X         C_r       NA_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C_r       NA_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C_r       NC_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C_r       NC_r      X         9         180.000000          16.7360000000       2              ;JCC,7,(1986),230 
+ X         C_r       NC_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C_r       NC_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C_r       O_r       X         9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ X         C_r       O_r       X         9         180.000000          11.7152000000       2              ;Junmei et al, 1999 
+ X         C_r       O_r       X         9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ X         C_r       O_r       X         9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ X         C_r       OH_r      X         9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ X         C_r       OH_r      X         9         180.000000          9.6232000000        2              ;Junmei et al, 1999 
+ X         C_r       OH_r      X         9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ X         C_r       OH_r      X         9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ X         C_r       OS_r      X         9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ X         C_r       OS_r      X         9         180.000000          11.2968000000       2              ;Junmei et al, 1999 
+ X         C_r       OS_r      X         9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ X         C_r       OS_r      X         9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ X         CA_r      CA_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         CA_r      CA_r      X         9         180.000000          15.1670000000       2              ;intrpol.bsd.on C6H6 
+ X         CA_r      CA_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         CA_r      CA_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         CA_r      CB_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         CA_r      CB_r      X         9         180.000000          14.6440000000       2              ;intrpol.bsd.on C6H6 
+ X         CA_r      CB_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         CA_r      CB_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         CA_r      CS_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         CA_r      CS_r      X         9         180.000000          10.6692000000       2              ;intrpol.bsd.on C6H6 
+ X         CA_r      CS_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         CA_r      CS_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         CA_r      CT_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CA_r      CT_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CA_r      CT_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CA_r      CT_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CA_r      N2_r      X         9         0.000000            0.0000000000        1              ;reinterpolated 93' 
+ X         CA_r      N2_r      X         9         180.000000          10.0416000000       2              ;reinterpolated 93' 
+ X         CA_r      N2_r      X         9         0.000000            0.0000000000        3              ;reinterpolated 93' 
+ X         CA_r      N2_r      X         9         0.000000            0.0000000000        4              ;reinterpolated 93' 
+ X         CA_r      NA_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CA_r      NA_r      X         9         180.000000          6.2760000000        2              ;JCC,7,(1986),230 
+ X         CA_r      NA_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CA_r      NA_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CA_r      NC_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CA_r      NC_r      X         9         180.000000          20.0832000000       2              ;JCC,7,(1986),230 
+ X         CA_r      NC_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CA_r      NC_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CA_r      OH_r      X         9         0.000000            0.0000000000        1              ;Junmei et al, 99 
+ X         CA_r      OH_r      X         9         180.000000          3.7656000000        2              ;Junmei et al, 99 
+ X         CA_r      OH_r      X         9         0.000000            0.0000000000        3              ;Junmei et al, 99 
+ X         CA_r      OH_r      X         9         0.000000            0.0000000000        4              ;Junmei et al, 99 
+ X         CB_r      CB_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         CB_r      CB_r      X         9         180.000000          22.8028000000       2              ;intrpol.bsd.on C6H6 
+ X         CB_r      CB_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         CB_r      CB_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         CB_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CB_r      N&_r      X         9         180.000000          6.9036000000        2              ;JCC,7,(1986),230 
+ X         CB_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CB_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CB_r      NB_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CB_r      NB_r      X         9         180.000000          10.6692000000       2              ;JCC,7,(1986),230 
+ X         CB_r      NB_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CB_r      NB_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CB_r      NC_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CB_r      NC_r      X         9         180.000000          17.3636000000       2              ;JCC,7,(1986),230 
+ X         CB_r      NC_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CB_r      NC_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CP_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CP_r      N&_r      X         9         180.000000          7.1128000000        2              ;JCC,7,(1986),230 
+ X         CP_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CP_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CP_r      NB_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CP_r      NB_r      X         9         180.000000          41.8400000000       2              ;JCC,7,(1986),230 
+ X         CP_r      NB_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CP_r      NB_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CS_r      CS_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         CS_r      CS_r      X         9         180.000000          27.8236000000       2              ;intrpol.bsd.on C6H6 
+ X         CS_r      CS_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         CS_r      CS_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         CS_r      CT_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CS_r      CT_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CS_r      CT_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CS_r      CT_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CS_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CS_r      N&_r      X         9         180.000000          7.7404000000        2              ;JCC,7,(1986),230 
+ X         CS_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CS_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CS_r      OS_r      X         9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ X         CS_r      OS_r      X         9         180.000000          4.3932000000        2              ;Junmei et al, 1999 
+ X         CS_r      OS_r      X         9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ X         CS_r      OS_r      X         9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ X         CQ_r      NC_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CQ_r      NC_r      X         9         180.000000          28.4512000000       2              ;JCC,7,(1986),230 
+ X         CQ_r      NC_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CQ_r      NC_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CT_r      CT_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CT_r      CT_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CT_r      CT_r      X         9         0.000000            0.6508444444        3              ;JCC,7,(1986),230 
+ X         CT_r      CT_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CT_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CT_r      N&_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CT_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CT_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CT_r      N2_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CT_r      N2_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CT_r      N2_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         CT_r      N2_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CT_r      OH_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CT_r      OH_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CT_r      OH_r      X         9         0.000000            0.6973333333        3              ;JCC,7,(1986),230 
+ X         CT_r      OH_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CT_r      OS_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         CT_r      OS_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         CT_r      OS_r      X         9         0.000000            1.6038666667        3              ;JCC,7,(1986),230 
+ X         CT_r      OS_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         OH_r      P_r       X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         OH_r      P_r       X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         OH_r      P_r       X         9         0.000000            1.0460000000        3              ;JCC,7,(1986),230 
+ X         OH_r      P_r       X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         OS_r      P_r       X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         OS_r      P_r       X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         OS_r      P_r       X         9         0.000000            1.0460000000        3              ;JCC,7,(1986),230 
+ X         OS_r      P_r       X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         CI_r      OS_r      X         9         0.000000            0.0000000000        1              ; 
+ X         CI_r      OS_r      X         9         0.000000            0.0000000000        2              ; 
+ X         CI_r      OS_r      X         9         0.000000            1.6038666667        3              ; 
+ X         CI_r      OS_r      X         9         0.000000            0.0000000000        4              ; 
+ X         CI_r      OH_r      X         9         0.000000            0.0000000000        1              ; 
+ X         CI_r      OH_r      X         9         0.000000            0.0000000000        2              ; 
+ X         CI_r      OH_r      X         9         0.000000            0.6973333333        3              ; 
+ X         CI_r      OH_r      X         9         0.000000            0.0000000000        4              ; 
+ X         CI_r      CT_r      X         9         0.000000            0.0000000000        1              ; 
+ X         CI_r      CT_r      X         9         0.000000            0.0000000000        2              ; 
+ X         CI_r      CT_r      X         9         0.000000            0.6508444444        3              ; 
+ X         CI_r      CT_r      X         9         0.000000            0.0000000000        4              ; 
+ X         C5_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C5_r      N&_r      X         9         180.000000          7.1128000000        2              ;JCC,7,(1986),230 
+ X         C5_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C5_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C5_r      NB_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C5_r      NB_r      X         9         180.000000          41.8400000000       2              ;JCC,7,(1986),230 
+ X         C5_r      NB_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C5_r      NB_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C_r       C4_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C_r       C4_r      X         9         180.000000          9.1002000000        2              ;intrpol.bsd.on C6H6 
+ X         C_r       C4_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C_r       C4_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C4_r      CA_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C4_r      CA_r      X         9         180.000000          10.6692000000       2              ;intrpol.bsd.on C6H6 
+ X         C4_r      CA_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C4_r      CA_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C4_r      C4_r      X         9         0.000000            0.0000000000        1              ;intrpol.bsd.on C6H6 
+ X         C4_r      C4_r      X         9         180.000000          27.8236000000       2              ;intrpol.bsd.on C6H6 
+ X         C4_r      C4_r      X         9         0.000000            0.0000000000        3              ;intrpol.bsd.on C6H6 
+ X         C4_r      C4_r      X         9         0.000000            0.0000000000        4              ;intrpol.bsd.on C6H6 
+ X         C4_r      CT_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C4_r      CT_r      X         9         0.000000            0.0000000000        2              ;JCC,7,(1986),230 
+ X         C4_r      CT_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C4_r      CT_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ X         C4_r      N&_r      X         9         0.000000            0.0000000000        1              ;JCC,7,(1986),230 
+ X         C4_r      N&_r      X         9         180.000000          7.7404000000        2              ;JCC,7,(1986),230 
+ X         C4_r      N&_r      X         9         0.000000            0.0000000000        3              ;JCC,7,(1986),230 
+ X         C4_r      N&_r      X         9         0.000000            0.0000000000        4              ;JCC,7,(1986),230 
+ CI_r      CT_r      OS_r      CT_r      9         0.000000            0.0000000000        1              ; 
+ CI_r      CT_r      OS_r      CT_r      9         180.000000          0.4184000000        2              ; 
+ CI_r      CT_r      OS_r      CT_r      9         0.000000            1.6024720000        3              ; 
+ CI_r      CT_r      OS_r      CT_r      9         0.000000            0.0000000000        4              ; 
+ H1_r      CI_r      CT_r      OS_r      9         0.000000            1.0460000000        1              ; 
+ H1_r      CI_r      CT_r      OS_r      9         0.000000            0.0000000000        2              ; 
+ H1_r      CI_r      CT_r      OS_r      9         0.000000            0.0000000000        3              ; 
+ H1_r      CI_r      CT_r      OS_r      9         0.000000            0.0000000000        4              ; 
+ H1_r      CI_r      CT_r      OH_r      9         0.000000            1.0460000000        1              ; 
+ H1_r      CI_r      CT_r      OH_r      9         0.000000            0.0000000000        2              ; 
+ H1_r      CI_r      CT_r      OH_r      9         0.000000            0.0000000000        3              ; 
+ H1_r      CI_r      CT_r      OH_r      9         0.000000            0.0000000000        4              ; 
+ H1_r      CT_r      CI_r      OS_r      9         0.000000            1.0460000000        1              ; 
+ H1_r      CT_r      CI_r      OS_r      9         0.000000            0.0000000000        2              ; 
+ H1_r      CT_r      CI_r      OS_r      9         0.000000            0.0000000000        3              ; 
+ H1_r      CT_r      CI_r      OS_r      9         0.000000            0.0000000000        4              ; 
+ H1_r      CT_r      CI_r      OH_r      9         0.000000            1.0460000000        1              ; 
+ H1_r      CT_r      CI_r      OH_r      9         0.000000            0.0000000000        2              ; 
+ H1_r      CT_r      CI_r      OH_r      9         0.000000            0.0000000000        3              ; 
+ H1_r      CT_r      CI_r      OH_r      9         0.000000            0.0000000000        4              ; 
+ CI_r      CT_r      CT_r      CT_r      9         180.000000          0.8368000000        1              ; 
+ CI_r      CT_r      CT_r      CT_r      9         180.000000          1.0460000000        2              ; 
+ CI_r      CT_r      CT_r      CT_r      9         0.000000            0.7531200000        3              ; 
+ CI_r      CT_r      CT_r      CT_r      9         0.000000            0.0000000000        4              ; 
+ CI_r      OS_r      P_r       OS_r      9         31.795080           0.7747973040        1              ;alfa 
+ CI_r      OS_r      P_r       OS_r      9         351.959600          5.2573257040        2              ;alfa 
+ CI_r      OS_r      P_r       OS_r      9         357.247480          1.4847258720        3              ;alfa 
+ CI_r      OS_r      P_r       OS_r      9         357.247480          0.0000000000        4              ;alfa 
+ CI_r      OS_r      P_r       OH_r      9         31.795080           0.7747973040        1              ;alfa 
+ CI_r      OS_r      P_r       OH_r      9         351.959600          5.2573257040        2              ;alfa 
+ CI_r      OS_r      P_r       OH_r      9         357.247480          1.4847258720        3              ;alfa 
+ CI_r      OS_r      P_r       OH_r      9         357.247480          0.0000000000        4              ;alfa 
+ CT_r      CT_r      CI_r      OS_r      9         190.976530          4.9289193600        1              ;gamma 
+ CT_r      CT_r      CI_r      OS_r      9         295.632790          0.3853547680        2              ;gamma 
+ CT_r      CT_r      CI_r      OS_r      9         348.095350          4.0284807200        3              ;gamma 
+ CT_r      CT_r      CI_r      OS_r      9         348.095350          0.0000000000        4              ;gamma 
+ CT_r      CT_r      CI_r      OH_r      9         190.976530          4.9289193600        1              ;gamma 
+ CT_r      CT_r      CI_r      OH_r      9         295.632790          0.3853547680        2              ;gamma 
+ CT_r      CT_r      CI_r      OH_r      9         348.095350          4.0284807200        3              ;gamma 
+ CT_r      CT_r      CI_r      OH_r      9         348.095350          0.0000000000        4              ;gamma 
+ C4_r      C4_r      C_r       O_r       9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ C4_r      C4_r      C_r       O_r       9         180.000000          9.1002000000        2              ;Junmei et al, 1999 
+ C4_r      C4_r      C_r       O_r       9         0.000000            1.2552000000        3              ;Junmei et al, 1999 
+ C4_r      C4_r      C_r       O_r       9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ C5_r      N&_r      CT_r      OS_r      9         68.790200           4.0401122400        1              ;ol3 chi ade 
+ C5_r      N&_r      CT_r      OS_r      9         15.636000           4.4937415200        2              ;ol3 chi ade 
+ C5_r      N&_r      CT_r      OS_r      9         171.578700          1.9143473600        3              ;ol3 chi ade 
+ C5_r      N&_r      CT_r      OS_r      9         19.092100           1.2935672800        4              ;ol3 chi ade 
+ CP_r      N&_r      CT_r      OS_r      9         74.755800           2.9501384000        1              ;ol3 chi gua 
+ CP_r      N&_r      CT_r      OS_r      9         6.228600            4.4578846400        2              ;ol3 chi gua 
+ CP_r      N&_r      CT_r      OS_r      9         168.650300          1.8523823200        3              ;ol3 chi gua 
+ CP_r      N&_r      CT_r      OS_r      9         3.974600            1.0711876800        4              ;ol3 chi gua 
+ C4_r      N&_r      CT_r      OS_r      9         146.989200          5.1256510400        1              ;ol3 chi cyt 
+ C4_r      N&_r      CT_r      OS_r      9         16.476600           6.8391245600        2              ;ol3 chi cyt 
+ C4_r      N&_r      CT_r      OS_r      9         185.877400          3.9223744800        3              ;ol3 chi cyt 
+ C4_r      N&_r      CT_r      OS_r      9         32.159000           1.2984207200        4              ;ol3 chi cyt 
+ CS_r      N&_r      CT_r      OS_r      9         149.858300          4.2891857600        1              ;ol3 chi ura 
+ CS_r      N&_r      CT_r      OS_r      9         16.764800           7.3168118400        2              ;ol3 chi ura 
+ CS_r      N&_r      CT_r      OS_r      9         179.347400          2.4329960000        3              ;ol3 chi ura 
+ CS_r      N&_r      CT_r      OS_r      9         16.001600           1.4705923200        4              ;ol3 chi ura 
+ CT_r      OS_r      P_r       OH_r      9         0.000000            0.0000000000        1              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OH_r      9         0.000000            5.0208000000        2              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OH_r      9         0.000000            1.0460000000        3              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OH_r      9         0.000000            0.0000000000        4              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OS_r      9         0.000000            0.0000000000        1              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OS_r      9         0.000000            5.0208000000        2              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OS_r      9         0.000000            1.0460000000        3              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ CT_r      OS_r      P_r       OS_r      9         0.000000            0.0000000000        4              ;gg&gt ene.631gX/mp2 JCC,7,(1986),230 
+ H1_r      CT_r      C_r       O_r       9         0.000000            3.3472000000        1              ;Junmei et al, 1999 Explicit of wild card X-C-CT-X 
+ H1_r      CT_r      C_r       O_r       9         0.000000            0.0000000000        2              ;Junmei et al, 1999 Explicit of wild card X-C-CT-X 
+ H1_r      CT_r      C_r       O_r       9         180.000000          0.3347200000        3              ;Junmei et al, 1999 Explicit of wild card X-C-CT-X 
+ H1_r      CT_r      C_r       O_r       9         0.000000            0.0000000000        4              ;Junmei et al, 1999 Explicit of wild card X-C-CT-X 
+ CT_r      CT_r      OH_r      HO_r      9         0.000000            1.0460000000        1              ;Junmei et al, 1999 
+ CT_r      CT_r      OH_r      HO_r      9         0.000000            0.0000000000        2              ;Junmei et al, 1999 
+ CT_r      CT_r      OH_r      HO_r      9         0.000000            0.6694400000        3              ;Junmei et al, 1999 
+ CT_r      CT_r      OH_r      HO_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ HO_r      OH_r      C_r       O_r       9         0.000000            7.9496000000        1              ;Junmei et al, 1999 
+ HO_r      OH_r      C_r       O_r       9         180.000000          9.6232000000        2              ;Junmei et al, 1999 
+ HO_r      OH_r      C_r       O_r       9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ HO_r      OH_r      C_r       O_r       9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CS_r      CS_r      C_r       O_r       9         0.000000            0.0000000000        1              ;Junmei et al, 1999 
+ CS_r      CS_r      C_r       O_r       9         180.000000          9.1002000000        2              ;Junmei et al, 1999 
+ CS_r      CS_r      C_r       O_r       9         0.000000            1.2552000000        3              ;Junmei et al, 1999 
+ CS_r      CS_r      C_r       O_r       9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CT_r      CS_r      CS_r      CT_r      9         180.000000          7.9496000000        1              ;Junmei et al, 1999 
+ CT_r      CS_r      CS_r      CT_r      9         180.000000          27.8236000000       2              ;Junmei et al, 1999 
+ CT_r      CS_r      CS_r      CT_r      9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ CT_r      CS_r      CS_r      CT_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CT_r      CT_r      CT_r      CT_r      9         180.000000          0.8368000000        1              ;Junmei et al, 1999 
+ CT_r      CT_r      CT_r      CT_r      9         180.000000          1.0460000000        2              ;Junmei et al, 1999 
+ CT_r      CT_r      CT_r      CT_r      9         0.000000            0.7531200000        3              ;Junmei et al, 1999 
+ CT_r      CT_r      CT_r      CT_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CT_r      CT_r      OS_r      CT_r      9         0.000000            0.0000000000        1              ; 
+ CT_r      CT_r      OS_r      CT_r      9         180.000000          0.4184000000        2              ; 
+ CT_r      CT_r      OS_r      CT_r      9         0.000000            1.6024720000        3              ; 
+ CT_r      CT_r      OS_r      CT_r      9         0.000000            0.0000000000        4              ; 
+ C_r       OS_r      CT_r      CT_r      9         180.000000          3.3472000000        1              ;Junmei et al, 1999 
+ C_r       OS_r      CT_r      CT_r      9         0.000000            0.0000000000        2              ;Junmei et al, 1999 
+ C_r       OS_r      CT_r      CT_r      9         0.000000            1.6024720000        3              ;Junmei et al, 1999 
+ C_r       OS_r      CT_r      CT_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CT_r      OS_r      CT_r      OS_r      9         180.000000          5.6484000000        1              ;Junmei et al, 1999 
+ CT_r      OS_r      CT_r      OS_r      9         180.000000          3.5564000000        2              ;Junmei et al, 1999 
+ CT_r      OS_r      CT_r      OS_r      9         0.000000            0.4184000000        3              ;Junmei et al, 1999 
+ CT_r      OS_r      CT_r      OS_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ CT_r      OS_r      CT_r      N&_r      9         0.000000            0.0000000000        1              ;Piotr et al. parm98.dat, TC,PC,PAK 
+ CT_r      OS_r      CT_r      N&_r      9         0.000000            2.7196000000        2              ;Piotr et al. parm98.dat, TC,PC,PAK 
+ CT_r      OS_r      CT_r      N&_r      9         0.000000            1.6024720000        3              ;Piotr et al. parm98.dat, TC,PC,PAK 
+ CT_r      OS_r      CT_r      N&_r      9         0.000000            0.0000000000        4              ;Piotr et al. parm98.dat, TC,PC,PAK 
+ CT_r      OS_r      C_r       O_r       9         180.000000          5.8576000000        1              ;Junmei et al, 1999 
+ CT_r      OS_r      C_r       O_r       9         180.000000          11.2968000000       2              ;Junmei et al, 1999 
+ CT_r      OS_r      C_r       O_r       9         0.000000            0.0000000000        3              ;Junmei et al, 1999 
+ CT_r      OS_r      C_r       O_r       9         0.000000            0.0000000000        4              ;Junmei et al, 1999 
+ OS_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        1              ;Piotr et al. parm98, TC,PC,PAK 
+ OS_r      CT_r      CT_r      OS_r      9         0.000000            4.9162000000        2              ;Piotr et al. parm98, TC,PC,PAK 
+ OS_r      CT_r      CT_r      OS_r      9         0.000000            0.6024960000        3              ;Piotr et al. parm98, TC,PC,PAK 
+ OS_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        4              ;Piotr et al. parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        1              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OS_r      9         0.000000            4.9162000000        2              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OS_r      9         0.000000            0.6024960000        3              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        4              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OH_r      9         0.000000            0.0000000000        1              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OH_r      9         0.000000            4.9162000000        2              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OH_r      9         0.000000            0.6024960000        3              ;parm98, TC,PC,PAK 
+ OH_r      CT_r      CT_r      OH_r      9         0.000000            0.0000000000        4              ;parm98, TC,PC,PAK 
+ H1_r      CT_r      CT_r      OS_r      9         0.000000            1.0460000000        1              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        2              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        3              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OS_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OH_r      9         0.000000            1.0460000000        1              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OH_r      9         0.000000            0.0000000000        2              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OH_r      9         0.000000            0.0000000000        3              ;Junmei et al, 1999 JCC,7,(1986),230 
+ H1_r      CT_r      CT_r      OH_r      9         0.000000            0.0000000000        4              ;Junmei et al, 1999 JCC,7,(1986),230 
+
+
+
+
+

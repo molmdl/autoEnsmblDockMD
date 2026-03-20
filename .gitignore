@@ -205,3 +205,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Test data and large output
+*.edr
+*.xtc
+*.trr
+*.tpr
+*#*
+*.log
+*.gro
+*.xvg
+
+# Placeholder for exceptions
+
