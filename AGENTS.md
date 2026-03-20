@@ -1,4 +1,4 @@
-# AGENTS.md - Guidelines for Agentic Coding in autoEnsmblDockMD
+# AGENTS.md - Guidelines for Agentic Workflow in autoEnsmblDockMD
 
 Agent skill to 
 
@@ -6,8 +6,11 @@ Agent skill to
 
 
 ## Detailed requirements
+- workflow
+- command
+- skill
 
-## pre
+## prere
 env
 preinstall gnina gmx
 
@@ -18,6 +21,8 @@ file paths
 user provided templates
 
 workspace
+
+expected output
 
 ## Workflow
 
