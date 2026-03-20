@@ -1,0 +1,33 @@
+{
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": {
+      "quality": {
+        "planning": "github-copilot/claude-sonnet-4.5",
+        "execution": "github-copilot/gpt-5.3-codex",
+        "verification": "github-copilot/claude-sonnet-4.5"
+      },
+      "balanced": {
+        "planning": "openrouter/minimax/minimax-m2.5",
+        "execution": "openrouter/minimax/minimax-m2.5",
+        "verification": "openrouter/minimax/minimax-m2.5"
+      },
+      "budget": {
+        "planning": "openrouter/minimax/minimax-m2.5",
+        "execution": "openrouter/minimax/minimax-m2.5",
+        "verification": "github-copilot/gpt-5-mini"
+      }
+    },
+    "custom_overrides": {
+      "quality": {},
+      "balanced": {},
+      "budget": {}
+    }
+  },
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true
+  },
+  "model_profile": "balanced"
+}

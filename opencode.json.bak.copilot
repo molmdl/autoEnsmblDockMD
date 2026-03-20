@@ -1,0 +1,44 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "small_model": "github-copilot/gpt-5-mini",
+  "agent": {
+    "gsd-planner": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-plan-checker": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-phase-researcher": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-roadmapper": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-project-researcher": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-research-synthesizer": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-codebase-mapper": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-executor": { "model": "github-copilot/gpt-5.3-codex" },
+    "gsd-debugger": { "model": "github-copilot/gpt-5.3-codex" },
+    "gsd-verifier": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-integration-checker": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-set-profile": { "model": "github-copilot/gpt-5-mini" },
+    "gsd-settings": { "model": "github-copilot/gpt-5-mini" },
+    "gsd-set-model": { "model": "github-copilot/gpt-5-mini" }
+  },
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "git *": "ask",
+      "git rebase *": "ask",
+      "git revert *": "ask",
+      "git push *": "ask",
+      "git checkout *": "ask",
+      "npm *": "ask",
+      "rm *": "deny",
+      "pip *": "ask",
+      "pip3 *": "ask",
+      "apt *": "ask",
+      "mv *": "ask",
+      "conda *": "ask",
+      "wget *": "ask",
+      "curl *": "ask",
+      "python *": "ask"
+    },
+    "edit": {
+      "*": "deny"
+    }
+  }
+}
+
