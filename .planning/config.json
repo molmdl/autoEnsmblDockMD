@@ -9,13 +9,13 @@
       },
       "balanced": {
         "planning": "openrouter/minimax/minimax-m2.5",
-        "execution": "openrouter/minimax/minimax-m2.5",
+        "execution": "openrouter/z-ai/glm-5",
         "verification": "openrouter/minimax/minimax-m2.5"
       },
       "budget": {
         "planning": "openrouter/minimax/minimax-m2.5",
         "execution": "openrouter/minimax/minimax-m2.5",
-        "verification": "github-copilot/gpt-5-mini"
+        "verification": "github-copilot/minimax-m2.5"
       }
     },
     "custom_overrides": {
