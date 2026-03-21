@@ -1,5 +1,5 @@
 # AGENTS.md - Guidelines for Building an Agentic Workflow in autoEnsmblDockMD
-This project aim to create a set of scripts, with an experimental but SAFE AND EFFICIENT agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agwnts. The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters.
+This project aim to create a set of scripts, with an experimental but SAFE AND EFFICIENT agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agents. 
 
 ---
 
@@ -40,25 +40,13 @@ Formated, to be loaded by agents, minimal but sufficient.
 ## Prerequisite
 For other users
 - **Environment setup**: Conda environment in `env.yml` should be installed and activated.
-- **Software installation**: Gromacs version > 2022, gnina
+- **Software installation**: Gromacs version > 2022, gnina, gmx_MMPBSA (already in conda environment via pip)
 - **files to be provided by user**: see work/input for the files of each stage. copy them to new workspace to start
 
 For the CURRENT user (developer) or agents on this cluster
 - **Loading the environment**: `source ./scripts/setenv.sh`
 - **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
 - **Expected output (selected) from a manual trial by human**: Selected output from a manual trial by human will be provided in the ./expected directory, which has the same structure as the work/input directory, and the new workspace created by agent for testing in work/ should also have the same structure.
-
-
----
-
-## Repository structure (brief)
-
-file paths
-
-user provided templates
-
-workspace
-expected output (only providing important output here to save space)
 
 ---
 
