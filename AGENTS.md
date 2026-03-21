@@ -47,6 +47,7 @@ For the CURRENT user (developer) or agents on this cluster
 - **Loading the environment**: `source ./scripts/setenv.sh`
 - **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
 - **Expected output (selected) from a manual trial by human**: Selected output from a manual trial by human will be provided in the ./expected directory, which has the same structure as the work/input directory, and the new workspace created by agent for testing in work/ should also have the same structure.
+- **Other examples**: Other examples files for reference, e.g. the gmxMMPBSA pred example from the developers github, are provided, that the user will provie the path to this exmple when working on that stage.
 
 ---
 
