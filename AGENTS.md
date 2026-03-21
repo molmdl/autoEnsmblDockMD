@@ -1,14 +1,41 @@
 # AGENTS.md - Guidelines for Building an Agentic Workflow in autoEnsmblDockMD
-This project aim to create an agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agwnts. The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters.
+This project aim to create a set of scripts, with an experimental but SAFE AND EFFICIENT agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agwnts. The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters.
+
+---
 
 ## Detailed requirements
-Success of this project depends on the following elements
-1. workflow: the full workflow should be automated via calling of slash commands or agent skills. Slash commands and agent skill use the scripts to do the work. Agents orchestrate the workflow, execute commands or call scripts, preoare input files, inspect results and make decisions based on results.
-3. agent
-checkpoints should be provided fir human verification and starting new session to @void overflow of context window of LLM.
-2. slash command:
-3. agent skill:
-4. scripts: python and bash scripts of the current manual workflow is provided in the respective (sub-)directory in `./expected`, usage and execution order under the `## Workflow` session. Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines, with options input via cli flag or input conf file.
+Success of this project depends on the elements I, II, III, IB, V, and VI.
+
+### I. Workflow
+1. The full workflow should be automated via calling of slash commands or agent skills. 
+2. Slash commands and agent skill use the scripts to do the work. 
+3. Agents orchestrate the workflow, execute commands or call scripts, preoare input files, inspect results and make decisions based on results.
+4. checkpoints should be provided for human verification and starting new session to avoid overflow of context window of LLM.
+
+### II. Agent(s)
+Agents are aware of how and when to use related commands and skills, and where to obtain relevant documentations. 
+1. orchestrator manage all agents, knows the workflow, knows when to spawn which agent, knows the agent-targeted documentation.
+2. runner run specific steps of the workflow, loads the workflow of a stage or a slash command, and knows how to use the scripts.
+3. analyzer run standard analysis and create custom analysis scripts if necessary, following a consistent coding style and i/o format
+4. checker investigate results to evaluate/judge/warn/suggest/comment on it
+5. debugger follow the gsd-debugger workflow to fix major issues awaring of the manual of the versions of gromacs, gnina, gmx_MMPBSA, and other python libraries.
+
+
+### III. Slash command: 
+For the user to run specific major stage in the workflow.
+
+### IV. Agent skill
+Formated, to be loaded by agents, minimal but sufficient. 
+
+### V. Scripts
+- Python and bash scripts of the current manual workflow is provided in the respective (sub-)directory in `./expected`, usage and execution order under the `## Workflow` session. 
+- Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines, with options input via cli flag or input conf file.
+
+### VI. Documentation
+1. Minimal, sufficient, professional, clear and concise documentation in README.md for human
+2. Detailed documentation in a format optimized for agents to check whenever necessary (to avoid loading too much context every time)
+
+---
 
 ## Prerequisite
 For other users
@@ -19,7 +46,10 @@ For other users
 For the CURRENT user (developer) or agents on this cluster
 - **Loading the environment**: `source ./scripts/setenv.sh`
 - **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
-- **Expected output (selected) from a manual trial by human**:
+- **Expected output (selected) from a manual trial by human**: Selected output from a manual trial by human will be provided in the ./expected directory, which has the same structure as the work/input directory, and the new workspace created by agent for testing in work/ should also have the same structure.
+
+
+---
 
 ## Repository structure (brief)
 
@@ -28,15 +58,21 @@ file paths
 user provided templates
 
 workspace
+expected output (only providing important output here to save space)
 
-expected output (only providing important output here to save space
+---
 
 ## Workflow
 
-checks
+Workflow will be provided in the `WORKFLOW.md` file to reduce the filesize of this AGENTS.md.
+
+## Future
+- Automate the ligand preparation procedures and ffnonbond.itp edits
 
 
 ## Notes for Agents
+- **No rm command except in the test directory**: the `rm` command is prohibited except in the test directory of the workspace created for the test, for handling temporary test files. In any case you use the rm command, report it in a file. and seek explicit approval
+- **Never require sudo permission**
 - **Environment sourcing**: Source `./scripts/setenv.sh` before using the script and commands in this project.
 - **Professional tone**: Be clear, concise, and professional in responses. Check output for errors.
 - **Conda environment only**: Do not modify system-wide Python installations
@@ -45,8 +81,5 @@ checks
 - **Configuration-driven approach**: Preferred over hardcoded values
 - **Multi-job manager support**: Must be preserved in shell scripts
 - **Consistency**: Ensure input/output file formats and code style consistency across different conversations of this project
-- **No rm command except in the test directory**: the `rm` command is prohibited except in the test directory for handling temporary test files. In any case you use the rm command, report it in a file.
 - **Report summary of the tasks done and to-be-done**: After planning, the plan should write to a md file before proceed. After executing tasks, the working being done should be summarized abd append into a md file, and the to-do tasks summarized in another md file
 
-## Future
-- Automate the ligand preparation procedures and ffnonbond.itp edits
