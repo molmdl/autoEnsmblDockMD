@@ -1,5 +1,5 @@
 # AGENTS.md - Guidelines for Building an Agentic Workflow in autoEnsmblDockMD
-This project aim to create an agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agwnts. The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates
+This project aim to create an agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agwnts. The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters.
 
 ## Detailed requirements
 Success of this project depends on the following elements
@@ -8,13 +8,20 @@ Success of this project depends on the following elements
 checkpoints should be provided fir human verification and starting new session to @void overflow of context window of LLM.
 2. slash command:
 3. agent skill:
-4. scripts: python and bash scripts of the current manual workflow is provided in the respective directory in `./expected`, usage and execution order under the `## Workflow` session. Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines, with options input via cli flag or input conf file.
+4. scripts: python and bash scripts of the current manual workflow is provided in the respective (sub-)directory in `./expected`, usage and execution order under the `## Workflow` session. Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines, with options input via cli flag or input conf file.
 
-## prere
-env
-preinstall gnina gmx
+## Prerequisite
+For other users
+- **Environment setup**: Conda environment in `env.yml` should be installed and activated.
+- **Software installation**: Gromacs version > 2022, gnina
+- **files to be provided by user**: see work/input for the files of each stage. copy them to new workspace to start
 
-## Repository structure
+For the CURRENT user (developer) or agents on this cluster
+- **Loading the environment**: `source ./scripts/setenv.sh`
+- **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
+- **Expected output (selected) from a manual trial by human**:
+
+## Repository structure (brief)
 
 file paths
 
@@ -22,7 +29,7 @@ user provided templates
 
 workspace
 
-expected output
+expected output (only providing important output here to save space
 
 ## Workflow
 
@@ -30,13 +37,16 @@ checks
 
 
 ## Notes for Agents
-- **Environment sourcing**: Source `setenv.sh` before using the script and commands in this project.
+- **Environment sourcing**: Source `./scripts/setenv.sh` before using the script and commands in this project.
 - **Professional tone**: Be clear, concise, and professional in responses. Check output for errors.
 - **Conda environment only**: Do not modify system-wide Python installations
-- **Test directory**: Primary location for validation and testing
+- **work/test directory of the protocol/agent**: Primary location for validation and testing. User-provided inputs are in `./work/input`.
 - **Maintain backward compatibility**: When modifying core workflows
 - **Configuration-driven approach**: Preferred over hardcoded values
 - **Multi-job manager support**: Must be preserved in shell scripts
 - **Consistency**: Ensure input/output file formats and code style consistency across different conversations of this project
 - **No rm command except in the test directory**: the `rm` command is prohibited except in the test directory for handling temporary test files. In any case you use the rm command, report it in a file.
 - **Report summary of the tasks done and to-be-done**: After planning, the plan should write to a md file before proceed. After executing tasks, the working being done should be summarized abd append into a md file, and the to-do tasks summarized in another md file
+
+## Future
+- Automate the ligand preparation procedures and ffnonbond.itp edits
