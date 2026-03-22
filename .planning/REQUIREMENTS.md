@@ -99,6 +99,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SCRIPT-01 | Phase 2 | Pending |
+| SCRIPT-02 | N/A (deferred to v2) | Deferred |
 | SCRIPT-03 | Phase 2 | Pending |
 | SCRIPT-04 | Phase 2 | Pending |
 | SCRIPT-05 | Phase 2 | Pending |
@@ -127,7 +128,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXEC-05 | Phase 2 | Pending |
 | CHECK-01 | Phase 1 | Pending |
 | CHECK-02 | Phase 1 | Pending |
-| CHECK-03 | Phase 3 | Pending |
+| CHECK-03 | Phase 1 | Pending |
 | DOC-01 | Phase 5 | Pending |
 | DOC-02 | Phase 4 | Pending |
 | DOC-03 | Phase 5 | Pending |
@@ -135,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 34
+- Mapped to phases: 33 (1 deferred to v2)
 - Unmapped: 0 ✓
 
 ---
