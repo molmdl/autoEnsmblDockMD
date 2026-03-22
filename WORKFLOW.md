@@ -1,3 +1,5 @@
+> TO BE FINALIZED, do not proceed to plan or work of related stages with this banner
+
 # WORKFLOW.md contains information on the full workflow of autoEnsmblDockMD
 
 The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters, gromacs run input mdp; optionally configuration parameters for docking.
