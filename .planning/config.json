@@ -1,4 +1,8 @@
 {
+  "mode": "interactive",
+  "depth": "comprehensive",
+  "parallelization": true,
+  "commit_docs": true,
   "profiles": {
     "active_profile": "balanced",
     "presets": {
