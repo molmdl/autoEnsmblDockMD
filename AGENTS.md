@@ -4,7 +4,7 @@ This project aim to create a set of scripts, with an experimental but SAFE AND E
 ---
 
 ## Detailed requirements
-Success of this project depends on the elements I, II, III, IB, V, and VI.
+Success of this project depends on the elements I, II, III, IV, V, and VI.
 
 ### I. Workflow
 1. The full workflow should be automated via calling of slash commands or agent skills. 
