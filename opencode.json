@@ -47,7 +47,7 @@
     }
   },
   "agent": {
-    "gsd-planner": { "model": "openrouter/minimax/minimax-m2.5" },
+    "gsd-planner": { "model": "openrouter/z-ai/glm-5" },
     "gsd-plan-checker": { "model": "openrouter/minimax/minimax-m2.5" },
     "gsd-phase-researcher": { "model": "openrouter/minimax/minimax-m2.5" },
     "gsd-roadmapper": { "model": "openrouter/minimax/minimax-m2.5" },
