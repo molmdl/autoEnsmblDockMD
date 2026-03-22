@@ -8,6 +8,9 @@ which dir to enter, which file to detect, which script to execute, which analysi
 
 ## Major stages
 remind or help user to place the required input
+standard workflow
+default analysis
+tailored analysis
 
 ---
 

@@ -11,6 +11,7 @@ Success of this project depends on the elements I, II, III, IV, V, and VI.
 2. Slash commands and agent skill use the scripts to do the work. 
 3. Agents orchestrate the workflow, execute commands or call scripts, preoare input files, inspect results and make decisions based on results.
 4. checkpoints should be provided for human verification and starting new session to avoid overflow of context window of LLM.
+5. When scripts can be used, prepare scripts for the protocol instead of letting the agent generate new commands every time.
 
 ### II. Agent(s)
 Agents are aware of how and when to use related commands and skills, and where to obtain relevant documentations. 
@@ -29,7 +30,9 @@ Formated, to be loaded by agents, minimal but sufficient.
 
 ### V. Scripts
 - Python and bash scripts of the current manual workflow is provided in the respective (sub-)directory in `./expected`, usage and execution order under the `## Workflow` session. 
-- Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines, with options input via cli flag or input conf file.
+- Identify missing scripts (gaps) in the protocol. Ask the user to provide first, otherwise generate one.
+- Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines; and 'gaps' scripts generated, with options input via cli flag or input conf file.
+- All the scripts should be revised, refactored for consistency and generalizability.
 
 ### VI. Documentation
 1. Minimal, sufficient, professional, clear and concise documentation in README.md for human
