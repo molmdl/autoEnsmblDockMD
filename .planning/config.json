@@ -12,7 +12,7 @@
         "verification": "github-copilot/claude-sonnet-4.5"
       },
       "balanced": {
-        "planning": "openrouter/minimax/minimax-m2.5",
+        "planning": "openrouter/z-ai/glm-5",
         "execution": "openrouter/z-ai/glm-5",
         "verification": "openrouter/minimax/minimax-m2.5"
       },
