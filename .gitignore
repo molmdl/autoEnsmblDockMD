@@ -217,5 +217,8 @@ __marimo__/
 *.gro
 *.xvg
 
+# Temp add session backup to gitignore
+.oc_session/**
+
 # Placeholder for exceptions
 
