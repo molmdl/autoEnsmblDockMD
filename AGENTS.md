@@ -46,7 +46,7 @@ For other users
 - **Software installation**: Gromacs version > 2022, gnina, gmx_MMPBSA (already in conda environment via pip)
 - **files to be provided by user**: see work/input for the files of each stage. copy them to new workspace to start
 
-For the CURRENT user (developer) or agents on this cluster
+For the CURRENT user (developer) or agents on this cluster (hostname=mgpu)
 - **Loading the environment**: `source ./scripts/setenv.sh`
 - **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
 - **Expected output (selected) from a manual trial by human**: Selected output from a manual trial by human will be provided in the ./expected directory, which has the same structure as the work/input directory, and the new workspace created by agent for testing in work/ should also have the same structure.
