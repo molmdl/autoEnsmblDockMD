@@ -51,6 +51,9 @@
 | Human automation over agent autonomy | Agent behavior has uncertainties; validated human workflow is priority | 3, 4 |
 | Defer codebase mapping | Workflow/scripts being finalized; map after stabilization | 2 |
 | Ligand prep deferred to v2 | Complex chemistry, error-prone; user provides prepared ligands | 2 |
+| Agent-stage mapping in WORKFLOW.md | Explicit agent responsibility mapping enables orchestrator coordination | All |
+| Requirement-per-stage traceability | Links workflow stages to REQUIREMENTS.md IDs for requirement-driven development | All |
+| Script categorization | Groups scripts by purpose for agent navigation and selection | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -73,6 +76,12 @@
 ### Next Action
 
 Awaiting user approval of roadmap. After approval, proceed to `/gsd-plan-phase 1` to plan Foundation phase.
+
+### Quick Tasks Completed
+
+| Task | Description | Date | Summary |
+|------|-------------|------|---------|
+| quick-001 | Update WORKFLOW.md template | 2026-03-23 | Added agent integration, requirement traceability, script categorization |
 
 ### Workflow Status
 
@@ -111,3 +120,4 @@ Awaiting user approval of roadmap. After approval, proceed to `/gsd-plan-phase 1
 
 *State updated: 2026-03-23*
 *Last phase: N/A (initialization)*
+*Last quick task: quick-001 (2026-03-23)*
