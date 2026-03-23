@@ -1,2 +1,26 @@
-dzp is more manual
-the ibp trial use exact scripts in it
+# Contents in this directory
+
+## ibp
+reference ligand ibp related files, use exact scripts in it. Order of execution:
+(0. copying related files from receptor preparation, ligand preparation, docking output to here)
+1. `bash dock2com.sh`
+2. `bash prep.sh`
+3. `sbatch pr.sh`
+4. `sbatch prod.sh`
+
+## dzp
+files of reference ligand dzp simulation, the run was more manual, provided for later test and reference
+
+## lig
+this is actually dzp selected from ensemple docking results
+
+## amber19SB_OL21_OL3_lipid17.ff
+symbolic link to ff directory
+
+## scripts
+com_ana_trj.py
+dock2com.py
+mol2_reorder.py
+
+
+
