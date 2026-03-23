@@ -611,36 +611,36 @@ INPUT                    RECEPTOR                    ENSEMBLE
 
 ## Scripts Status
 
-| Script | Status | Location |
-|--------|--------|----------|
-| `validate_input.py` | PLACEHOLDER | `scripts/` |
-| `rec_clean.sh/py` | PLACEHOLDER | `scripts/` |
-| `rec_addH.sh/py` | PLACEHOLDER | `scripts/` |
-| `rec_topol.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_em.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_nvt.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_npt.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_prod.sh/py` | PLACEHOLDER | `scripts/` |
-| `ensemble_extract.sh/py` | PLACEHOLDER | `scripts/` |
-| `cluster_rmsd.sh/py` | PLACEHOLDER | `scripts/` |
-| `ensemble_select.sh/py` | PLACEHOLDER | `scripts/` |
-| `dock_prep_grid.sh/py` | PLACEHOLDER | `scripts/` |
-| `dock_gnina.sh/py` | PLACEHOLDER | `scripts/` |
-| `dock_rmsd.sh/py` | PLACEHOLDER | `scripts/` |
-| `dock_ligands.sh/py` | PLACEHOLDER | `scripts/` |
-| `dock_aggregate.sh/py` | PLACEHOLDER | `scripts/` |
-| `com_select_poses.sh/py` | PLACEHOLDER | `scripts/` |
-| `com_build_topol.sh/py` | PLACEHOLDER | `scripts/` |
-| `com_solvate.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_em_complex.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_equilibrate.sh/py` | PLACEHOLDER | `scripts/` |
-| `md_prod_complex.sh/py` | PLACEHOLDER | `scripts/` |
-| `mmpbsa_prep.sh/py` | PLACEHOLDER | `scripts/` |
-| `mmpbsa_run.sh/py` | PLACEHOLDER | `scripts/` |
-| `mmpbsa_aggregate.sh/py` | PLACEHOLDER | `scripts/` |
-| `analysis_ranking.py` | PLACEHOLDER | `scripts/` |
-| `analysis_plots.py` | PLACEHOLDER | `scripts/` |
-| `analysis_report.py` | PLACEHOLDER | `scripts/` |
+| Script | Category | Status | Location | CLI Support |
+|--------|-----------|--------|----------|-------------|
+| `validate_input.py` | Input/Validation | PLACEHOLDER | `scripts/` | PLANNED |
+| `rec_clean.sh/py` | Receptor | PLACEHOLDER | `scripts/` | PLANNED |
+| `rec_addH.sh/py` | Receptor | PLACEHOLDER | `scripts/` | PLANNED |
+| `rec_topol.sh/py` | Receptor | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_em.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_nvt.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_npt.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_prod.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `ensemble_extract.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `cluster_rmsd.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `ensemble_select.sh/py` | Ensemble/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `dock_prep_grid.sh/py` | Docking | PLACEHOLDER | `scripts/` | PLANNED |
+| `dock_gnina.sh/py` | Docking | PLACEHOLDER | `scripts/` | PLANNED |
+| `dock_rmsd.sh/py` | Docking | PLACEHOLDER | `scripts/` | PLANNED |
+| `dock_ligands.sh/py` | Docking | PLACEHOLDER | `scripts/` | PLANNED |
+| `dock_aggregate.sh/py` | Docking | PLACEHOLDER | `scripts/` | PLANNED |
+| `com_select_poses.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `com_build_topol.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `com_solvate.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_em_complex.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_equilibrate.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `md_prod_complex.sh/py` | Complex/MD | PLACEHOLDER | `scripts/` | PLANNED |
+| `mmpbsa_prep.sh/py` | MMPBSA | PLACEHOLDER | `scripts/` | PLANNED |
+| `mmpbsa_run.sh/py` | MMPBSA | PLACEHOLDER | `scripts/` | PLANNED |
+| `mmpbsa_aggregate.sh/py` | MMPBSA | PLACEHOLDER | `scripts/` | PLANNED |
+| `analysis_ranking.py` | Analysis | PLACEHOLDER | `scripts/` | PLANNED |
+| `analysis_plots.py` | Analysis | PLACEHOLDER | `scripts/` | PLANNED |
+| `analysis_report.py` | Analysis | PLACEHOLDER | `scripts/` | PLANNED |
 
 ---
 
