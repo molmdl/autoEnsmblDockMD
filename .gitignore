@@ -221,4 +221,8 @@ __marimo__/
 .oc_session/**
 
 # Placeholder for exceptions
+expected/**/*.*
+!expected/**/*.md
+!expected/**/*.sh
+!expected/**/*.py
 
