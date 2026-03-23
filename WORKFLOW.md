@@ -58,6 +58,8 @@ This workflow is designed for agent-assisted execution. Agents reference this do
 
 ## Stage 0: Input Validation & Setup
 
+**Requirements:** CHECK-01 (stage checkpoints), CHECK-02 (human verification), EXEC-01 (local execution)
+
 **Purpose:** Verify all required inputs exist and are properly formatted.
 
 **Working Directory:** `{WORKSPACE}/`
@@ -105,6 +107,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 
 ## Stage 1: Receptor Preparation
 
+**Requirements:** SCRIPT-01 (receptor scripts), CHECK-01 (stage checkpoints), EXEC-01 (local execution)
+
 **Purpose:** Process receptor structure for docking and MD.
 
 **Working Directory:** `cd {WORKSPACE}/rec/`
@@ -149,6 +153,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 2: Ensemble Generation (MD-based Conformer Sampling)
+
+**Requirements:** SCRIPT-01 (receptor scripts), CHECK-01 (stage checkpoints), EXEC-01 (local execution)
 
 **Purpose:** Generate structural ensemble for docking flexibility.
 
@@ -209,6 +215,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 
 ## Stage 3: Ensemble Clustering & Selection
 
+**Requirements:** SCRIPT-01 (receptor scripts), CHECK-01 (stage checkpoints), EXEC-01 (local execution)
+
 **Purpose:** Select representative conformers from MD trajectory.
 
 **Working Directory:** `cd {WORKSPACE}/rec/ensemble/`
@@ -244,6 +252,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 4: Reference Redocking (Validation)
+
+**Requirements:** SCRIPT-03 (docking scripts), CHECK-01 (stage checkpoints), CHECK-02 (human verification), EXEC-05 (parallel jobs)
 
 **Purpose:** Validate docking protocol using reference ligand with known pose.
 
@@ -289,6 +299,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 
 ## Stage 5: Target Ligand Docking
 
+**Requirements:** SCRIPT-03 (docking scripts), CHECK-01 (stage checkpoints), CHECK-02 (human verification), EXEC-05 (parallel jobs)
+
 **Purpose:** Dock all target ligands to ensemble representatives.
 
 **Working Directory:** `cd {WORKSPACE}/dock/new/`
@@ -325,6 +337,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 6: Complex Preparation (for MD Rescoring)
+
+**Requirements:** SCRIPT-04 (MD setup scripts), SCRIPT-05 (MD production scripts), CHECK-01 (stage checkpoints), EXEC-02 (Slurm)
 
 **Purpose:** Prepare protein-ligand complexes for MD simulation.
 
@@ -365,6 +379,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 7: MD Simulation (Rescoring)
+
+**Requirements:** SCRIPT-04 (MD setup scripts), SCRIPT-05 (MD production scripts), CHECK-01 (stage checkpoints), EXEC-02 (Slurm)
 
 **Purpose:** Run MD simulations for binding free energy calculation.
 
@@ -408,6 +424,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 8: MMPBSA Binding Free Energy
+
+**Requirements:** SCRIPT-06 (MMPBSA scripts), CHECK-01 (stage checkpoints), EXEC-02 (Slurm), EXEC-05 (parallel jobs)
 
 **Purpose:** Calculate binding free energies using MM/PBSA.
 
@@ -453,6 +471,8 @@ for lig in work/input/lig/new/*.pdb; do [ -f "$lig" ] || echo "ERROR: No target 
 ---
 
 ## Stage 9: Final Analysis & Reporting
+
+**Requirements:** SCRIPT-07 (analysis scripts), DOC-01 (README documentation), DOC-02 (agent-optimized docs)
 
 **Purpose:** Generate comprehensive analysis report.
 
