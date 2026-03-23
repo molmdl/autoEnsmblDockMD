@@ -27,6 +27,8 @@ reference redock
 interested lig dock
 gen ensemble, cluster, select, align
 intermediate analysis step
+ensemble docking, from all ensemble out select best rec-lig combination
+conversion and setup for md
 multiple parallel agent for multiple ligands, max parallel up to N agents
 using slurm for hpc, and run local option
 
