@@ -4,16 +4,9 @@
   "permission": {
     "external_directory": {
       "*": "ask",
-      "/share/home/nglokwan/.local/share/opencode/tool-output/*": "allow",
-      "/share/home/nglokwan/.local/share/opencode/plans/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/file-format-conversion/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/force-field-operations/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/free-energy-analysis/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/molecular-data-processing/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/statistical-analysis/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/coordinate-geometry/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/coarse-graining/*": "allow",
-      "/share/home/nglokwan/.opencode/skills/molecular-visualization/*": "allow"
+      "~/.local/share/opencode/tool-output/*": "allow",
+      "~/.local/share/opencode/plans/*": "allow",
+      "~/.config/opencode/get-shit-done/**": "allow"
     },
     "*": "ask",
     "read": {
