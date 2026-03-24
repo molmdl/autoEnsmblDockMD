@@ -1,5 +1,7 @@
 #!/bin/bash
 
+python ../../scripts/bypass_angle_type3.py lig_g.itp sys.top
+
 for i in {0..3} ; do
 	mkdir mmpbsa_${i}
 	cd mmpbsa_${i}
