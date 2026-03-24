@@ -18,14 +18,14 @@ The roadmap derives phases from the natural groupings of requirements, following
 
 | Phase | Goal | Requirements | Success Criteria |
 |-------|------|--------------|------------------|
-| **1 - Foundation** | Provide configuration system, execution environment, and checkpoint infrastructure | EXEC-01 to EXEC-05, CHECK-01 to CHECK-03, AGENT-06 | 5 criteria |
-| **2 - Core Pipeline** | Deliver generalized scripts for all workflow stages (receptor prep, docking, MD, MMPBSA, analysis) | SCRIPT-01, SCRIPT-03 to SCRIPT-10 | 5 criteria |
+| **1 - Foundation** | Provide configuration system, execution environment, and checkpoint infrastructure | EXEC-01 to EXEC-04, CHECK-01 to CHECK-03, AGENT-06, SCRIPT-11 | 5 criteria |
+| **2 - Core Pipeline** | Deliver generalized scripts for all workflow stages (receptor prep, docking, MD, MMPBSA, analysis), wrapper scripts, and gap-filling scripts | SCRIPT-01, SCRIPT-03 to SCRIPT-10, SCRIPT-12, SCRIPT-13, EXEC-05 | 5 criteria |
 | **3 - Agent Infrastructure** | Implement five agent types with distinct responsibilities and file-based state passing | AGENT-01 to AGENT-06 | 4 criteria |
 | **4 - Integration** | Connect agents to scripts via slash commands and loadable skills | CMD-01 to CMD-03, SKILL-01 to SKILL-03, AGENT-07 | 4 criteria |
 | **5 - Polish** | Finalize documentation, mark agents as experimental, validate end-to-end workflow | DOC-01 to DOC-04 | 4 criteria |
 
 **Total Phases:** 5
-**Coverage:** 34/34 requirements mapped ✓
+**Coverage:** 37/37 requirements mapped ✓
 
 ---
 
@@ -40,11 +40,21 @@ The roadmap derives phases from the natural groupings of requirements, following
 - EXEC-02: HPC Slurm support for demanding tasks
 - EXEC-03: Job monitoring via log parsing
 - EXEC-04: Error detection and reporting
-- EXEC-05: Independent jobs submit to Slurm in parallel
 - CHECK-01: Stage checkpoints save intermediate states
 - CHECK-02: Human verification gates between stages
 - CHECK-03: Agent context dump to file for session continuity
 - AGENT-06: All agents use file-based state passing to avoid context overflow
+- SCRIPT-11: Infrastructure/utility scripts (config processing, checkpoint utilities, verification gates)
+
+**Note:** EXEC-05 (parallel Slurm submission) moved to Phase 2 as it depends on workflow stages being defined.
+
+**Deliverables:**
+- Reusable infrastructure components (not workflow-specific)
+- Config parsing utilities
+- Checkpoint save/load utilities (format-agnostic)
+- Execution backend detection + job submission utilities
+- Job monitoring utilities (log parsing, status detection)
+- Verification gate mechanism (pause/resume/approve/reject)
 
 **Dependencies:** None — Phase 1 is the foundation for all subsequent phases.
 
@@ -88,8 +98,17 @@ The roadmap derives phases from the natural groupings of requirements, following
 - SCRIPT-08: All scripts support CLI flags for options
 - SCRIPT-09: All scripts use human-friendly config format
 - SCRIPT-10: Scripts consistent in I/O format, error handling, and coding style
+- SCRIPT-12: Wrapper scripts for pipeline orchestration
+- SCRIPT-13: Gap-filling scripts to bridge workflow stages
+- EXEC-05: Independent jobs submit to Slurm in parallel
 
 **Note:** SCRIPT-02 (Ligand preparation) is explicitly deferred to v2 per project requirements — user provides prepared ligands.
+
+**Deliverables:**
+- All computational workflow scripts (receptor prep through analysis)
+- Wrapper script(s) that orchestrate the pipeline (read config, call stage scripts)
+- Gap-filling scripts identified after workflow finalization
+- Integration of Phase 1 infrastructure into workflow stages
 
 **Dependencies:** Phase 1 must complete (foundation required for script execution environment)
 
@@ -250,6 +269,9 @@ The roadmap derives phases from the natural groupings of requirements, following
 | SCRIPT-08 | Phase 2 | Pending |
 | SCRIPT-09 | Phase 2 | Pending |
 | SCRIPT-10 | Phase 2 | Pending |
+| SCRIPT-11 | Phase 1 | Pending |
+| SCRIPT-12 | Phase 2 | Pending |
+| SCRIPT-13 | Phase 2 | Pending |
 | AGENT-01 | Phase 3 | Pending |
 | AGENT-02 | Phase 3 | Pending |
 | AGENT-03 | Phase 3 | Pending |
@@ -282,8 +304,8 @@ The roadmap derives phases from the natural groupings of requirements, following
 
 | Phase | Name | Status | Requirements | Blockers |
 |-------|------|--------|--------------|----------|
-| 1 | Foundation | Not Started | 9 | None ✓ |
-| 2 | Core Pipeline | Not Started | 9 | WORKFLOW.md, Scripts, Reference Output |
+| 1 | Foundation | Not Started | 10 | None ✓ |
+| 2 | Core Pipeline | Not Started | 12 | WORKFLOW.md, Scripts, Reference Output |
 | 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md, Phase 2 |
 | 4 | Integration | Not Started | 7 | Phase 3 |
 | 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
@@ -292,11 +314,12 @@ The roadmap derives phases from the natural groupings of requirements, following
 
 ## Notes
 
-- **Depth Calibration:** With 34 v1 requirements and comprehensive depth setting, 5 phases provides balanced grouping. Each phase delivers a coherent, verifiable capability.
+- **Depth Calibration:** With 37 v1 requirements and comprehensive depth setting, 5 phases provides balanced grouping. Each phase delivers a coherent, verifiable capability.
 - **Deferred Work:** SCRIPT-02 (ligand preparation) explicitly deferred to v2 per PROJECT.md — user provides prepared ligands.
 - **Research Alignment:** Phase structure aligns with research/SUMMARY.md recommendations with minor adjustment: DOC-02 (agent-optimized docs) moved to Phase 4 to align with skills integration.
 - **Anti-Patterns Avoided:** No horizontal layers, no arbitrary structure, every requirement maps to exactly one phase.
 - **Phase 1 Ready:** Can proceed immediately — no blockers. Phases 2-5 blocked pending WORKFLOW.md finalization and script/output provision.
+- **Script Split:** Phase 1 delivers infrastructure/utility scripts (workflow-agnostic). Phase 2 delivers workflow scripts, wrapper(s), and gap-filling scripts (workflow-dependent).
 
 ---
 

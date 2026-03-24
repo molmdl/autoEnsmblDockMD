@@ -19,6 +19,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **SCRIPT-08**: All scripts support CLI flags for options
 - [ ] **SCRIPT-09**: All scripts use human-friendly config format (not YAML/JSON complexity)
 - [ ] **SCRIPT-10**: Scripts consistent in I/O format, error handling, and coding style
+- [ ] **SCRIPT-11**: Infrastructure/utility scripts for config processing, checkpoint save/load, verification gates (Phase 1)
+- [ ] **SCRIPT-12**: Wrapper scripts for pipeline orchestration (Phase 2)
+- [ ] **SCRIPT-13**: Gap-filling scripts to bridge workflow stages (Phase 2)
 
 ### II. Agents (AGENT)
 
@@ -108,6 +111,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCRIPT-08 | Phase 2 | Pending |
 | SCRIPT-09 | Phase 2 | Pending |
 | SCRIPT-10 | Phase 2 | Pending |
+| SCRIPT-11 | Phase 1 | Pending |
+| SCRIPT-12 | Phase 2 | Pending |
+| SCRIPT-13 | Phase 2 | Pending |
 | AGENT-01 | Phase 3 | Pending |
 | AGENT-02 | Phase 3 | Pending |
 | AGENT-03 | Phase 3 | Pending |
@@ -135,10 +141,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-04 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 33 (1 deferred to v2)
+- v1 requirements: 37 total
+- Mapped to phases: 36 (1 deferred to v2)
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initialization*
+*Last updated: 2026-03-24 after Phase 1 context discussion*

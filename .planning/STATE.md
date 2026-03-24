@@ -34,7 +34,7 @@
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| **Requirements Mapped** | 34/34 | 100% coverage |
+| **Requirements Mapped** | 37/37 | 100% coverage |
 | **Phases Defined** | 5 | Comprehensive depth |
 | **Deferred to v2** | 1 | SCRIPT-02 (ligand prep) |
 | **Research Flags** | 3 | Phase 2 (docking, MMPBSA), Phase 3 (Slurm) |
@@ -54,6 +54,7 @@
 | Agent-stage mapping in WORKFLOW.md | Explicit agent responsibility mapping enables orchestrator coordination | All |
 | Requirement-per-stage traceability | Links workflow stages to REQUIREMENTS.md IDs for requirement-driven development | All |
 | Script categorization | Groups scripts by purpose for agent navigation and selection | 2 |
+| Infrastructure vs workflow scripts split | Phase 1 delivers workflow-agnostic utilities; Phase 2 delivers workflow scripts, wrappers, gap-filling after workflow finalized | 1, 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -118,6 +119,6 @@ Awaiting user approval of roadmap. After approval, proceed to `/gsd-plan-phase 1
 
 ---
 
-*State updated: 2026-03-23*
+*State updated: 2026-03-24*
 *Last phase: N/A (initialization)*
 *Last quick task: quick-001 (2026-03-23)*
