@@ -226,4 +226,5 @@ expected/**/*.*
 !expected/**/*.mdp
 !expected/**/*.sh
 !expected/**/*.py
+!expected/**/*.in
 
