@@ -29,7 +29,7 @@ For the user to run specific major stage in the workflow.
 Formated, to be loaded by agents, minimal but sufficient. 
 
 ### V. Scripts
-- Python and bash scripts of the current manual workflow is provided in the respective (sub-)directory in `./expected`, usage and execution order under the `## Workflow` session. 
+- Python and bash scripts of the current manual workflow is provided in the (sub-)directory in `./expected/scripts`, usage and execution order under the `## Workflow` session. 
 - Identify missing scripts (gaps) in the protocol. Ask the user to provide first, otherwise generate one.
 - Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines; and 'gaps' scripts generated, with options input via cli flag or input conf file.
 - All the scripts should be revised, refactored for consistency and generalizability.
