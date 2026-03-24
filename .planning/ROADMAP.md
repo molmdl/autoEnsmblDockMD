@@ -60,6 +60,16 @@ The roadmap derives phases from the natural groupings of requirements, following
 
 **Blockers:** None — can proceed immediately.
 
+**Plans:** 6 plans in 4 waves
+
+Plans:
+- [ ] 01-01-PLAN.md — Core configuration and state management (Wave 1)
+- [ ] 01-02-PLAN.md — Checkpoint save/load system (Wave 2)
+- [ ] 01-03-PLAN.md — Execution backend detection and job submission (Wave 2)
+- [ ] 01-04-PLAN.md — Job monitoring via log parsing (Wave 3)
+- [ ] 01-05-PLAN.md — Human verification gates (Wave 3)
+- [ ] 01-06-PLAN.md — Integration testing (Wave 4)
+
 **Success Criteria:**
 
 1. **Local Execution Works**
