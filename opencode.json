@@ -16,7 +16,7 @@
     "gsd-set-profile": { "model": "github-copilot/gpt-5-mini" },
     "gsd-settings": { "model": "github-copilot/gpt-5-mini" },
     "gsd-set-model": { "model": "github-copilot/gpt-5-mini" }
-  }
+  },
   "permission": {
     "external_directory": {
       "*": "ask",
