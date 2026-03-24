@@ -261,19 +261,20 @@ def _element(atom_type):
 
 def parse_itp(path):
     atoms = []
+    bonds = []
     in_atoms = False
+    in_bonds = False
     
     with open(path) as fh:
         for line in fh:
             line = line.strip()
             if line.startswith("["):
-                if "atoms" in line.lower():
-                    in_atoms = True
-                    continue
-                else:
-                    in_atoms = False
+                section = line.strip().lower()
+                in_atoms = "atoms" in section
+                in_bonds = "bonds" in section
+                continue
             
-            if in_atoms and line and not line.startswith(";"):
+            if in_atoms and line and not line.startswith(";") and not line.startswith("#"):
                 parts = line.split()
                 if len(parts) >= 8:
                     try:
@@ -289,8 +290,19 @@ def parse_itp(path):
                         })
                     except ValueError:
                         continue
+            
+            if in_bonds and line and not line.startswith(";") and not line.startswith("#"):
+                parts = line.split()
+                if len(parts) >= 2:
+                    try:
+                        bonds.append({
+                            "a1": int(parts[0]),
+                            "a2": int(parts[1]),
+                        })
+                    except ValueError:
+                        continue
     
-    return atoms
+    return atoms, bonds
 
 
 def _itp_element(atom_type):
@@ -299,7 +311,11 @@ def _itp_element(atom_type):
         "ca": "C", "ce": "C", "c": "C", "c3": "C",
         "o": "O", "n": "N", "n2": "N",
         "ha": "H", "h1": "H", "h": "H",
+        "eu": "EU", "EU": "EU",
     }
+    lower_type = atom_type.lower()
+    if lower_type.startswith("eu"):
+        return "EU"
     return type_map.get(atom_type.lower(), atom_type[0].upper())
 
 
@@ -307,8 +323,9 @@ def _itp_element(atom_type):
 # GRO I/O
 # ---------------------------------------------------------------------------
 
-def write_gro(path, atoms, title="Generated", box=None):
-    _no_overwrite(path)
+def write_gro(path, atoms, title="Generated", box=None, overwrite=False):
+    if not overwrite:
+        _no_overwrite(path)
     with open(path, "w") as fh:
         fh.write(f"{title}\n")
         fh.write(f"{len(atoms)}\n")
@@ -325,6 +342,44 @@ def write_gro(path, atoms, title="Generated", box=None):
             fh.write(f"{box[0]:>10.5f}{box[1]:>10.5f}{box[2]:>10.5f}\n")
         else:
             fh.write("   0.00000   0.00000   0.00000\n")
+
+
+# ---------------------------------------------------------------------------
+# PDB I/O
+# ---------------------------------------------------------------------------
+
+def parse_pdb(path):
+    atoms = []
+    with open(path) as fh:
+        for line in fh:
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                try:
+                    atom_name = line[12:16].strip()
+                    res_name = line[17:20].strip()
+                    res_num = int(line[22:26].strip())
+                    x = float(line[30:38])
+                    y = float(line[38:46])
+                    z = float(line[46:54])
+                    element = line[76:78].strip() if len(line) > 76 else atom_name[0]
+                    atoms.append({
+                        "idx": len(atoms) + 1,
+                        "atom_name": atom_name,
+                        "res_name": res_name,
+                        "res_num": res_num,
+                        "x": x,
+                        "y": y,
+                        "z": z,
+                        "element": element,
+                    })
+                except (ValueError, IndexError):
+                    continue
+    return atoms
+
+
+def pdb_to_gro(pdb_path, gro_path, box=None):
+    atoms = parse_pdb(pdb_path)
+    write_gro(gro_path, atoms, title=f"Converted from {os.path.basename(pdb_path)}", box=box, overwrite=True)
+    return len(atoms)
 
 
 # ---------------------------------------------------------------------------
@@ -442,8 +497,8 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
     _no_overwrite(out_path)
     
     print(f"Parsing ITP:         {itp_path}")
-    itp_atoms = parse_itp(itp_path)
-    print(f"  {len(itp_atoms)} atoms")
+    itp_atoms, itp_bonds = parse_itp(itp_path)
+    print(f"  {len(itp_atoms)} atoms, {len(itp_bonds)} bonds")
     
     mol2_atoms = None
     mol2_bonds = None
@@ -457,13 +512,16 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
     print(f"  {len(models)} models found")
     
     model = models[model_num - 1] if model_num else _select_model(models, metric)
-    sc = model["scores"]
-    print(
-        f"  Selected model {model['model_num']}  "
-        f"minimizedAffinity={sc.get('minimizedAffinity', float('nan')):.4f}  "
-        f"CNNscore={sc.get('CNNscore', float('nan')):.4f}  "
-        f"CNNaffinity={sc.get('CNNaffinity', float('nan')):.4f}"
-    )
+    if model_num is None:
+        sc = model["scores"]
+        print(
+            f"  Selected model {model['model_num']}  "
+            f"minimizedAffinity={sc.get('minimizedAffinity', float('nan')):.4f}  "
+            f"CNNscore={sc.get('CNNscore', float('nan')):.4f}  "
+            f"CNNaffinity={sc.get('CNNaffinity', float('nan')):.4f}"
+        )
+    else:
+        print(f"  Using model {model_num}")
     
     sdf_atoms = model["atoms"]
     sdf_bonds = model["bonds"]
@@ -496,17 +554,36 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
         G_sdf_h = _build_graph(sdf_heavy, sdf_heavy_bonds)
         mapping = find_isomorphism(G_ref_h, G_sdf_h)
         
+        ref_by_idx = {a["idx"]: a for a in ref_atoms}
+        itp_heavy = [a for a in itp_atoms if _itp_element(a["type"]) != "H"]
+        
+        ref_heavy_by_elem = defaultdict(list)
+        for a in ref_heavy:
+            ref_heavy_by_elem[a["element"].upper()].append(a)
+        
+        itp_to_ref = {}
+        for itp_a in itp_heavy:
+            itp_elem = _itp_element(itp_a["type"]).upper()
+            candidates = ref_heavy_by_elem.get(itp_elem, [])
+            for ref_a in candidates:
+                if ref_a["idx"] not in itp_to_ref.values():
+                    itp_to_ref[itp_a["idx"]] = ref_a["idx"]
+                    break
+        
         itp_to_sdf = {}
-        for itp_a in itp_atoms:
-            itp_idx = itp_a["idx"]
-            if itp_idx in mapping:
-                itp_to_sdf[itp_idx] = mapping[itp_idx]
+        for itp_idx, ref_idx in itp_to_ref.items():
+            if ref_idx in mapping:
+                itp_to_sdf[itp_idx] = mapping[ref_idx]
         
         ref_by_idx = {a["idx"]: a for a in ref_atoms}
         ref_adj = defaultdict(list)
         for b in ref_bonds:
             ref_adj[b["a1"]].append(b["a2"])
             ref_adj[b["a2"]].append(b["a1"])
+        
+        ref_to_itp = {v: k for k, v in itp_to_ref.items()}
+        
+        ref_h_by_idx = {a["idx"]: a for a in ref_atoms if a["element"] == "H"}
         
         sdf_n_h_map = defaultdict(list)
         for a in sdf_atoms:
@@ -524,53 +601,62 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
         for itp_a in itp_atoms:
             itp_idx = itp_a["idx"]
             if _itp_element(itp_a["type"]) == "H":
-                if itp_idx in ref_by_idx and ref_by_idx[itp_idx]["element"] == "H":
-                    ref_h = ref_by_idx[itp_idx]
-                    heavy_nbrs_ref = [ref_by_idx[n] for n in ref_adj[ref_h["idx"]]
-                                      if ref_by_idx[n]["element"] != "H"]
-                    if not heavy_nbrs_ref:
-                        new_coords[itp_idx] = (ref_h["x"], ref_h["y"], ref_h["z"])
-                        continue
-                    
-                    parent_ref = heavy_nbrs_ref[0]
-                    
-                    if parent_ref["element"] == "N":
-                        sdf_parent_idx = mapping.get(parent_ref["idx"])
-                        if sdf_parent_idx:
-                            avail_sdf_h = [h for h in sdf_n_h_map[sdf_parent_idx]
-                                           if h not in used_sdf_h]
-                            if avail_sdf_h:
-                                sdf_h = sdf_by_idx[avail_sdf_h[0]]
-                                used_sdf_h.add(avail_sdf_h[0])
-                                new_coords[itp_idx] = (sdf_h["x"], sdf_h["y"], sdf_h["z"])
-                                continue
-                    
-                    sdf_parent_idx = mapping.get(parent_ref["idx"])
-                    if sdf_parent_idx is None:
-                        new_coords[itp_idx] = (ref_h["x"], ref_h["y"], ref_h["z"])
-                        continue
-                    
-                    new_parent_coord = np.array(new_coords[parent_ref["idx"]])
-                    
-                    other_heavy_ref = [ref_by_idx[n] for n in ref_adj[parent_ref["idx"]]
-                                       if n != ref_h["idx"] and ref_by_idx[n]["element"] != "H"]
-                    
-                    other_heavy_new_coords = []
-                    for oh in other_heavy_ref:
-                        if oh["idx"] in new_coords:
-                            other_heavy_new_coords.append(np.array(new_coords[oh["idx"]]))
-                        else:
-                            other_heavy_new_coords.append(_get_coord(oh))
-                    
-                    new_h_xyz = place_h_from_template(
-                        parent_ref, ref_h, other_heavy_ref,
-                        new_parent_coord, other_heavy_new_coords,
-                    )
-                    new_coords[itp_idx] = tuple(new_h_xyz)
-                else:
+                ref_h = ref_h_by_idx.get(itp_idx)
+                
+                if ref_h is None:
                     new_coords[itp_idx] = (0.0, 0.0, 0.0)
+                    continue
+                
+                heavy_nbrs_ref = [ref_by_idx[n] for n in ref_adj[ref_h["idx"]]
+                                  if ref_by_idx[n]["element"] != "H"]
+                if not heavy_nbrs_ref:
+                    new_coords[itp_idx] = (ref_h["x"], ref_h["y"], ref_h["z"])
+                    continue
+                
+                parent_ref = heavy_nbrs_ref[0]
+                
+                if parent_ref["element"] == "N":
+                    sdf_parent_idx = mapping.get(parent_ref["idx"])
+                    if sdf_parent_idx:
+                        avail_sdf_h = [h for h in sdf_n_h_map[sdf_parent_idx]
+                                       if h not in used_sdf_h]
+                        if avail_sdf_h:
+                            sdf_h = sdf_by_idx[avail_sdf_h[0]]
+                            used_sdf_h.add(avail_sdf_h[0])
+                            new_coords[itp_idx] = (sdf_h["x"], sdf_h["y"], sdf_h["z"])
+                            continue
+                
+                sdf_parent_idx = mapping.get(parent_ref["idx"])
+                if sdf_parent_idx is None:
+                    new_coords[itp_idx] = (ref_h["x"], ref_h["y"], ref_h["z"])
+                    continue
+                
+                parent_itp_idx = ref_to_itp.get(parent_ref["idx"])
+                if parent_itp_idx is None or parent_itp_idx not in new_coords:
+                    new_coords[itp_idx] = (ref_h["x"], ref_h["y"], ref_h["z"])
+                    continue
+                
+                new_parent_coord = np.array(new_coords[parent_itp_idx])
+                
+                other_heavy_ref = [ref_by_idx[n] for n in ref_adj[parent_ref["idx"]]
+                                   if n != ref_h["idx"] and ref_by_idx[n]["element"] != "H"]
+                
+                other_heavy_new_coords = []
+                for oh in other_heavy_ref:
+                    oh_itp_idx = ref_to_itp.get(oh["idx"])
+                    if oh_itp_idx is not None and oh_itp_idx in new_coords:
+                        other_heavy_new_coords.append(np.array(new_coords[oh_itp_idx]))
+                    else:
+                        other_heavy_new_coords.append(_get_coord(oh))
+                
+                new_h_xyz = place_h_from_template(
+                    parent_ref, ref_h, other_heavy_ref,
+                    new_parent_coord, other_heavy_new_coords,
+                )
+                new_coords[itp_idx] = tuple(new_h_xyz)
     else:
         itp_heavy = [a for a in itp_atoms if _itp_element(a["type"]) != "H"]
+        itp_heavy_idx = {a["idx"] for a in itp_heavy}
         
         sdf_heavy = [{"idx": a["idx"], "element": a["el"]}
                     for a in sdf_atoms if a["el"] != "H"]
@@ -587,26 +673,16 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
                 f"Element counts mismatch: ITP={dict(itp_elems)}, SDF={dict(sdf_elems)}"
             )
         
-        itp_heavy_by_elem = defaultdict(list)
-        for a in itp_heavy:
-            itp_heavy_by_elem[_itp_element(a["type"]).upper()].append(a)
+        itp_heavy_for_graph = [{"idx": a["idx"], "element": _itp_element(a["type"]).upper()}
+                               for a in itp_heavy]
+        itp_heavy_bonds = [{"a1": b["a1"], "a2": b["a2"]}
+                          for b in itp_bonds
+                          if b["a1"] in itp_heavy_idx and b["a2"] in itp_heavy_idx]
         
-        sdf_heavy_by_elem = defaultdict(list)
-        for a in sdf_heavy:
-            sdf_heavy_by_elem[a["element"].upper()].append(a)
+        G_itp = _build_graph(itp_heavy_for_graph, itp_heavy_bonds)
+        G_sdf = _build_graph(sdf_heavy, sdf_heavy_bonds)
         
-        sdf_degrees = {}
-        for a in sdf_heavy:
-            deg = sum(1 for b in sdf_heavy_bonds if b["a1"] == a["idx"] or b["a2"] == a["idx"])
-            sdf_degrees[a["idx"]] = deg
-        
-        mapping = {}
-        for elem, itp_list in itp_heavy_by_elem.items():
-            sdf_list = sdf_heavy_by_elem[elem]
-            itp_sorted = sorted(itp_list, key=lambda x: x["idx"])
-            sdf_sorted = sorted(sdf_list, key=lambda a: sdf_degrees.get(a["idx"], 0))
-            for itp_a, sdf_a in zip(itp_sorted, sdf_sorted):
-                mapping[itp_a["idx"]] = sdf_a["idx"]
+        mapping = find_isomorphism(G_itp, G_sdf)
         
         for itp_idx, sdf_idx in mapping.items():
             sdf_a = sdf_by_idx[sdf_idx]
@@ -909,8 +985,12 @@ def build_parser():
     rec_group = parser.add_argument_group("Receptor Inputs")
     rec_group.add_argument("-r", "--rec-top", default=None, metavar="TOP",
                            help="Receptor topology file (.top). Required unless --list-models.")
+    rec_group.add_argument("--rec-gro", default=None, metavar="GRO",
+                           help="Receptor GRO file. If not provided, auto-detected from SDF filename pattern.")
+    rec_group.add_argument("--rec-pdb", default=None, metavar="PDB",
+                           help="Receptor PDB file. Converts to GRO if --rec-gro not provided.")
     rec_group.add_argument("--rec-gro-pattern", default=DEFAULT_REC_GRO_PATTERN, metavar="PATTERN",
-                           help=f"Pattern for receptor GRO filename. Default: {DEFAULT_REC_GRO_PATTERN}")
+                           help=f"Pattern for receptor GRO filename (used if --rec-gro not provided). Default: {DEFAULT_REC_GRO_PATTERN}")
     rec_group.add_argument("--rec-dir", default=None, metavar="DIR",
                            help="Directory containing receptor files. Default: same as SDF files.")
     
@@ -956,6 +1036,8 @@ class Config:
         self.mol2_template = args.template
         
         self.rec_top = args.rec_top
+        self.rec_gro = args.rec_gro
+        self.rec_pdb = args.rec_pdb
         self.rec_gro_pattern = args.rec_gro_pattern
         self.rec_dir = args.rec_dir
         
@@ -1005,22 +1087,43 @@ def main():
           f"CNNaffinity={sc.get('CNNaffinity', float('nan')):.4f}")
     
     print("\n" + "=" * 60)
-    print("STEP 2: Auto-detecting receptor GRO file...")
+    print("STEP 2: Locating receptor GRO file...")
     print("=" * 60)
     
-    rec_gro, prefix = derive_receptor_gro_from_sdf(
-        best_file,
-        pattern=config.rec_gro_pattern,
-        search_dir=config.rec_dir
-    )
+    rec_gro = None
+    prefix = None
     
-    if not os.path.exists(rec_gro):
-        print(f"ERROR: Receptor GRO file not found: {rec_gro}", file=sys.stderr)
-        print(f"  Derived from SDF: {best_file}", file=sys.stderr)
-        print(f"  Pattern used: {config.rec_gro_pattern}", file=sys.stderr)
-        sys.exit(1)
+    if config.rec_gro:
+        rec_gro = config.rec_gro
+        prefix = os.path.splitext(os.path.basename(rec_gro))[0]
+        if not os.path.exists(rec_gro):
+            print(f"ERROR: Receptor GRO file not found: {rec_gro}", file=sys.stderr)
+            sys.exit(1)
+        print(f"  Using specified GRO: {rec_gro}")
+    elif config.rec_pdb:
+        if not os.path.exists(config.rec_pdb):
+            print(f"ERROR: Receptor PDB file not found: {config.rec_pdb}", file=sys.stderr)
+            sys.exit(1)
+        prefix = os.path.splitext(os.path.basename(config.rec_pdb))[0]
+        rec_gro = f"{prefix}.gro"
+        print(f"  Converting PDB to GRO: {config.rec_pdb} -> {rec_gro}")
+        n_atoms = pdb_to_gro(config.rec_pdb, rec_gro)
+        print(f"  Converted {n_atoms} atoms")
+    else:
+        rec_gro, prefix = derive_receptor_gro_from_sdf(
+            best_file,
+            pattern=config.rec_gro_pattern,
+            search_dir=config.rec_dir
+        )
+        
+        if not os.path.exists(rec_gro):
+            print(f"ERROR: Receptor GRO file not found: {rec_gro}", file=sys.stderr)
+            print(f"  Derived from SDF: {best_file}", file=sys.stderr)
+            print(f"  Pattern used: {config.rec_gro_pattern}", file=sys.stderr)
+            sys.exit(1)
+        
+        print(f"  Auto-detected: {rec_gro}")
     
-    print(f"  Receptor GRO: {rec_gro}")
     print(f"  Prefix: {prefix}")
     
     print("\n" + "=" * 60)
