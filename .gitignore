@@ -223,6 +223,7 @@ __marimo__/
 # Placeholder for exceptions
 expected/**/*.*
 !expected/**/*.md
+!expected/**/*.mdp
 !expected/**/*.sh
 !expected/**/*.py
 
