@@ -19,7 +19,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **SCRIPT-08**: All scripts support CLI flags for options
 - [ ] **SCRIPT-09**: All scripts use human-friendly config format (not YAML/JSON complexity)
 - [ ] **SCRIPT-10**: Scripts consistent in I/O format, error handling, and coding style
-- [ ] **SCRIPT-11**: Infrastructure/utility scripts for config processing, checkpoint save/load, verification gates (Phase 1)
+- [x] **SCRIPT-11**: Infrastructure/utility scripts for config processing, checkpoint save/load, verification gates (Phase 1)
 - [ ] **SCRIPT-12**: Wrapper scripts for pipeline orchestration (Phase 2)
 - [ ] **SCRIPT-13**: Gap-filling scripts to bridge workflow stages (Phase 2)
 
@@ -30,7 +30,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AGENT-03**: Analyzer agent — runs standard analysis, supports custom analysis
 - [ ] **AGENT-04**: Checker agent — validates results, generates warnings/suggestions
 - [ ] **AGENT-05**: Debugger agent — follows gsd-debugger workflow, version-aware (GROMACS 2023.5, gnina, gmx_MMPBSA)
-- [ ] **AGENT-06**: All agents use file-based state passing to avoid context overflow
+- [x] **AGENT-06**: All agents use file-based state passing to avoid context overflow
 - [ ] **AGENT-07**: Agent support marked as experimental in documentation
 
 ### III. Slash Commands (CMD)
@@ -47,17 +47,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### V. Execution Environment (EXEC)
 
-- [ ] **EXEC-01**: Local execution support for all tasks
-- [ ] **EXEC-02**: HPC Slurm support for demanding tasks (mdrun, MMPBSA, heavy analysis)
-- [ ] **EXEC-03**: Job monitoring via log parsing
-- [ ] **EXEC-04**: Error detection and reporting
+- [x] **EXEC-01**: Local execution support for all tasks
+- [x] **EXEC-02**: HPC Slurm support for demanding tasks (mdrun, MMPBSA, heavy analysis)
+- [x] **EXEC-03**: Job monitoring via log parsing
+- [x] **EXEC-04**: Error detection and reporting
 - [ ] **EXEC-05**: Independent jobs submit to Slurm in parallel
 
 ### VI. Checkpoint System (CHECK)
 
-- [ ] **CHECK-01**: Stage checkpoints save intermediate states
-- [ ] **CHECK-02**: Human verification gates between stages
-- [ ] **CHECK-03**: Agent context dump to file for session continuity
+- [x] **CHECK-01**: Stage checkpoints save intermediate states
+- [x] **CHECK-02**: Human verification gates between stages
+- [x] **CHECK-03**: Agent context dump to file for session continuity
 
 ### VII. Documentation (DOC)
 
@@ -111,7 +111,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCRIPT-08 | Phase 2 | Pending |
 | SCRIPT-09 | Phase 2 | Pending |
 | SCRIPT-10 | Phase 2 | Pending |
-| SCRIPT-11 | Phase 1 | Pending |
+| SCRIPT-11 | Phase 1 | Complete |
 | SCRIPT-12 | Phase 2 | Pending |
 | SCRIPT-13 | Phase 2 | Pending |
 | AGENT-01 | Phase 3 | Pending |
@@ -119,7 +119,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AGENT-03 | Phase 3 | Pending |
 | AGENT-04 | Phase 3 | Pending |
 | AGENT-05 | Phase 3 | Pending |
-| AGENT-06 | Phase 1 | Pending |
+| AGENT-06 | Phase 1 | Complete |
 | AGENT-07 | Phase 4 | Pending |
 | CMD-01 | Phase 4 | Pending |
 | CMD-02 | Phase 4 | Pending |
@@ -127,14 +127,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SKILL-01 | Phase 4 | Pending |
 | SKILL-02 | Phase 4 | Pending |
 | SKILL-03 | Phase 4 | Pending |
-| EXEC-01 | Phase 1 | Pending |
-| EXEC-02 | Phase 1 | Pending |
-| EXEC-03 | Phase 1 | Pending |
-| EXEC-04 | Phase 1 | Pending |
+| EXEC-01 | Phase 1 | Complete |
+| EXEC-02 | Phase 1 | Complete |
+| EXEC-03 | Phase 1 | Complete |
+| EXEC-04 | Phase 1 | Complete |
 | EXEC-05 | Phase 2 | Pending |
-| CHECK-01 | Phase 1 | Pending |
-| CHECK-02 | Phase 1 | Pending |
-| CHECK-03 | Phase 1 | Pending |
+| CHECK-01 | Phase 1 | Complete |
+| CHECK-02 | Phase 1 | Complete |
+| CHECK-03 | Phase 1 | Complete |
 | DOC-01 | Phase 5 | Pending |
 | DOC-02 | Phase 4 | Pending |
 | DOC-03 | Phase 5 | Pending |

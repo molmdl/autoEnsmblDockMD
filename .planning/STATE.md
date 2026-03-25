@@ -23,7 +23,7 @@
 
 | Phase | Blocker | Required Action |
 |-------|---------|-----------------|
-| 1 | None | Ready to proceed |
+| 1 | Complete | ✓ Delivered |
 | 2 | WORKFLOW.md, Scripts, Reference Output | Finalize workflow, provide manual trial artifacts |
 | 3 | WORKFLOW.md, Phase 2 complete | Wait for Phase 2 |
 | 4 | Phase 3 complete | Wait for Phase 3 |
@@ -130,9 +130,9 @@
 
 | Checkpoint | Trigger | Status |
 |------------|---------|--------|
-| Stage Complete | Each phase completes | Not Started |
-| Human Verification | Between stages | Not Started |
-| Agent Context Dump | Session continuity | Not Started |
+| Stage Complete | Each phase completes | Phase 1 Complete ✓ |
+| Human Verification | Between stages | Phase 1 Verified ✓ |
+| Agent Context Dump | Session continuity | Active |
 
 ---
 

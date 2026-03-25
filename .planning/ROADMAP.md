@@ -63,12 +63,12 @@ The roadmap derives phases from the natural groupings of requirements, following
 **Plans:** 6 plans in 4 waves
 
 Plans:
-- [ ] 01-01-PLAN.md — Core configuration and state management (Wave 1)
-- [ ] 01-02-PLAN.md — Checkpoint save/load system (Wave 2)
-- [ ] 01-03-PLAN.md — Execution backend detection and job submission (Wave 2)
-- [ ] 01-04-PLAN.md — Job monitoring via log parsing (Wave 3)
-- [ ] 01-05-PLAN.md — Human verification gates (Wave 3)
-- [ ] 01-06-PLAN.md — Integration testing (Wave 4)
+- [x] 01-01-PLAN.md — Core configuration and state management (Wave 1)
+- [x] 01-02-PLAN.md — Checkpoint save/load system (Wave 2)
+- [x] 01-03-PLAN.md — Execution backend detection and job submission (Wave 2)
+- [x] 01-04-PLAN.md — Job monitoring via log parsing (Wave 3)
+- [x] 01-05-PLAN.md — Human verification gates (Wave 3)
+- [x] 01-06-PLAN.md — Integration testing (Wave 4)
 
 **Success Criteria:**
 
@@ -314,7 +314,7 @@ Plans:
 
 | Phase | Name | Status | Requirements | Blockers |
 |-------|------|--------|--------------|----------|
-| 1 | Foundation | Not Started | 10 | None ✓ |
+| 1 | Foundation | Complete ✓ | 10 | None |
 | 2 | Core Pipeline | Not Started | 12 | WORKFLOW.md, Scripts, Reference Output |
 | 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md, Phase 2 |
 | 4 | Integration | Not Started | 7 | Phase 3 |
