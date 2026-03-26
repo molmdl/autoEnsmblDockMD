@@ -1418,12 +1418,13 @@ def clean_itp_for_system(itp_file):
     with open(itp_file, 'r') as f:
         content = f.read()
     
-    if '[ atomtypes ]' in content or '[ atomtypes ]\n' in content:
-        atomtypes_start = content.find('[ atomtypes ]')
-        moleculetype_start = content.find('[ moleculetype ]', atomtypes_start)
+    if '[ atomtypes ]' in content:
+        atomtypes_pos = content.find('[ atomtypes ]')
+        line_start = content.rfind('\n', 0, atomtypes_pos) + 1
+        moleculetype_start = content.find('[ moleculetype ]', atomtypes_pos)
         
         if moleculetype_start != -1:
-            content = content[:atomtypes_start] + content[moleculetype_start:]
+            content = content[:line_start] + content[moleculetype_start:]
             
             with open(itp_file, 'w') as f:
                 f.write(content)
