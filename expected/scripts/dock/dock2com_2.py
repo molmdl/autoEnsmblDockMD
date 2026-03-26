@@ -12,6 +12,13 @@ Combines functionality from:
 New Features in dock2com_2.py:
 - SASA as a selection metric (--metric sasa)
 - Lower SASA indicates better ligand burial within binding site
+- Pre-selection filter: models with positive minimizedAffinity are excluded
+
+Pre-selection Filtering
+-----------------------
+Models with minimizedAffinity > 0 are automatically excluded from selection.
+Positive affinity values indicate unfavorable binding and are filtered out
+before any metric-based ranking is performed.
 
 Example Usage
 -------------
@@ -42,6 +49,31 @@ from networkx.algorithms import isomorphism
 
 LOWER_IS_BETTER = {"minimizedAffinity", "sasa"}  # Added "sasa" - lower SASA = better burial
 DEFAULT_METRIC = "minimizedAffinity"
+
+def is_model_valid(model):
+    """
+    Check if model passes pre-selection filters.
+    
+    Filters:
+    - minimizedAffinity must be <= 0 (positive values indicate unfavorable binding)
+    
+    Parameters
+    ----------
+    model : dict
+        Model dict with 'scores' key
+    
+    Returns
+    -------
+    bool
+        True if model passes all filters
+    """
+    if "minimizedAffinity" in model["scores"]:
+        affinity = model["scores"]["minimizedAffinity"]
+        if np.isnan(affinity):
+            return True
+        if affinity > 0:
+            return False
+    return True
 DEFAULT_REC_GRO_PATTERN = "{prefix}.pdb_ali.gro"
 
 # SASA calculation parameters (from quick_sasa.py)
@@ -518,7 +550,9 @@ def select_best_across_sdfiles(
             fallback_to_affinity = True
         
         for model in models:
-            # Calculate SASA if that's the selection metric
+            if not is_model_valid(model):
+                continue
+            
             if original_metric == "sasa" and receptor_atoms is not None:
                 if "sasa" not in model["scores"]:
                     try:
@@ -598,7 +632,9 @@ def list_models_across_sdfiles(sdf_paths, metrics=None, rec_gro_pattern=None, re
                     receptor_atoms = None
         
         for m in models:
-            # Calculate SASA if needed
+            if not is_model_valid(m):
+                continue
+            
             if "sasa" in metrics and receptor_atoms is not None and "sasa" not in m["scores"]:
                 try:
                     sasa = calculate_pose_sasa(m["atoms"], receptor_atoms, probe_radius)
@@ -1229,9 +1265,10 @@ def sdf_pose_to_gro(itp_path, sdf_path, out_path,
 
 
 def _select_model(models, metric=DEFAULT_METRIC):
-    candidates = [m for m in models if metric in m["scores"]]
+    valid_models = [m for m in models if is_model_valid(m)]
+    candidates = [m for m in valid_models if metric in m["scores"]]
     if not candidates:
-        raise ValueError(f"Metric '{metric}' not found in any model.")
+        raise ValueError(f"Metric '{metric}' not found in any valid model.")
     reverse = metric not in LOWER_IS_BETTER
     return sorted(candidates, key=lambda m: m["scores"][metric], reverse=reverse)[0]
 
