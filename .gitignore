@@ -228,4 +228,4 @@ expected/**/*.*
 !expected/**/*.py
 !expected/**/*.in
 
-scripts/run_oc.sh
+!scripts/run_oc.sh
