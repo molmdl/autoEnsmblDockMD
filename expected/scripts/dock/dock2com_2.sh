@@ -25,7 +25,7 @@ cd ..
 cd phe_rrrL
 ln -s ../hsa?.pdb_ali.gro .
 cp ../../solv_md/phe_rrrL_sap/lig_g.itp .
-python ../../scripts/dock/dock2com_2.py -i lig_g.itp -s hsa*-phe_rrrL.sdf -t phe.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../amber19SB_OL21_OL3_lipid17.ff/forcefield.itp --water-itp ../../amber19SB_OL21_OL3_lipid17.ff/opc3.itp --ions-itp ../../amber19SB_OL21_OL3_lipid17.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top  --metric sasa 
+python ../../scripts/dock/dock2com_2.py -i lig_g.itp -s hsa*-phe_rrrL.sdf -t phe_rrrL.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../amber19SB_OL21_OL3_lipid17.ff/forcefield.itp --water-itp ../../amber19SB_OL21_OL3_lipid17.ff/opc3.itp --ions-itp ../../amber19SB_OL21_OL3_lipid17.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top  --metric sasa 
 rm hsa?.pdb_ali.gro
 
 mkdir ../../com_md/phe_rrrL_sap/
