@@ -1,8 +1,8 @@
 ;
 ;	File 'mdout.mdp' was generated
-;	By user: nglokwan (1011)
-;	On host: mgpu
-;	At date: Fri Mar 27 23:25:48 2026
+;	By user: unknown (1011)
+;	On host: gpu6
+;	At date: Fri Mar 27 23:30:17 2026
 ;
 ;	Created by:
 ;	              :-) GROMACS - gmx grompp, 2023.5-plumed_2.9.3 (-:
@@ -11,21 +11,21 @@
 ;	Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
 ;	Working dir:  /share/home/nglokwan/dparker/dp_xinyi/ana_code/autoEnsmblDockMD/expected/chm/BRD4/rec
 ;	Command line:
-;	  gmx grompp -v -f pr_pos.mdp -c em.gro -p topol.top -o pr_pos.tpr -r em.gro -maxwarn 3
+;	  gmx grompp -v -f pr0.mdp -c pr_em.gro -p topol.top -o pr_2.tpr -maxwarn 3
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
 ; e.g.: -I/home/joe/doe -I/home/mary/roe
 include                  = 
 ; e.g.: -DPOSRES -DFLEXIBLE (note these variable names are case sensitive)
-define                   = -DPOSRES
+define                   = 
 
 ; RUN CONTROL PARAMETERS
 integrator               = md
 ; Start time and timestep in ps
 tinit                    = 0
 dt                       = 0.002
-nsteps                   = 20000
+nsteps                   = 30000000
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -35,7 +35,7 @@ mts                      = no
 ; mode for center of mass motion removal
 comm-mode                = Linear
 ; number of steps for center of mass motion removal
-nstcomm                  = 1
+nstcomm                  = 100
 ; group(s) for center of mass motion removal
 comm-grps                = 
 
@@ -65,11 +65,11 @@ nstxout                  = 0
 nstvout                  = 0
 nstfout                  = 0
 ; Output frequency for energies to log file and energy file
-nstlog                   = 1000
+nstlog                   = 50000
 nstcalcenergy            = 100
-nstenergy                = 1000
+nstenergy                = 50000
 ; Output frequency and precision for .xtc file
-nstxout-compressed       = 5000
+nstxout-compressed       = 50000
 compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
@@ -140,7 +140,7 @@ print-nose-hoover-chain-variables = no
 ; Groups to couple separately
 tc-grps                  = Protein non-Protein
 ; Time constant (ps) and reference temperature (K)
-tau_t                    = 0.1      0.1
+tau_t                    = 0.2      0.2
 ref_t                    = 300      300
 ; pressure coupling     
 Pcoupl                   = c-rescale
@@ -151,7 +151,7 @@ tau_p                    = 2.0
 compressibility          = 4.5e-5
 ref_p                    = 1.0
 ; Scaling of reference coordinates, No, All or COM
-refcoord_scaling         = com
+refcoord-scaling         = No
 
 ; OPTIONS FOR QMMM calculations
 QMMM                     = no
@@ -171,7 +171,7 @@ annealing-temp           =
 ; GENERATE VELOCITIES FOR STARTUP RUN
 gen_vel                  = yes
 gen_temp                 = 300
-gen_seed                 = -1208304641
+gen_seed                 = -67668243
 
 ; OPTIONS FOR BONDS    
 constraints              = h-bonds
