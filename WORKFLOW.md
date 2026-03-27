@@ -32,6 +32,12 @@ conversion and setup for md
 multiple parallel agent for multiple ligands, max parallel up to N agents
 using slurm for hpc, and run local option
 
+blind docking workflow example usinf charmm ff, see @expected/chm/BRD4/READMD.md
+
+---
+
+## 
+
 checker agent
 debugger agent
 
