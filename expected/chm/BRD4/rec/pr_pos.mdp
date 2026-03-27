@@ -21,13 +21,13 @@ DispCorr = no
 refcoord_scaling    = com
 
 ; Berendsen temperature coupling is on in two groups
-Tcoupl         =   c-rescale ; Berendsen
+Tcoupl         =   v-rescale ; Berendsen
 tc-grps             =  Protein non-Protein 
 tau_t               =  0.1      0.1
 ref_t               =  300      300
 ; Pressure coupling is on
-Pcoupl              = Berendsen
-tau_p               =  0.5
+Pcoupl              = c-rescale
+tau_p               =  2.0
 compressibility     =  4.5e-5
 ref_p               =  1.0
 ; Generate velocites is on at 300 K.
