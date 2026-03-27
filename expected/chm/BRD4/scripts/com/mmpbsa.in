@@ -11,11 +11,14 @@ netcdf=1,
 solvated_trajectory=0,
 keep_files=0,
 /
-#&gb
-#igb=5, saltcon=0.150,
-#/
+# In gmx_MMPBSA v1.5.0 we have added a new PB radii set named charmm_radii. This radii set should be used only
+# with systems prepared with CHARMM force fields. Uncomment the line below to use charmm_radii set
+PBRadii=7,
+/
 &pb
-radiopt=0, istrng=0.150, inp=1,
+# radiopt=0 is recommended which means using radii from the prmtop file for both the PB calculation and for the NP
+# calculation
+istrng=0.15, fillratio=4.0, radiopt=0
 /
 #make sure to include at least one residue from both the receptor
 #and ligand in the print_res mask of the &decomp section.
@@ -25,3 +28,5 @@ radiopt=0, istrng=0.150, inp=1,
 idecomp=2, dec_verbose=3,
 print_res="within 4.5"
 /
+
+
