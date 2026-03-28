@@ -5,7 +5,7 @@ CWD=`pwd`
 for i in {1..10} ; do 
 	cd lig/lig$i
 	l=`basename *.mol2 .mol2`
-	scripts/dock/extract_ligand_itp.py ${l}_gmx.top
+	python ${CWD}/scripts/dock/extract_ligand_itp.py ${l}_gmx.top
 	cd $CWD
 done
 
