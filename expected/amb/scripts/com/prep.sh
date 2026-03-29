@@ -2,7 +2,8 @@
 #SBATCH -J prep
 #SBATCH -n 1
 #SBATCH -c 22
-#SBATCH -p workq
+##SBATCH -p workq
+#SBATCH -p l40
 #SBATCH --gres=gpu:1
 
 gmx editconf -f com.gro -o box.gro -d 1 -bt dodecahedron -c

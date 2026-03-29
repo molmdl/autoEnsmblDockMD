@@ -9,7 +9,8 @@ for i in {0..3} ; do
 #SBATCH -c 22
 #SBATCH -n 1
 ##SBATCH -p rtx4090
-#SBATCH -p workq
+##SBATCH -p workq
+#SBATCH -p l40
 #SBATCH --gres=gpu:1
 
 source ~/scripts/gmxMMPBSA.env
