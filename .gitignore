@@ -227,5 +227,6 @@ expected/**/*.*
 !expected/**/*.sh
 !expected/**/*.py
 !expected/**/*.in
+!expected/**/*.txt
 
 !scripts/run_oc.sh
