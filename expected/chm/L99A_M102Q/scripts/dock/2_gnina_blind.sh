@@ -2,8 +2,8 @@
 
 cd dock
 
-for ligid in {1..10} ; do
-	cd lig$ligid
+for ligid in `cat ../lig/M102Q.txt` ; do
+	cd $ligid
 	l=`basename *.mol2 .mol2`
 	sbatch << EOF
 #!/bin/bash

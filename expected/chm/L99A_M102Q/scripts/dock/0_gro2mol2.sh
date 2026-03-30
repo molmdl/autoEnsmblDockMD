@@ -6,7 +6,7 @@
 #	python ../scripts/dock/gro_itp_to_mol2.py --gro ${i}.gro --itp ${i}_gmx.top --out ${i}.mol2
 #done
 
-for i in `cat lig/L99A.txt` ; do
-	mkdir ../dock/$i
-	cp ${i}/*.mol2 ../dock/${i}
+for i in `cat lig/M102Q.txt` ; do
+	mkdir -p dock/$i
+	cp lig/${i}/*.mol2 dock/${i}
 done

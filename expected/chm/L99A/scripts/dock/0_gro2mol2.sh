@@ -7,6 +7,6 @@
 #done
 
 for i in `cat lig/L99A.txt` ; do
-	mkdir ../dock/$i
-	cp lig/${i}/*.mol2 ../dock/${i}
+	mkdir -p dock/$i
+	cp lig/${i}/*.mol2 dock/${i}
 done
