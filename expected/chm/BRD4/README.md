@@ -23,5 +23,7 @@ cd this directory
 3. submit all jobs to slurm: bash scripts/dock/2_gnina_blind.sh
 
 **Run CompLex MD and MM/PBSA**
+
+##bug: missing copy ligand ffbonded
 1. extract ligand itp from top and extract top rec+lig pair for gromacs simiulation:  bash scripts/dock/dock2com_2.1.sh
 2. 
