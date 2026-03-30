@@ -1,0 +1,36 @@
+integrator          =  md
+dt                  =  0.002
+nsteps              =  30000000
+nstxout = 0
+nstvout = 0
+nstfout = 0
+nstlog  = 50000
+nstenergy = 50000
+nstxout-compressed = 50000
+compressed-x-grps  = protein ;system
+
+constraints = h-bonds
+cutoff-scheme = Verlet
+vdwtype = cutoff
+vdw-modifier = force-switch
+rlist = 1.2
+rvdw = 1.2
+rvdw-switch = 1.0
+coulombtype = PME
+rcoulomb = 1.2
+DispCorr = no
+
+
+Tcoupl         =  v-rescale
+tc-grps             =  Protein non-Protein 
+tau_t               =  0.2      0.2
+ref_t               =  300      300
+; Pressure coupling is on
+Pcoupl              = c-rescale
+tau_p               =  2.0
+compressibility     =  4.5e-5
+ref_p               =  1.0
+; Generate velocites is on at 300 K.
+gen_vel             =  yes
+gen_temp            =  300
+gen_seed            =  -1 ;893389
