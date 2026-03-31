@@ -7,6 +7,7 @@ Pocket: whole protein
 1. receptor pdb in rec/ (BRD4)
 2. ligand top and gro, placed in corresponding lig/ligid directory
 3. charmm36.ff from CGenFF server
+4. charmm36.ff/LIGANDNAME_ffbonded.itp from CGenFF server copied into the same directory as the ligand.
 
 ##$ Workflow
 cd this directory
@@ -22,8 +23,6 @@ cd this directory
 2. copy receptor to docking dir: bash scripts/dock/1_rec4dock.sh
 3. submit all jobs to slurm: bash scripts/dock/2_gnina_blind.sh
 
-**Run CompLex MD and MM/PBSA**
-
-##bug: missing copy ligand ffbonded
-1. extract ligand itp from top and extract top rec+lig pair for gromacs simiulation:  bash scripts/dock/dock2com_2.1.sh
+**Run Complex MD and MM/PBSA**
+1. extract ligand itp from top and extract top rec+lig pair for gromacs simulation: bash scripts/dock/dock2com_2.2.sh
 2. 
