@@ -24,7 +24,7 @@ echo -e '"Protein" | "Other"  \\n q' | gmx make_ndx -f em.tpr
 #gmx make_ndx -f lig.gro 
 #gmx genrestr -f lig.gro 
 gmx mdrun -deffnm em -ntmpi 1 -ntomp 22
-gmx grompp -f pr.mdp -c em.gro -p sys.top  -r em.gro -o pr.tpr -maxwarn 2 
+gmx grompp -f pr.mdp -c em.gro -p sys.top  -r em.gro -o pr.tpr -maxwarn 2 -n index.ndx
 gmx mdrun -deffnm pr -ntmpi 1 -ntomp 22 -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5 
 EOF
 	cd ..

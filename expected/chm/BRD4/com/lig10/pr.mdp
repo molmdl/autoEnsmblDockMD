@@ -1,0 +1,40 @@
+define              = -DPOSRES
+integrator          =  md
+dt                  =  0.002
+nsteps              =  100000
+comm-grps  = system
+
+refcoord-scaling = com
+nstxout = 0
+nstvout = 0
+nstfout = 0
+nstlog  = 500
+nstenergy = 500
+nstxout-compressed = 1000
+compressed-x-grps  = Protein Other ;system
+
+constraints = h-bonds
+cutoff-scheme = Verlet
+vdwtype = cutoff
+vdw-modifier = force-switch
+rlist = 1.2
+rvdw = 1.2
+rvdw-switch = 1.0
+coulombtype = PME
+rcoulomb = 1.2
+DispCorr = no
+
+
+Tcoupl         =  v-rescale
+tc-grps             =  Protein_Other Water_and_ions
+tau_t               =  0.2      0.2
+ref_t               =  298.15   298.15
+; Pressure coupling is on
+Pcoupl              = c-rescale
+tau_p               =  2.0
+compressibility     =  4.5e-5
+ref_p               =  1.0
+; Generate velocites is on at 298.15 K.
+gen_vel             =  yes
+gen_temp            =  298.15
+gen_seed            =  -1 ;893389
