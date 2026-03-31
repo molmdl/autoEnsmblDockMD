@@ -228,5 +228,5 @@ expected/**/*.*
 !expected/**/*.py
 !expected/**/*.in
 !expected/**/*.txt
-
+*mdout.mdp
 !scripts/run_oc.sh
