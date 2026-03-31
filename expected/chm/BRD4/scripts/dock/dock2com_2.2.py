@@ -3,7 +3,7 @@
 dock2com_2.2.py
 ===============
 One-step workflow: Select best docking pose and create MD-ready system files.
-Extended with SASA-based selection metric and halogen support.
+Extended with SASA-based selection metric, halogen support, and CHARMM CGenFF support.
 
 Combines functionality from:
 - dock2com_1.py (SDF parsing, model selection, GRO conversion)
@@ -13,6 +13,8 @@ New Features in dock2com_2.2.py:
 - CHARMM CGenFF ffbonded.itp support for ligand-specific parameters
 - Auto-detection of *_ffbonded.itp from ligand ITP directory
 - Proper inclusion of ffbonded.itp in system topology
+- Automatic generation of ligand position restraints (posre_lig.itp)
+- Ligand heavy atom position restraints for equilibration (under POSRES flag)
 
 New Features in dock2com_2.1.py:
 - Fixed halogen handling (Br, Cl, I, F) in atom type recognition
@@ -29,9 +31,15 @@ Models with minimizedAffinity > 0 are automatically excluded from selection.
 Positive affinity values indicate unfavorable binding and are filtered out
 before any metric-based ranking is performed.
 
+Position Restraints
+-------------------
+Ligand position restraints are generated for heavy atoms only (hydrogens excluded).
+The ligand ITP is modified to include posre_lig.itp under the POSRES flag.
+Use define = -DPOSRES in MDP files to restrain both receptor and ligand during equilibration.
+
 Example Usage
 -------------
-    # Original behavior (unchanged)
+    # Basic usage
     python dock2com_2.2.py -i lig.itp -s hsa*-phe_sssD.sdf -r topol.top -t lig.mol2
 
     # Select by SASA (lower = more buried = better)
@@ -1303,6 +1311,84 @@ def copy_ffbonded_to_workdir(ffbonded_src, output_name="lig_ffbonded.itp"):
     return output_name
 
 
+def generate_ligand_posre(lig_itp_path, output_path="posre_lig.itp", fc=1000):
+    """
+    Generate position restraints for ligand heavy atoms.
+    
+    Parses lig.itp, identifies non-hydrogen atoms, writes posre_lig.itp
+    with position restraints for each heavy atom.
+    
+    Parameters
+    ----------
+    lig_itp_path : str
+        Path to ligand ITP file
+    output_path : str
+        Output path for posre_lig.itp
+    fc : float
+        Force constant for position restraints (kJ/mol/nm^2)
+    
+    Returns
+    -------
+    str
+        Path to generated posre_lig.itp
+    """
+    atoms, _ = parse_itp(lig_itp_path)
+    
+    heavy_atoms = [a for a in atoms if _itp_element(a["type"]) != "H"]
+    
+    if not heavy_atoms:
+        print("WARNING: No heavy atoms found in ligand ITP")
+        return None
+    
+    with open(output_path, 'w') as f:
+        f.write("[ position_restraints ]\n")
+        f.write(";  i funct       fcx        fcy        fcz\n")
+        for a in heavy_atoms:
+            f.write(f"{a['idx']:>4d}    1  {fc:>10.1f}  {fc:>10.1f}  {fc:>10.1f}\n")
+    
+    print(f"Generated {output_path} with {len(heavy_atoms)} heavy atom restraints")
+    
+    return output_path
+
+
+def modify_lig_itp_posre(lig_itp_path, output_path=None):
+    """
+    Modify lig.itp to reference posre_lig.itp instead of posre.itp.
+    
+    Changes the #include statement in the POSRES section from
+    "posre.itp" to "posre_lig.itp".
+    
+    Parameters
+    ----------
+    lig_itp_path : str
+        Path to ligand ITP file (will be modified in place if output_path is None)
+    output_path : str, optional
+        Output path for modified ITP. If None, modifies in place.
+    
+    Returns
+    -------
+    str
+        Path to modified lig.itp
+    """
+    if output_path is None:
+        output_path = lig_itp_path
+    
+    with open(lig_itp_path, 'r') as f:
+        content = f.read()
+    
+    content = content.replace('#include "posre.itp"', '#include "posre_lig.itp"')
+    
+    if lig_itp_path != output_path:
+        shutil.copy2(lig_itp_path, output_path)
+    
+    with open(output_path, 'w') as f:
+        f.write(content)
+    
+    print(f"Modified {output_path}: posre.itp -> posre_lig.itp")
+    
+    return output_path
+
+
 def create_system_topology(args):
     for itp in [args.rec_itp, args.lig_itp]:
         if itp and os.path.exists(itp):
@@ -1624,7 +1710,15 @@ def main():
         config.lig_ffbonded = None
     
     print("\n" + "=" * 60)
-    print("STEP 7: Creating system topology...")
+    print("STEP 7: Generating ligand position restraints...")
+    print("=" * 60)
+    
+    generate_ligand_posre(config.lig_itp, "posre_lig.itp", fc=1000)
+    
+    modify_lig_itp_posre(config.lig_itp)
+    
+    print("\n" + "=" * 60)
+    print("STEP 8: Creating system topology...")
     print("=" * 60)
     
     ff_path, water_itp, ions_itp = extract_ff_paths_from_top(config.rec_top)
@@ -1664,6 +1758,7 @@ def main():
     print(f"  Combined GRO:  {config.com_gro}")
     print(f"  Receptor ITP:  {config.rec_itp}")
     print(f"  System TOP:    {config.sys_top}")
+    print(f"  Ligand posre:  posre_lig.itp")
     if config.lig_ffbonded:
         print(f"  Ligand FF:     {config.lig_ffbonded}")
     print("\nDock2com_2.2 completed successfully!")

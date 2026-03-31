@@ -25,4 +25,7 @@ cd this directory
 
 **Run Complex MD and MM/PBSA**
 1. extract ligand itp from top and extract top rec+lig pair for gromacs simulation: bash scripts/dock/dock2com_2.2.sh
-2. 
+   - This also generates posre_lig.itp (heavy atom position restraints for ligand)
+   - Ligand ITP references posre_lig.itp under #ifdef POSRES
+   - Use define = -DPOSRES in MDP to restrain both receptor and ligand
+2. run system preparation: bash scripts/com/0_prep.sh

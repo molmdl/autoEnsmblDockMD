@@ -29,7 +29,7 @@ for ligid in {1..10} ; do
 	
 	find . -maxdepth 1 -type l -delete
 	mkdir -p ../../com/lig${ligid}
-	cp sys.top rec.itp com.gro best.gro lig.itp ../../rec/posre.itp ../../com/lig${ligid}/
+	cp sys.top rec.itp com.gro best.gro lig.itp posre_lig.itp ../../rec/posre.itp ../../com/lig${ligid}/
 	
 	if [ -f "lig_ffbonded.itp" ]; then
 		cp lig_ffbonded.itp ../../com/lig${ligid}/
