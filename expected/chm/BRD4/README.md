@@ -29,3 +29,6 @@ cd this directory
    - Ligand ITP references posre_lig.itp under #ifdef POSRES
    - Use define = -DPOSRES in MDP to restrain both receptor and ligand
 2. run system preparation: bash scripts/com/0_prep.sh
+3. run unrestained equilibration and production MD: bash scripts/com/1_pr_prod.sh
+4. run trjconv and submit mmpbsa: bash scripts/com/2_run_mmpbsa.sh
+

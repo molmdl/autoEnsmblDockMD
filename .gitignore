@@ -229,4 +229,5 @@ expected/**/*.*
 !expected/**/*.in
 !expected/**/*.txt
 *mdout.mdp
+expected/**/mmpbsa_?/
 !scripts/run_oc.sh
