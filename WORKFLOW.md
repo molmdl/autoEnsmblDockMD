@@ -2,9 +2,15 @@
 
 # WORKFLOW.md contains information on the full workflow of autoEnsmblDockMD
 
-The workflow takes the following provided by the user: receptor structure PDB, reference ligand for pocket definition and velidatiom (coordinates and topology), ligands to be evaluated (coordinates and topology), and the customised forcefield that include ligand parameters, gromacs run input mdp; optionally configuration parameters for docking.
+The workflow takes the following provided by the user: 
+- receptor structure PDB, 
+- reference ligand for pocket definition and validation (coordinates and topology), 
+- ligands to be evaluated (coordinates and topology), 
+- the customised forcefield that include ligand parameters
+- gromacs run input mdp
+- optionally configuration parameters for docking.
 
-which dir to enter, which file to detect, which script to execute, which analysis to do
+Provided the workspace with input files, the agent should be aware of the modes of workflow, which directory to enter, which file to detect, which script to execute, which analysis to do.
 
 
 ## Modes
@@ -30,6 +36,7 @@ debugger agent
 ## Complete Workflow
 
 ### A. Reference Pocket Docking
+gaff2 atomtypes already inserted manually into the amberff ffnonbonded.itp by the user
 this is also the example of using amber forcefield
 reference redock
 interested lig dock
@@ -37,7 +44,6 @@ gen ensemble, cluster, select, align
 intermediate analysis step
 ensemble docking, from all ensemble out select best rec-lig combination
 conversion and setup for md
-multiple parallel agent for multiple ligands, max parallel up to N agents
 using slurm for hpc, and run local option
 
 ### B. Blind docking
