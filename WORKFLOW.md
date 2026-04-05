@@ -20,6 +20,7 @@ B. Blind docking
 
 ## Major stages
 remind or help user to place the required input
+optional pdb2pqr
 standard workflow
 default analysis
 tailored analysis
@@ -36,6 +37,7 @@ debugger agent
 ## Complete Workflow
 
 ### A. Reference Pocket Docking
+process receptor with pdb2pqr
 gaff2 atomtypes already inserted manually into the amberff ffnonbonded.itp by the user
 this is also the example of using amber forcefield
 reference redock
