@@ -1,6 +1,6 @@
 # blind docking protocol with CHERMM36m/CGenFF
 
-Forcefield: charmm36 + CGenFF
+Forcefield: charmm36m + CGenFF
 Pocket: whole protein
 
 ## Required inputs: 
@@ -31,4 +31,5 @@ cd this directory
 2. run system preparation: bash scripts/com/0_prep.sh
 3. run unrestained equilibration and production MD: bash scripts/com/1_pr_prod.sh
 4. run trjconv and submit mmpbsa: bash scripts/com/2_run_mmpbsa.sh
+5. Run standard trajectory anaylsis on the trajectory in the mmpbsa dir, and plotting both mmpbsa results and trj analysis results: bash scripts/com/3_ana.sh
 

@@ -6,6 +6,12 @@ The workflow takes the following provided by the user: receptor structure PDB, r
 
 which dir to enter, which file to detect, which script to execute, which analysis to do
 
+
+## Modes
+A. Reference pocket docking
+B. Blind docking
+
+
 ## Major stages
 remind or help user to place the required input
 standard workflow
@@ -23,6 +29,8 @@ debugger agent
 
 ## Complete Workflow
 
+### A. Reference Pocket Docking
+this is also the example of using amber forcefield
 reference redock
 interested lig dock
 gen ensemble, cluster, select, align
@@ -32,7 +40,10 @@ conversion and setup for md
 multiple parallel agent for multiple ligands, max parallel up to N agents
 using slurm for hpc, and run local option
 
-blind docking workflow example usinf charmm ff, see @expected/chm/BRD4/READMD.md
+### B. Blind docking
+Blind docking workflow. This also the example of using the charmm fforcefiled, 
+Full workflow: < --- reference @expected/chm/BRD4/README.md --- >
+Docking-only workflow: < --- reference TBD --- > 
 
 ---
 
