@@ -89,7 +89,30 @@ Blind docking workflow using CHARMM36m/CGenFF force field with whole protein as 
 - `com/LIGAND_ID/` - Complex MD trajectories, energy files, MM/PBSA subdirectories
 - `com_ana/` - Cross-ligand comparison plots and per-ligand analysis
 
-**Docking-only workflow:** TBD
+**Docking-only workflow (no Complex MD/MM-PBSA):**
+
+Simplified workflow that stops after ensemble docking without proceeding to complex MD simulations and MM/PBSA calculations. Used for rapid screening when binding free energy calculations are not required.
+
+**Required Inputs:**
+1. Receptor PDB file in `rec/` directory
+2. Ligand MOL2 files in `lig/LIGAND_ID/` directories
+3. Force field directory `charmm36.ff/` (for receptor ensemble generation only)
+
+**Note:** Ligands only need MOL2 format. No topology (.top), coordinates (.gro), or bonded parameter (.itp) files required.
+
+**Workflow Stages:**
+- **Stage 1: Generate Receptor Ensemble** (same as full workflow)
+- **Stage 2: Run Blind Docking** (same as full workflow)
+- **Stage 3: Complex MD and MM/PBSA** - SKIPPED
+
+**Output Structure:**
+- `rec/` - Receptor trajectories, analysis, and clustered conformations (rec0-rec9.gro)
+- `dock/LIGAND_ID/` - Docking poses (SDF), scores, logs per ligand
+
+**Omitted from full workflow:**
+- No `com/` or `com_ana/` directories
+- No `scripts/com/` scripts
+- No complex topology files or bonded parameters for ligands
 
 ---
 
