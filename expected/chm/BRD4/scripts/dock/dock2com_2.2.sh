@@ -25,7 +25,7 @@ for ligid in {1..10} ; do
 		echo "Found ffbonded.itp: $ffbonded_src"
 	fi
 	
-	python ${CWD}/scripts/dock/dock2com_2.2.py -i lig.itp -s rec?-${l}.sdf -t ${l}.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../charmm36.ff/forcefield.itp --water-itp ../../charmm36.ff/tip3p.itp --ions-itp ../../charmm36.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top --metric minimizedAffinity --rec-gro-pattern {prefix}.gro $ffbonded_arg
+	python ${CWD}/scripts/dock/dock2com_2.2.1.py -i lig.itp -s rec?-${l}.sdf -t ${l}.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../charmm36.ff/forcefield.itp --water-itp ../../charmm36.ff/tip3p.itp --ions-itp ../../charmm36.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top --metric minimizedAffinity --rec-gro-pattern {prefix}.gro $ffbonded_arg
 	
 	find . -maxdepth 1 -type l -delete
 	mkdir -p ../../com/lig${ligid}
