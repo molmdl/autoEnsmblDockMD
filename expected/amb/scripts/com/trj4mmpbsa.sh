@@ -2,12 +2,6 @@
 
 #python ../../scripts/com/bypass_angle_type3.py lig_g.itp sys.top
 #python ../../scripts/com/bypass_angle_type3.py lig_me_g.itp sys.top
-#for i in sssL sssD rrrL rrrD ; do
-#	cd phe_${i}_tsap
-#	python ../../scripts/com/bypass_angle_type3.py phe_${i}_tsap.itp sys.top
-#	cd ..
-#done
-
 for i in {0..3} ; do
 	mkdir mmpbsa_${i}
 	cd mmpbsa_${i}
