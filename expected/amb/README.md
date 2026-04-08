@@ -1,6 +1,6 @@
 # Reference pocket docking workflow with AMBER/GAFF2 - [PROTEIN_NAME]
 
-Forcefield: AMBER19SB + GAFF2  
+Forcefield: AMBER19SB (for Gromacs version < 2025) + GAFF2  
 Pocket: Defined by reference ligand  
 Workflow: Reference validation + Receptor ensemble + Ensemble docking + Complex MD/MM-PBSA
 

@@ -20,7 +20,8 @@ B. Blind docking
 
 ## Major stages
 remind or help user to place the required input
-optional pdb2pqr
+manual ff preparation
+optional pdb2pqr for missing atoms
 standard workflow
 default analysis
 tailored analysis
@@ -36,7 +37,7 @@ debugger agent
 
 ## Complete Workflow
 
-### A. Reference Pocket Docking
+### Mode A. Reference Pocket Docking
 process receptor with pdb2pqr
 gaff2 atomtypes already inserted manually into the amberff ffnonbonded.itp by the user
 this is also the example of using amber forcefield
@@ -48,7 +49,7 @@ ensemble docking, from all ensemble out select best rec-lig combination
 conversion and setup for md
 using slurm for hpc, and run local option
 
-### B. Blind docking
+### Mode B. Blind docking
 Blind docking workflow using CHARMM36m/CGenFF force field with whole protein as binding pocket.
 
 **Required Inputs:**
@@ -124,8 +125,8 @@ Simplified workflow that stops after ensemble docking without proceeding to comp
 
 ---
 
-## 
+## Helper agents
 
-checker agent
-debugger agent
+**checker agent**
+**debugger agent**
 
