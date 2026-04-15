@@ -490,9 +490,35 @@ def load_mol_gro(gro):
     return u, mol_ag
 
 
+def _find_matching_gro(tpr_path, n_atoms):
+    """
+    Search for a GRO file with exactly n_atoms atoms near the given TPR.
+
+    Looks in:
+      1. The directory containing the TPR  (e.g. fp/)
+      2. The parent of that directory       (e.g. the system root)
+
+    Returns the path of the first matching GRO, or None.
+    """
+    import glob
+    tpr_dir = os.path.dirname(os.path.abspath(tpr_path))
+    search_dirs = [tpr_dir, os.path.dirname(tpr_dir)]
+    for sdir in search_dirs:
+        for gro in sorted(glob.glob(os.path.join(sdir, '*.gro'))):
+            try:
+                with open(gro) as fh:
+                    fh.readline()           # title line
+                    n = int(fh.readline())  # atom count line
+                if n == n_atoms:
+                    return gro
+            except Exception:
+                continue
+    return None
+
+
 def load_mol_universe(tpr, xtc):
     """
-    Load the MOL residue from tpr+xtc, handling two cases transparently:
+    Load the MOL residue from tpr+xtc, handling three cases transparently:
 
     Case A – stripped XTC (atoms == MOL only):
         Build a MOL-only universe via Merge + load_new.  mol_ag = u.atoms.
@@ -500,6 +526,14 @@ def load_mol_universe(tpr, xtc):
     Case B – full XTC (atoms == whole simulation box):
         Load Universe(tpr, xtc) directly.  mol_ag is the persistent
         'resname MOL' AtomGroup inside that universe.
+
+    Case C – stripped XTC (atoms == complex minus solvent, i.e. between
+              MOL count and full-system count):
+        Find a GRO file in the same or parent directory whose atom count
+        matches the XTC.  Load Universe(gro, xtc) to get per-frame
+        positions, then copy TPR masses onto the MOL atoms so that Eu
+        gets its correct mass (~152 Da) rather than the 0.0 that
+        MDAnalysis guesses from the bare GRO atom type "E".
 
     Returns (u, mol_ag) where:
         u       – Universe whose .trajectory is iterated in the main loop
@@ -523,10 +557,34 @@ def load_mol_universe(tpr, xtc):
         u      = mda.Universe(tpr, xtc)
         mol_ag = u.select_atoms('resname MOL')
     else:
-        raise ValueError(
-            f"XTC has {xtc_natoms} atoms, but TPR has {u_tpr.atoms.n_atoms} total "
-            f"and {n_mol} MOL atoms.  Cannot determine loading strategy."
-        )
+        # Case C: stripped XTC that is a subset of the full system
+        # (e.g. complex without bulk solvent).  The TPR atom count does not
+        # match the XTC, so we locate a companion GRO with the right count
+        # and use it as the topology for loading the trajectory.
+        # We then transplant TPR masses onto the MOL atoms so Eu mass is
+        # correct (TPR stores ~152 Da; bare GRO gives 0.0 for type "E").
+        gro_path = _find_matching_gro(tpr, xtc_natoms)
+        if gro_path is None:
+            raise ValueError(
+                f"XTC has {xtc_natoms} atoms, but TPR has {u_tpr.atoms.n_atoms} "
+                f"total and {n_mol} MOL atoms.  Could not find a GRO file with "
+                f"{xtc_natoms} atoms near {tpr} to use as topology."
+            )
+        print(f'  [load] Case C (stripped complex XTC): using {gro_path} as topology')
+        u      = mda.Universe(gro_path, xtc)
+        mol_ag = u.select_atoms('resname MOL')
+        if mol_ag.n_atoms == 0:
+            raise ValueError(
+                f"No resname MOL atoms found in {gro_path}."
+            )
+        # Copy masses from TPR so Eu gets ~152 Da instead of 0.0
+        if mol_ag.n_atoms == n_mol:
+            mol_ag.masses = mol_tpr.masses
+        else:
+            # Atom count mismatch between TPR MOL and GRO MOL — patch only Eu
+            for atom in mol_ag.atoms:
+                if atom.mass == 0.0 and atom.type.lower().startswith('e'):
+                    atom.mass = EU_MASS
 
     return u, mol_ag
 
