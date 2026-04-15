@@ -5,7 +5,7 @@ Sample input file with decomposition analysis
 
 &general
 sys_name="Decomposition",
-startframe=501,
+startframe=1,
 endframe=9999999,
 netcdf=1,
 solvated_trajectory=0,
