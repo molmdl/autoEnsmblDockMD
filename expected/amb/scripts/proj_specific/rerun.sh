@@ -24,7 +24,7 @@ source ~/scripts/gmxMMPBSA.env
 i=${trial}
 
 gmx grompp -f ${CWD}/rerun.mdp -c pr_\${i}.gro -p $topol -o rerun_\${i}.tpr  -maxwarn 2
-gmx mdrun -deffnm rerun_\$i -ntmpi 1 -ntomp 8 -bonded cpu -nb cpu -update cpu -pme cpu -cpt 5
+gmx mdrun -deffnm rerun_\$i -ntmpi 1 -ntomp 8 -bonded cpu -nb cpu -update cpu -pme cpu -cpt 5 -rerun prod_\${i}.xtc
 
 EOF
 	done
