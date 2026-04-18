@@ -46,7 +46,7 @@ Targeted docking workflow using AMBER19SB/GAFF2 force field with pocket defined 
 4. New ligand coordinates (.gro) and topology files in `lig/new/LIGAND_ID/` directories
 5. Force field directory `amber19SB_OL21_OL3_lipid17.ff/`
 6. GAFF2 atom types manually inserted into `ffnonbonded.itp`
-7. Ligand bonded parameters `.itp` files from ACPYPE or equivalent
+7. Ligand bonded parameters `.itp` files from ACPYPE, sobtop, or equivalent
 
 **Directory Structure:**
 - `rec/` - Receptor ensemble generation workspace
@@ -78,12 +78,11 @@ Targeted docking workflow using AMBER19SB/GAFF2 force field with pocket defined 
 
 **Stage 2: Ensemble Docking with Reference Pocket**
 1. Convert ligands from GRO to MOL2 format: `python scripts/dock/gro_itp_to_mol2.py`
-   - AMBER-specific: Uses bypass_angle_type3.py internally
 2. Redock reference ligand to ensemble (validation): `bash scripts/dock/gnina_0.sh`
    - Confirms pocket definition generalizes across ensemble
 3. Dock new ligands to ensemble with reference-defined pocket:
    - `bash scripts/dock/gnina_1.sh` and `bash scripts/dock/gnina_2.sh`
-   - Pocket: `--autobox_ligand ref.pdb --autobox_add 8`
+   - Pocket: `--autobox_ligand ref.pdb --autobox_add 8` (before you start, estimate the size of the biggest ligand and choose the autobox add accordingly)
 4. Generate docking reports and rankings: `bash scripts/dock/dock_report.sh`
 
 **Stage 3: Run Complex MD and MM/PBSA**
@@ -93,12 +92,13 @@ Targeted docking workflow using AMBER19SB/GAFF2 force field with pocket defined 
    - Applies bypass_angle_type3.py for AMBER topology compatibility
 2. Prepare complex system (solvation, ionization, minimization): `bash scripts/com/prep_com.sh` then `bash scripts/com/prep.sh`
 3. Run equilibration and production MD: `bash scripts/com/pr_prod.sh`
+   - AMBER-specific: Uses bypass_angle_type3.py internally if the unsupported bond type exists
 4. Prepare trajectories and submit MM/PBSA calculations: `bash scripts/com/sub_mmpbsa.sh`
 5. Run trajectory analysis and plot results: `bash scripts/com/ana.sh`
 
 **Output Structure:**
 - `rec/rec_md/` - Receptor MD trajectories and analysis
-- `rec/ensemble/` - Clustered conformations (hsa0-hsa9.pdb/gro), aligned to reference
+- `rec/ensemble/` - Clustered conformations (receptor's .pdb/gro), aligned to reference
 - `dock/REF_LIGAND/` - Reference redocking validation results
 - `dock/LIGAND_ID/` - Docking poses (SDF), scores, logs per ligand
 - `com_md/LIGAND_ID/` - Complex MD trajectories, energy files, MM/PBSA results

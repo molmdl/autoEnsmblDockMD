@@ -76,3 +76,7 @@ Workflow will be provided in the `WORKFLOW.md` file to reduce the filesize of th
 - **Consistency**: Ensure input/output file formats and code style consistency across different conversations of this project
 - **Report summary of the tasks done and to-be-done**: After planning, the plan should write to a md file before proceed. After executing tasks, the working being done should be summarized abd append into a md file, and the to-do tasks summarized in another md file
 
+## Other Constraints
+- always use the question tool for interactions, for approval, for uncertainties
+- show me your understanding and report how you will do the edit, before making any chagnes
+- dont read many files at once to avoid context overload. split into smaller tasks..
