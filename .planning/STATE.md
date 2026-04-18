@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 5 of 11 in current phase |
+| **Plan** | 6 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | ██████░░░░ 11/17 plans complete (65%) |
+| **Progress** | ███████░░░ 12/17 plans complete (71%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-07-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-06-PLAN.md |
 
 ---
 
@@ -97,8 +97,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 21:02 +0800
-Stopped at: Completed 02-07-PLAN.md
+Last session: 2026-04-18 21:03 +0800
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -122,6 +122,7 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 | 02-02 | Receptor ensemble generation scripts | 2026-04-18 | Added generalized receptor prep/production/analysis/clustering scripts and MDAnalysis-based ensemble alignment utility |
 | 02-03 | Docking ligand conversion scripts | 2026-04-18 | Added GRO→MOL2 and SDF→GRO wrappers plus generalized AMBER GRO+ITP→MOL2 converter with CLI and importable API |
 | 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
+| 02-06 | Dock-to-complex shell wrappers | 2026-04-18 | Added config-driven wrappers for new/reference dock2com conversion pipeline with standardized com outputs |
 
 
 - [x] PROJECT.md created
@@ -159,5 +160,5 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-07 (complex MD preparation scripts)*
+*Last plan: 02-06 (dock-to-complex shell wrappers)*
 *Last quick task: quick-002 (2026-04-18)*
