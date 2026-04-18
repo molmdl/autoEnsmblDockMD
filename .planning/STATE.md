@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 3 - Agent Infrastructure |
-| **Plan** | 2 of 4 in current phase |
+| **Plan** | 3 of 4 in current phase |
 | **Status** | In progress |
-| **Progress** | ██████████████░░ 19/21 plans complete (90%) |
+| **Progress** | ███████████████░ 20/21 plans complete (95%) |
 | **Phase 3 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-19 - Completed 03-02-PLAN.md |
+| **Last Activity** | 2026-04-19 - Completed 03-03-PLAN.md |
 
 ---
 
@@ -81,6 +81,9 @@
 | BaseAgent reuses Phase 1 persistence primitives | Avoids reimplementation by wiring AgentState and CheckpointManager directly in shared agent base | 3 |
 | Orchestrator gate check before transition routing | Prevents stage advancement when previous stage verification is pending/rejected | 3 |
 | Runner emits subprocess-backed structured handoff payloads | Standardizes stage execution outcomes with captured outputs, metrics, and warnings | 3 |
+| Analyzer stage analysis registry | Uses explicit STAGE_ANALYSIS_MAP with optional custom hook discovery for deterministic/extensible analysis execution | 3 |
+| Checker default validation baseline with registry override | Applies common checks for outputs/return code/log/file sizes while permitting stage-specific check extension | 3 |
+| Debugger persists handoff-shaped diagnostics under .debug_reports | Produces reproducible, version-aware JSON debug artifacts consumable by downstream orchestration | 3 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -100,16 +103,16 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 01:32 +0800
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-04-19 01:39 +0800
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 3 in progress.** Plans 03-01 and 03-02 completed with foundational schemas plus orchestrator/runner implementations.
+**Phase 3 in progress.** Plans 03-01 through 03-03 completed with foundational schemas, orchestrator/runner execution, and specialized analyzer/checker/debugger roles.
 
 **Next recommended action:**
-- Execute 03-03-PLAN.md (Analyzer, Checker, and Debugger agents)
+- Execute 03-04-PLAN.md (agent registry, CLI entrypoint, and integration smoke test)
 
 ### Recent Milestones
 
@@ -117,6 +120,7 @@ Resume file: None
 - 2026-04-19: Phase 2 completed (02-01 through 02-11)
 - 2026-04-19: Phase 3 execution started with 03-01 completed
 - 2026-04-19: 03-02 completed (orchestrator and runner agents)
+- 2026-04-19: 03-03 completed (analyzer, checker, and debugger agents)
 
 ### Planning Status
 
@@ -124,7 +128,7 @@ Resume file: None
 - [x] Phase 1 planned and executed
 - [x] Phase 2 planned and executed
 - [x] Phase 3 planned
-- [ ] Phase 3 executed (in progress: 03-01 and 03-02 complete)
+- [ ] Phase 3 executed (in progress: 03-01 to 03-03 complete)
 - [ ] Phase 4 planned/executed
 - [ ] Phase 5 planned/executed
 
@@ -146,5 +150,5 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Last phase: 03-agent-infrastructure (IN PROGRESS)*
-*Last plan: 03-02 (orchestrator and runner agents)*
+*Last plan: 03-03 (analyzer, checker, and debugger agents)*
 *Last quick task: quick-002 (2026-04-18)*
