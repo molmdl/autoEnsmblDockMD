@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 1 - Foundation |
-| **Plan** | 6 of 6 in current phase |
-| **Status** | Phase complete |
-| **Progress** | █░░░░░░░░░░░░░░░░ 1/5 phases complete |
-| **Phase 1 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed quick-002-PLAN.md |
+| **Current Phase** | 2 - Core Pipeline |
+| **Plan** | 1 of 11 in current phase |
+| **Status** | In progress |
+| **Progress** | ████░░░░░░ 7/17 plans complete (41%) |
+| **Phase 2 Blocker** | None ✓ |
+| **Last Activity** | 2026-04-18 - Completed 02-01-PLAN.md |
 
 ---
 
@@ -24,7 +24,7 @@
 | Phase | Blocker | Required Action |
 |-------|---------|-----------------|
 | 1 | Complete | ✓ Delivered |
-| 2 | WORKFLOW.md, Scripts, Reference Output | Finalize workflow, provide manual trial artifacts |
+| 2 | None | Execute remaining Phase 2 plans |
 | 3 | WORKFLOW.md, Phase 2 complete | Wait for Phase 2 |
 | 4 | Phase 3 complete | Wait for Phase 3 |
 | 5 | WORKFLOW.md, End-to-end test | Finalize workflow, run full pipeline |
@@ -68,6 +68,8 @@
 | Atomic read-modify-write pattern | Prevents race conditions in concurrent state modifications | 1 |
 | Public API exports via __init__.py | Clean import interface for infrastructure modules | All |
 | Integration test suite | Validates cross-module functionality end-to-end | All |
+| Pure-bash INI loader for workflow scripts | Gives shell scripts config access compatible with Python INI model while avoiding external dependencies | 2 |
+| Auto-source config loader from common.sh | Ensures downstream scripts can load one shared library and get config + utility helpers consistently | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -87,16 +89,13 @@
 
 ## Session Continuity
 
+Last session: 2026-04-18 20:46 +0800
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
+
 ### Next Action
 
-**Phase 1 COMPLETE.** All 6 infrastructure modules delivered and tested.
-
-**Phase 2 blockers:**
-- WORKFLOW.md needs to be finalized (remove "TO BE FINALIZED" banner)
-- Scripts need to be provided/finalized
-- Reference output from manual trial needed
-
-**Recommend:** User should finalize WORKFLOW.md and provide manual trial artifacts before starting Phase 2.
+Continue Phase 2 execution with 02-02-PLAN.md.
 
 ### Quick Tasks Completed
 
@@ -110,6 +109,7 @@
 | 01-04 | Create job log monitor | 2026-03-24 | LogMonitor for error/warning detection and job status tracking |
 | 01-05 | Create verification gate system | 2026-03-25 | VerificationGate for human checkpoints with concurrent access protection |
 | 01-06 | Integrate infrastructure modules | 2026-03-25 | Public API exports, integration tests, Phase 1 complete |
+| 02-01 | Bash config loader and common utilities | 2026-04-18 | Added shared sourceable shell libraries for INI config access, logging, validation, and execution helpers |
 
 
 - [x] PROJECT.md created
@@ -118,7 +118,7 @@
 - [x] Roadmap created
 - [x] Phase 1 planned
 - [x] Phase 1 executed (01-01, 01-02, 01-03, 01-04, 01-05, 01-06 complete)
-- [ ] Phase 2 planned
+- [x] Phase 2 planned
 - [ ] Phase 2 executed
 - [ ] Phase 3 planned
 - [ ] Phase 3 executed
@@ -131,8 +131,8 @@
 
 | Checkpoint | Trigger | Status |
 |------------|---------|--------|
-| Stage Complete | Each phase completes | Phase 1 Complete ✓ |
-| Human Verification | Between stages | Phase 1 Verified ✓ |
+| Stage Complete | Each phase completes | Phase 1 Complete ✓, Phase 2 In Progress |
+| Human Verification | Between stages | Active |
 | Agent Context Dump | Session continuity | Active |
 
 ---
@@ -146,6 +146,6 @@
 ---
 
 *State updated: 2026-04-18*
-*Last phase: 01-foundation (COMPLETE)*
-*Last plan: 01-06 (infrastructure integration)*
+*Last phase: 02-core-pipeline (IN PROGRESS)*
+*Last plan: 02-01 (bash config loader and common utilities)*
 *Last quick task: quick-002 (2026-04-18)*
