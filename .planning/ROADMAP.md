@@ -178,9 +178,15 @@ Plans:
 
 **Dependencies:** Phase 2 must complete (agents orchestrate scripts that must exist first)
 
-**Blockers:**
-- ⚠️ **WORKFLOW.md finalized** — Need workflow stages for agent state machine logic
-- ⚠️ **Phase 2 complete** — Requires working scripts to orchestrate
+**Blockers:** None — Phase 2 complete, WORKFLOW.md available.
+
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — Base agent class, schemas (HandoffRecord, WorkflowStage), routing (Wave 1)
+- [ ] 03-02-PLAN.md — Orchestrator and Runner agents (Wave 2)
+- [ ] 03-03-PLAN.md — Analyzer, Checker, and Debugger agents (Wave 2)
+- [ ] 03-04-PLAN.md — Agent registry, CLI entrypoint, integration smoke test (Wave 3)
 
 **Success Criteria:**
 
