@@ -1,5 +1,3 @@
-> TO BE FINALIZED, do not proceed to plan or work of related stages with this banner
-
 # WORKFLOW.md contains information on the full workflow of autoEnsmblDockMD
 
 The workflow takes the following provided by the user: 

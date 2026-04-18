@@ -1,6 +1,6 @@
 # Scripts Context - Generalized Ensemble Docking Pipeline
 
-This document lists the generalized scripts needed for both targeted (Mode A) and blind (Mode B) docking workflows.
+This document lists the generalized scripts needed for both targeted (Mode A) and blind (Mode B) docking workflows. If possible combine and generalize the scripts.
 
 ## Script Naming Convention
 - Numeric prefix indicates execution order: `0_`, `1_`, `2_`, etc.
@@ -33,11 +33,10 @@ Mode A:
 Mode B:
 - `2_gnina_blind.sh` - Blind docking across ensemble (IMPLEMENTED)
 
-Mode A:
+Mode A: combine the scripts below to accept mode/input as variable
 - `gnina_test.sh` - Reference ligand validation redocking (GAP)
 - `gnina_0.sh` - Reference ligand ensemble redocking (GAP)
-- `gnina_1.sh` - New ligand ensemble docking batch 1 (GAP)
-- `gnina_2.sh` - New ligand ensemble docking batch 2 (GAP)
+- `gnina_N.sh` - New ligand ensemble docking batch 2 (GAP)
 
 ### Post-Docking Analysis
 Mode A/B common:

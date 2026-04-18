@@ -57,7 +57,6 @@ For the CURRENT user (developer) or agents on this cluster (hostname=mgpu)
 ## Workflow
 
 Workflow will be provided in the `WORKFLOW.md` file to reduce the filesize of this AGENTS.md.
-**CURRENT STATUS: workflow and related script to be finalized, do not proceed to plan stages related to workflow yet until the user manually remove this statement and the `TO BE FINALIZED` banner in WORKFLOW.md**
 
 ## Future
 - Automate the ligand preparation procedures and ffnonbond.itp edits
