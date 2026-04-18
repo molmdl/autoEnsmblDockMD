@@ -122,10 +122,22 @@ Plans:
 
 **Dependencies:** Phase 1 must complete (foundation required for script execution environment)
 
-**Blockers:** 
-- ⚠️ **WORKFLOW.md finalized** — Need workflow stages and script execution order defined
-- ⚠️ **Manual trial scripts provided** — Need working scripts in `./expected/` subdirectories
-- ⚠️ **Reference output provided** — Need expected outputs to validate script correctness
+**Blockers:** None — all resolved (WORKFLOW.md, expected scripts, reference output available)
+
+**Plans:** 11 plans in 5 waves
+
+Plans:
+- [ ] 02-01-PLAN.md — Bash config loader and common utilities (Wave 1)
+- [ ] 02-02-PLAN.md — Receptor ensemble generation scripts (Wave 2)
+- [ ] 02-03-PLAN.md — Docking ligand conversion scripts (Wave 2)
+- [ ] 02-04-PLAN.md — Docking execution scripts (Wave 2)
+- [ ] 02-05-PLAN.md — Post-docking scoring and dock2com Python core (Wave 3)
+- [ ] 02-06-PLAN.md — Dock-to-complex shell wrappers (Wave 3)
+- [ ] 02-07-PLAN.md — Complex MD preparation scripts (Wave 3)
+- [ ] 02-08-PLAN.md — Production MD and MM/PBSA scripts (Wave 4)
+- [ ] 02-09-PLAN.md — Complex MD trajectory analysis scripts (Wave 4)
+- [ ] 02-10-PLAN.md — Supporting utilities: fingerprints, archive, rerun (Wave 5)
+- [ ] 02-11-PLAN.md — Pipeline wrapper, config template, validation (Wave 5)
 
 **Success Criteria:**
 
@@ -315,7 +327,7 @@ Plans:
 | Phase | Name | Status | Requirements | Blockers |
 |-------|------|--------|--------------|----------|
 | 1 | Foundation | Complete ✓ | 10 | None |
-| 2 | Core Pipeline | Not Started | 12 | WORKFLOW.md, Scripts, Reference Output |
+| 2 | Core Pipeline | Planning Complete | 12 | None (resolved) |
 | 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md, Phase 2 |
 | 4 | Integration | Not Started | 7 | Phase 3 |
 | 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
