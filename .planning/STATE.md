@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 1 of 11 in current phase |
+| **Plan** | 2 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | ████░░░░░░ 7/17 plans complete (41%) |
+| **Progress** | █████░░░░░ 8/17 plans complete (47%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-01-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-04-PLAN.md |
 
 ---
 
@@ -70,6 +70,8 @@
 | Integration test suite | Validates cross-module functionality end-to-end | All |
 | Pure-bash INI loader for workflow scripts | Gives shell scripts config access compatible with Python INI model while avoiding external dependencies | 2 |
 | Auto-source config loader from common.sh | Ensures downstream scripts can load one shared library and get config + utility helpers consistently | 2 |
+| Unified gnina mode handling in one script | Reduces drift across mode-specific scripts and keeps docking behavior config-driven | 2 |
+| Per-ligand Slurm submission with ensemble inner loop | Preserves parallel throughput while keeping per-ligand outputs grouped and reproducible | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -89,8 +91,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 20:46 +0800
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-18 20:53 +0800
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -110,6 +112,7 @@ Continue Phase 2 execution with 02-02-PLAN.md.
 | 01-05 | Create verification gate system | 2026-03-25 | VerificationGate for human checkpoints with concurrent access protection |
 | 01-06 | Integrate infrastructure modules | 2026-03-25 | Public API exports, integration tests, Phase 1 complete |
 | 02-01 | Bash config loader and common utilities | 2026-04-18 | Added shared sourceable shell libraries for INI config access, logging, validation, and execution helpers |
+| 02-04 | Docking execution scripts | 2026-04-18 | Added generalized receptor docking prep plus unified gnina launcher for test/blind/targeted modes with per-ligand Slurm submission |
 
 
 - [x] PROJECT.md created
@@ -147,5 +150,5 @@ Continue Phase 2 execution with 02-02-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-01 (bash config loader and common utilities)*
+*Last plan: 02-04 (docking execution scripts)*
 *Last quick task: quick-002 (2026-04-18)*

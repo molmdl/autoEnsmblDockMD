@@ -127,10 +127,10 @@ Plans:
 **Plans:** 11 plans in 5 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Bash config loader and common utilities (Wave 1)
+- [x] 02-01-PLAN.md — Bash config loader and common utilities (Wave 1)
 - [ ] 02-02-PLAN.md — Receptor ensemble generation scripts (Wave 2)
 - [ ] 02-03-PLAN.md — Docking ligand conversion scripts (Wave 2)
-- [ ] 02-04-PLAN.md — Docking execution scripts (Wave 2)
+- [x] 02-04-PLAN.md — Docking execution scripts (Wave 2)
 - [ ] 02-05-PLAN.md — Post-docking scoring and dock2com Python core (Wave 3)
 - [ ] 02-06-PLAN.md — Dock-to-complex shell wrappers (Wave 3)
 - [ ] 02-07-PLAN.md — Complex MD preparation scripts (Wave 3)
