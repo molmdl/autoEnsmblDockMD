@@ -138,19 +138,39 @@ discover_ligands() {
 }
 
 make_index_with_complex_group() {
-    local ligand_dir="$1"
-    local seed_tpr="$2"
-    local index_file="$3"
+    local seed_tpr="$1"
+    local index_file="$2"
+    local group_count complex_group_id
 
     local ndx_cmd
-    ndx_cmd="${RECEPTOR_GROUP} | ${LIGAND_GROUP}\nname 24 ${COMPLEX_GROUP_NAME}\nq\n"
+    ndx_cmd="${RECEPTOR_GROUP} | ${LIGAND_GROUP}\nq\n"
     printf '%b' "${ndx_cmd}" | gmx make_ndx -f "${seed_tpr}" -o "${index_file}" >/dev/null
+
+    group_count="$(python - "${index_file}" <<'PY'
+import re
+import sys
+count = 0
+for line in open(sys.argv[1], 'r', encoding='utf-8'):
+    if re.match(r'^\s*\[.*\]\s*$', line):
+        count += 1
+print(count)
+PY
+)"
+
+    if ! [[ "${group_count}" =~ ^[0-9]+$ ]] || [[ "${group_count}" -le 0 ]]; then
+        log_error "Failed to determine group count from ${index_file}"
+        exit 1
+    fi
+
+    complex_group_id=$((group_count - 1))
+    printf '%s\n' "${complex_group_id}"
 }
 
 process_chunk() {
     local ligand_dir="$1"
     local chunk_idx="$2"
     local index_file="$3"
+    local complex_group_id="$4"
     local src_xtc src_tpr chunk_dir
 
     src_xtc="$(printf "${SOURCE_XTC_PATTERN}" "${chunk_idx}")"
@@ -164,10 +184,10 @@ process_chunk() {
 
     ensure_dir "${chunk_dir}"
 
-    printf '%b' "${COMPLEX_GROUP_NAME}\n${COMPLEX_GROUP_NAME}\n" | \
+    printf '%b' "${complex_group_id}\n${complex_group_id}\n" | \
         gmx trjconv -s "${src_tpr}" -f "${src_xtc}" -pbc mol -ur compact -center -n "${index_file}" -o "${chunk_dir}/pbc.xtc" >/dev/null
 
-    printf '%b' "${COMPLEX_GROUP_NAME}\n${COMPLEX_GROUP_NAME}\n" | \
+    printf '%b' "${complex_group_id}\n${complex_group_id}\n" | \
         gmx trjconv -s "${src_tpr}" -f "${chunk_dir}/pbc.xtc" -pbc cluster -fit rot+trans -n "${index_file}" -o "${chunk_dir}/com_traj.xtc" >/dev/null
 
     cp -f "${src_tpr}" "${chunk_dir}/com.tpr"
@@ -190,15 +210,16 @@ for lig_path in "${TARGETS[@]}"; do
     lig_name="$(basename "${lig_path}")"
     first_tpr="${lig_path}/$(printf "${SOURCE_TPR_PATTERN}" 0)"
     index_file="${lig_path}/${INDEX_FILE_NAME}"
+    complex_group_id=""
 
     require_file "${first_tpr}" "Missing seed topology for index generation: ${first_tpr}"
-    make_index_with_complex_group "${lig_path}" "${first_tpr}" "${index_file}"
+    complex_group_id="$(make_index_with_complex_group "${first_tpr}" "${index_file}")"
 
     for chunk in $(seq 0 $((N_CHUNKS - 1))); do
-        process_chunk "${lig_path}" "${chunk}" "${index_file}"
+        process_chunk "${lig_path}" "${chunk}" "${index_file}" "${complex_group_id}"
     done
 
-    log_info "Prepared ${N_CHUNKS} MM/PBSA chunk(s) for ${lig_name}"
+    log_info "Prepared ${N_CHUNKS} MM/PBSA chunk(s) for ${lig_name} (complex group ${complex_group_id})"
 done
 
 log_info "Trajectory preparation for MM/PBSA complete"
