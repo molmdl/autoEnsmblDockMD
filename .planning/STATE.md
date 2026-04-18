@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 10 of 11 in current phase |
-| **Status** | In progress |
-| **Progress** | █████████░ 16/17 plans complete (94%) |
+| **Plan** | 11 of 11 in current phase |
+| **Status** | Phase complete |
+| **Progress** | ██████████ 17/17 plans complete (100%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-10-PLAN.md |
+| **Last Activity** | 2026-04-19 - Completed 02-11-PLAN.md |
 
 ---
 
@@ -24,8 +24,8 @@
 | Phase | Blocker | Required Action |
 |-------|---------|-----------------|
 | 1 | Complete | ✓ Delivered |
-| 2 | None | Execute remaining Phase 2 plans |
-| 3 | WORKFLOW.md, Phase 2 complete | Wait for Phase 2 |
+| 2 | Complete | ✓ Delivered |
+| 3 | WORKFLOW.md | Finalize workflow, then begin Phase 3 |
 | 4 | Phase 3 complete | Wait for Phase 3 |
 | 5 | WORKFLOW.md, End-to-end test | Finalize workflow, run full pipeline |
 
@@ -86,6 +86,8 @@
 | MM/PBSA as per-ligand Slurm arrays | Parallelize chunk calculations with one array task per chunk for scalable throughput | 2 |
 | Dynamic index group ID resolution for MM/PBSA | Avoids hardcoded make_ndx group numbers by deriving complex group IDs from generated index files | 2 |
 | MDAnalysis-based contact fingerprints for post-analysis | Reuses existing trajectory stack and avoids new hard dependencies while providing matrix + heatmap outputs | 2 |
+| Stable wrapper stage interface with --list-stages | Machine-readable stage discovery enables scriptable orchestration and future agent automation | 2, 3, 4 |
+| Config template as authoritative parameter reference | Centralized INI documentation reduces misconfiguration across receptor/docking/complex stages | 2, 3 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -105,13 +107,13 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 21:22 +0800
-Stopped at: Completed 02-10-PLAN.md
+Last session: 2026-04-19 00:08 +0800
+Stopped at: Completed 02-11-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 2 execution with 02-11-PLAN.md.
+Phase 2 complete. Prepare/execute Phase 3 when WORKFLOW.md finalization blocker is cleared.
 
 ### Quick Tasks Completed
 
@@ -135,6 +137,7 @@ Continue Phase 2 execution with 02-11-PLAN.md.
 | 02-09 | Complex MD trajectory analysis scripts | 2026-04-18 | Added unified GROMACS+MDAnalysis trajectory analysis scripts with reusable selection defaults and plot generation |
 | 02-08 | Production MD and MM/PBSA pipeline scripts | 2026-04-18 | Added unified production submission chain plus trajectory processing and Slurm-array MM/PBSA orchestration scripts |
 | 02-10 | Supporting utilities: fingerprints, archive, rerun | 2026-04-18 | Added fingerprint analysis utility and wrappers plus archive/rerun selection scripts for post-analysis operations |
+| 02-11 | Pipeline wrapper and config template | 2026-04-19 | Added unified run_pipeline.sh wrapper, comprehensive config.ini template, and synchronized scripts inventory |
 
 
 - [x] PROJECT.md created
@@ -144,7 +147,7 @@ Continue Phase 2 execution with 02-11-PLAN.md.
 - [x] Phase 1 planned
 - [x] Phase 1 executed (01-01, 01-02, 01-03, 01-04, 01-05, 01-06 complete)
 - [x] Phase 2 planned
-- [ ] Phase 2 executed
+- [x] Phase 2 executed
 - [ ] Phase 3 planned
 - [ ] Phase 3 executed
 - [ ] Phase 4 planned
@@ -156,7 +159,7 @@ Continue Phase 2 execution with 02-11-PLAN.md.
 
 | Checkpoint | Trigger | Status |
 |------------|---------|--------|
-| Stage Complete | Each phase completes | Phase 1 Complete ✓, Phase 2 In Progress |
+| Stage Complete | Each phase completes | Phase 1 Complete ✓, Phase 2 Complete ✓ |
 | Human Verification | Between stages | Active |
 | Agent Context Dump | Session continuity | Active |
 
@@ -170,7 +173,7 @@ Continue Phase 2 execution with 02-11-PLAN.md.
 
 ---
 
-*State updated: 2026-04-18*
-*Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-10 (supporting utilities: fingerprints, archive, rerun)*
+*State updated: 2026-04-19*
+*Last phase: 02-core-pipeline (COMPLETE)*
+*Last plan: 02-11 (pipeline wrapper and config template)*
 *Last quick task: quick-002 (2026-04-18)*
