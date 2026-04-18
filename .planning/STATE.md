@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 6 of 11 in current phase |
+| **Plan** | 7 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | ███████░░░ 12/17 plans complete (71%) |
+| **Progress** | ████████░░ 13/17 plans complete (76%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-06-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-05-PLAN.md |
 
 ---
 
@@ -78,6 +78,8 @@
 | Wrapper import path for numeric converter script | Keeps numeric workflow naming while providing stable library import `scripts.dock.gro_itp_to_mol2:convert` | 2 |
 | Unified complex prep entrypoint for AMBER and CHARMM | One script with mode switch reduces force-field-specific drift and preserves config-driven control | 2 |
 | Preserve angle bypass conversion logic while expanding interfaces | Existing topology conversion behavior is validated; only CLI/config/validation layers were generalized | 2 |
+| Post-docking report script uses bash entrypoint + embedded Python parser | Keeps stage-level shell interface consistency while handling structured SDF parsing robustly | 2 |
+| Wrapper module for numeric dotted script import interoperability | Preserves planned numeric filenames while enabling reliable Python module imports | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -97,13 +99,13 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 21:03 +0800
-Stopped at: Completed 02-06-PLAN.md
+Last session: 2026-04-18 21:04 +0800
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 2 execution with 02-05-PLAN.md.
+Continue Phase 2 execution with 02-08-PLAN.md.
 
 ### Quick Tasks Completed
 
@@ -121,6 +123,7 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 | 02-04 | Docking execution scripts | 2026-04-18 | Added generalized receptor docking prep plus unified gnina launcher for test/blind/targeted modes with per-ligand Slurm submission |
 | 02-02 | Receptor ensemble generation scripts | 2026-04-18 | Added generalized receptor prep/production/analysis/clustering scripts and MDAnalysis-based ensemble alignment utility |
 | 02-03 | Docking ligand conversion scripts | 2026-04-18 | Added GRO→MOL2 and SDF→GRO wrappers plus generalized AMBER GRO+ITP→MOL2 converter with CLI and importable API |
+| 02-05 | Post-docking scoring and dock2com Python core | 2026-04-18 | Added docking score reporting plus SDF→GRO, topology parsing/assembly, and ligand posre Python utilities |
 | 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
 | 02-06 | Dock-to-complex shell wrappers | 2026-04-18 | Added config-driven wrappers for new/reference dock2com conversion pipeline with standardized com outputs |
 
@@ -160,5 +163,5 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-06 (dock-to-complex shell wrappers)*
+*Last plan: 02-05 (post-docking scoring and dock2com Python core)*
 *Last quick task: quick-002 (2026-04-18)*
