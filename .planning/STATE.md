@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 9 of 11 in current phase |
+| **Plan** | 8 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | ████████░░ 14/17 plans complete (82%) |
+| **Progress** | █████████░ 15/17 plans complete (88%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-09-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-08-PLAN.md |
 
 ---
 
@@ -82,6 +82,9 @@
 | Wrapper module for numeric dotted script import interoperability | Preserves planned numeric filenames while enabling reliable Python module imports | 2 |
 | Unified complex trajectory analysis orchestrator | One `3_ana.sh` entrypoint runs both GROMACS baseline and MDAnalysis advanced metrics with config toggles | 2 |
 | Dynamic loading for numeric selection module | Uses importlib loading of `3_selection_defaults.py` to preserve numeric naming and reusable library behavior | 2 |
+| Unified production MD job chaining | Submit equilibration and production as separate Slurm jobs linked via afterok dependencies for reliable stage ordering | 2 |
+| MM/PBSA as per-ligand Slurm arrays | Parallelize chunk calculations with one array task per chunk for scalable throughput | 2 |
+| Dynamic index group ID resolution for MM/PBSA | Avoids hardcoded make_ndx group numbers by deriving complex group IDs from generated index files | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -101,13 +104,13 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 21:10 +0800
-Stopped at: Completed 02-09-PLAN.md
+Last session: 2026-04-18 21:14 +0800
+Stopped at: Completed 02-08-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 2 execution with 02-08-PLAN.md.
+Continue Phase 2 execution with 02-10-PLAN.md.
 
 ### Quick Tasks Completed
 
@@ -129,6 +132,7 @@ Continue Phase 2 execution with 02-08-PLAN.md.
 | 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
 | 02-06 | Dock-to-complex shell wrappers | 2026-04-18 | Added config-driven wrappers for new/reference dock2com conversion pipeline with standardized com outputs |
 | 02-09 | Complex MD trajectory analysis scripts | 2026-04-18 | Added unified GROMACS+MDAnalysis trajectory analysis scripts with reusable selection defaults and plot generation |
+| 02-08 | Production MD and MM/PBSA pipeline scripts | 2026-04-18 | Added unified production submission chain plus trajectory processing and Slurm-array MM/PBSA orchestration scripts |
 
 
 - [x] PROJECT.md created
@@ -166,5 +170,5 @@ Continue Phase 2 execution with 02-08-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-09 (complex MD trajectory analysis scripts)*
+*Last plan: 02-08 (production MD and MM/PBSA pipeline scripts)*
 *Last quick task: quick-002 (2026-04-18)*
