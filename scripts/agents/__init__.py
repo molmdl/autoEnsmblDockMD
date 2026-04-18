@@ -28,7 +28,13 @@ def get_agent(
     config: Dict[str, Any] | None = None,
 ) -> BaseAgent:
     """Instantiate an agent by role string."""
+    if not isinstance(role, str):
+        raise TypeError("role must be a string")
+
     normalized_role = role.strip().lower()
+    if not normalized_role:
+        raise ValueError("role must be a non-empty string")
+
     if normalized_role not in AGENT_REGISTRY:
         raise ValueError(
             f"Unknown agent role '{role}'. "
