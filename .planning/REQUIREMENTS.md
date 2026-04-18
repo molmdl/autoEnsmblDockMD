@@ -9,19 +9,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### I. Scripts (SCRIPT)
 
-- [ ] **SCRIPT-01**: Receptor preparation scripts generalized (pdb2pqr, gmx pdb2gmx, ensemble MD, clustering, alignment)
+- [x] **SCRIPT-01**: Receptor preparation scripts generalized (pdb2pqr, gmx pdb2gmx, ensemble MD, clustering, alignment)
 - [ ] **SCRIPT-02**: Ligand preparation deferred — user provides prepared ligands (future work)
-- [ ] **SCRIPT-03**: Docking scripts generalized (gnina execution, pose extraction, ensemble docking, autobox)
-- [ ] **SCRIPT-04**: MD setup scripts generalized (complex building, solvation, ions, minimization, equilibration)
-- [ ] **SCRIPT-05**: MD production scripts generalized (production run, trajectory handling)
-- [ ] **SCRIPT-06**: MMPBSA scripts generalized (trajectory processing, binding energy, decomposition, plots, averaging)
-- [ ] **SCRIPT-07**: Standard analysis scripts (RMSD, RMSF, contacts, etc.)
-- [ ] **SCRIPT-08**: All scripts support CLI flags for options
-- [ ] **SCRIPT-09**: All scripts use human-friendly config format (not YAML/JSON complexity)
-- [ ] **SCRIPT-10**: Scripts consistent in I/O format, error handling, and coding style
+- [x] **SCRIPT-03**: Docking scripts generalized (gnina execution, pose extraction, ensemble docking, autobox)
+- [x] **SCRIPT-04**: MD setup scripts generalized (complex building, solvation, ions, minimization, equilibration)
+- [x] **SCRIPT-05**: MD production scripts generalized (production run, trajectory handling)
+- [x] **SCRIPT-06**: MMPBSA scripts generalized (trajectory processing, binding energy, decomposition, plots, averaging)
+- [x] **SCRIPT-07**: Standard analysis scripts (RMSD, RMSF, contacts, etc.)
+- [x] **SCRIPT-08**: All scripts support CLI flags for options
+- [x] **SCRIPT-09**: All scripts use human-friendly config format (not YAML/JSON complexity)
+- [x] **SCRIPT-10**: Scripts consistent in I/O format, error handling, and coding style
 - [x] **SCRIPT-11**: Infrastructure/utility scripts for config processing, checkpoint save/load, verification gates (Phase 1)
-- [ ] **SCRIPT-12**: Wrapper scripts for pipeline orchestration (Phase 2)
-- [ ] **SCRIPT-13**: Gap-filling scripts to bridge workflow stages (Phase 2)
+- [x] **SCRIPT-12**: Wrapper scripts for pipeline orchestration (Phase 2)
+- [x] **SCRIPT-13**: Gap-filling scripts to bridge workflow stages (Phase 2)
 
 ### II. Agents (AGENT)
 
@@ -51,7 +51,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **EXEC-02**: HPC Slurm support for demanding tasks (mdrun, MMPBSA, heavy analysis)
 - [x] **EXEC-03**: Job monitoring via log parsing
 - [x] **EXEC-04**: Error detection and reporting
-- [ ] **EXEC-05**: Independent jobs submit to Slurm in parallel
+- [x] **EXEC-05**: Independent jobs submit to Slurm in parallel
 
 ### VI. Checkpoint System (CHECK)
 

@@ -137,7 +137,7 @@ Plans:
 - [x] 02-08-PLAN.md — Production MD and MM/PBSA scripts (Wave 4)
 - [x] 02-09-PLAN.md — Complex MD trajectory analysis scripts (Wave 4)
 - [x] 02-10-PLAN.md — Supporting utilities: fingerprints, archive, rerun (Wave 5)
-- [ ] 02-11-PLAN.md — Pipeline wrapper, config template, validation (Wave 5)
+- [x] 02-11-PLAN.md — Pipeline wrapper, config template, validation (Wave 5)
 
 **Success Criteria:**
 
@@ -327,8 +327,8 @@ Plans:
 | Phase | Name | Status | Requirements | Blockers |
 |-------|------|--------|--------------|----------|
 | 1 | Foundation | Complete ✓ | 10 | None |
-| 2 | Core Pipeline | Planning Complete | 12 | None (resolved) |
-| 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md, Phase 2 |
+| 2 | Core Pipeline | Complete ✓ | 12 | None |
+| 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md (Phase 2 complete) |
 | 4 | Integration | Not Started | 7 | Phase 3 |
 | 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
 
