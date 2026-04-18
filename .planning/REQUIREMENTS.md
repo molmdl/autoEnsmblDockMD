@@ -101,24 +101,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCRIPT-01 | Phase 2 | Pending |
+| SCRIPT-01 | Phase 2 | Complete |
 | SCRIPT-02 | N/A (deferred to v2) | Deferred |
-| SCRIPT-03 | Phase 2 | Pending |
-| SCRIPT-04 | Phase 2 | Pending |
-| SCRIPT-05 | Phase 2 | Pending |
-| SCRIPT-06 | Phase 2 | Pending |
-| SCRIPT-07 | Phase 2 | Pending |
-| SCRIPT-08 | Phase 2 | Pending |
-| SCRIPT-09 | Phase 2 | Pending |
-| SCRIPT-10 | Phase 2 | Pending |
+| SCRIPT-03 | Phase 2 | Complete |
+| SCRIPT-04 | Phase 2 | Complete |
+| SCRIPT-05 | Phase 2 | Complete |
+| SCRIPT-06 | Phase 2 | Complete |
+| SCRIPT-07 | Phase 2 | Complete |
+| SCRIPT-08 | Phase 2 | Complete |
+| SCRIPT-09 | Phase 2 | Complete |
+| SCRIPT-10 | Phase 2 | Complete |
 | SCRIPT-11 | Phase 1 | Complete |
-| SCRIPT-12 | Phase 2 | Pending |
-| SCRIPT-13 | Phase 2 | Pending |
-| AGENT-01 | Phase 3 | Pending |
-| AGENT-02 | Phase 3 | Pending |
-| AGENT-03 | Phase 3 | Pending |
-| AGENT-04 | Phase 3 | Pending |
-| AGENT-05 | Phase 3 | Pending |
+| SCRIPT-12 | Phase 2 | Complete |
+| SCRIPT-13 | Phase 2 | Complete |
+| AGENT-01 | Phase 3 | Complete |
+| AGENT-02 | Phase 3 | Complete |
+| AGENT-03 | Phase 3 | Complete |
+| AGENT-04 | Phase 3 | Complete |
+| AGENT-05 | Phase 3 | Complete |
 | AGENT-06 | Phase 1 | Complete |
 | AGENT-07 | Phase 4 | Pending |
 | CMD-01 | Phase 4 | Pending |
@@ -131,7 +131,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXEC-02 | Phase 1 | Complete |
 | EXEC-03 | Phase 1 | Complete |
 | EXEC-04 | Phase 1 | Complete |
-| EXEC-05 | Phase 2 | Pending |
+| EXEC-05 | Phase 2 | Complete |
 | CHECK-01 | Phase 1 | Complete |
 | CHECK-02 | Phase 1 | Complete |
 | CHECK-03 | Phase 1 | Complete |

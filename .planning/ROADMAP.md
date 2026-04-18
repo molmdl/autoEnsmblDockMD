@@ -183,10 +183,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 03-01-PLAN.md — Base agent class, schemas (HandoffRecord, WorkflowStage), routing (Wave 1)
-- [ ] 03-02-PLAN.md — Orchestrator and Runner agents (Wave 2)
-- [ ] 03-03-PLAN.md — Analyzer, Checker, and Debugger agents (Wave 2)
-- [ ] 03-04-PLAN.md — Agent registry, CLI entrypoint, integration smoke test (Wave 3)
+- [x] 03-01-PLAN.md — Base agent class, schemas (HandoffRecord, WorkflowStage), routing (Wave 1)
+- [x] 03-02-PLAN.md — Orchestrator and Runner agents (Wave 2)
+- [x] 03-03-PLAN.md — Analyzer, Checker, and Debugger agents (Wave 2)
+- [x] 03-04-PLAN.md — Agent registry, CLI entrypoint, integration smoke test (Wave 3)
 
 **Success Criteria:**
 
@@ -334,8 +334,8 @@ Plans:
 |-------|------|--------|--------------|----------|
 | 1 | Foundation | Complete ✓ | 10 | None |
 | 2 | Core Pipeline | Complete ✓ | 12 | None |
-| 3 | Agent Infrastructure | Not Started | 6 | WORKFLOW.md (Phase 2 complete) |
-| 4 | Integration | Not Started | 7 | Phase 3 |
+| 3 | Agent Infrastructure | Complete ✓ | 6 | None |
+| 4 | Integration | Not Started | 7 | Phase 3 complete |
 | 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
 
 ---
