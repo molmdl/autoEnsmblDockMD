@@ -16,8 +16,8 @@ Workflow: Reference validation + Receptor ensemble + Ensemble docking + Complex 
 ## Workflow
 
 **Stage 0: Reference Ligand Redocking (Validation)**
-1. [TBD: Reference redocking protocol]
-2. [TBD: Validation criteria - RMSD threshold, scoring]
+1. Run reference redocking validation: `bash scripts/dock/gnina_test.sh` (uses `--autobox_ligand ref.pdb --autobox_add 8`)
+2. Validation criteria: RMSD < 2.0 Å from crystal structure and acceptable CNN score threshold
 
 **Stage 1: Generate Receptor Ensemble**
 1. Prepare receptor and submit equilibration job: `bash scripts/rec/prep.sh`
@@ -26,18 +26,18 @@ Workflow: Reference validation + Receptor ensemble + Ensemble docking + Complex 
 4. Perform clustering to extract diverse conformations: `bash scripts/rec/cluster.sh`
 
 **Stage 2: Ensemble Docking with Reference Pocket**
-1. Align ensemble structures to reference: [TBD: alignment script]
-2. Redock reference ligand to ensemble (validation): [TBD: gnina_ref.sh or equivalent]
-3. Dock new ligands to ensemble with reference-defined pocket: [TBD: gnina_ensemble.sh or equivalent]
+1. Align ensemble structures to reference: `python scripts/rec/align_structures.py`
+2. Redock reference ligand to ensemble (validation): `bash scripts/dock/gnina_0.sh` (reference validation)
+3. Dock new ligands to ensemble with reference-defined pocket: `bash scripts/dock/gnina_1.sh` and `bash scripts/dock/gnina_2.sh` (ensemble docking)
    - Pocket definition: `--autobox_ligand ref.pdb --autobox_add [X]`
-4. [TBD: Pose selection and ranking protocol]
+4. Pose selection and ranking: `bash scripts/dock/dock_report.sh` (scoring and ranking)
 
 **Stage 3: Run Complex MD and MM/PBSA**
-1. Extract best poses and prepare receptor-ligand topology: `bash scripts/dock/dock2com_2.sh`
+1. Extract best poses and prepare receptor-ligand topology: use `bash scripts/dock/dock2com_2_ref.sh` for reference ligand and `bash scripts/dock/dock2com_2.sh` for new ligands
 2. Prepare complex system (solvation, ionization, minimization): `bash scripts/com/prep.sh`
 3. Run equilibration and production MD: `bash scripts/com/pr_prod.sh`
 4. Submit MM/PBSA calculations: `bash scripts/com/sub_mmpbsa.sh`
-5. Run trajectory analysis: [TBD: analysis script]
+5. Run trajectory analysis: `bash scripts/com/ana.sh`
 
 ## Output Structure
 
@@ -46,7 +46,7 @@ Workflow: Reference validation + Receptor ensemble + Ensemble docking + Complex 
 - `dock/[REF_LIGAND]/` - Reference redocking results and validation
 - `dock/[LIGAND_ID]/` - Docking poses (SDF), scores, logs per ligand
 - `com_md/[LIGAND_ID]/` - Complex MD trajectories, energy files, MM/PBSA results
-- [TBD: com_ana/ for comparative analysis]
+- `com_ana/` - Comparative analysis across ligands
 
 ## Ligands
 
@@ -57,4 +57,6 @@ New ligands to evaluate: [LIST_LIGAND_IDS] ([N] ligands)
 
 - Ensemble structures require alignment to reference before docking (see `rec/ensemble/README.md`)
 - Reference ligand complex in `com_md/[REF]/` contains validated exact scripts
-- [TBD: Specific protocols and parameters to be finalized]
+- AMBER topology requires `scripts/com/bypass_angle_type3.py` for proper angle handling
+- Ligand format conversion via `scripts/dock/gro_itp_to_mol2.py` before docking
+- MM/PBSA analysis via `bash scripts/com/sub_mmpbsa.sh` with trajectory preparation
