@@ -15,7 +15,7 @@
 | **Status** | Phase complete |
 | **Progress** | █░░░░░░░░░░░░░░░░ 1/5 phases complete |
 | **Phase 1 Blocker** | None ✓ |
-| **Last Activity** | 2026-03-25 - Completed 01-06-PLAN.md (Phase 1 Complete) |
+| **Last Activity** | 2026-04-18 - Completed quick-002-PLAN.md |
 
 ---
 
@@ -103,6 +103,7 @@
 | Task | Description | Date | Summary |
 |------|-------------|------|---------|
 | quick-001 | Update WORKFLOW.md template | 2026-03-23 | Added agent integration, requirement traceability, script categorization |
+| quick-002 | Finalize targeted docking workflow documentation | 2026-04-18 | Filled AMBER README placeholders, rewrote Mode A workflow, added scripts context inventory |
 | 01-01 | Create config and state management | 2026-03-24 | ConfigManager for INI parsing, AgentState for JSON persistence |
 | 01-02 | Create checkpoint management | 2026-03-24 | CheckpointManager for workflow state persistence with atomic writes |
 | 01-03 | Create execution backend manager | 2026-03-24 | LocalExecutor/SlurmExecutor for command execution |
@@ -144,7 +145,7 @@
 
 ---
 
-*State updated: 2026-03-25*
+*State updated: 2026-04-18*
 *Last phase: 01-foundation (COMPLETE)*
 *Last plan: 01-06 (infrastructure integration)*
-*Last quick task: quick-001 (2026-03-23)*
+*Last quick task: quick-002 (2026-04-18)*
