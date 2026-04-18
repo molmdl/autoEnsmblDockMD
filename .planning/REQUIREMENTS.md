@@ -31,19 +31,19 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AGENT-04**: Checker agent — validates results, generates warnings/suggestions
 - [ ] **AGENT-05**: Debugger agent — follows gsd-debugger workflow, version-aware (GROMACS 2023.5, gnina, gmx_MMPBSA)
 - [x] **AGENT-06**: All agents use file-based state passing to avoid context overflow
-- [ ] **AGENT-07**: Agent support marked as experimental in documentation
+- [x] **AGENT-07**: Agent support marked as experimental in documentation
 
 ### III. Slash Commands (CMD)
 
-- [ ] **CMD-01**: Slash commands for each major workflow stage
-- [ ] **CMD-02**: Commands map to shell scripts executed by runner agent
-- [ ] **CMD-03**: Commands follow `/stage-action` naming convention
+- [x] **CMD-01**: Slash commands for each major workflow stage
+- [x] **CMD-02**: Commands map to shell scripts executed by runner agent
+- [x] **CMD-03**: Commands follow `/stage-action` naming convention
 
 ### IV. Agent Skills (SKILL)
 
-- [ ] **SKILL-01**: Skill files loadable by agents at runtime
-- [ ] **SKILL-02**: Skills minimal but sufficient (capability metadata, usage, parameters, examples)
-- [ ] **SKILL-03**: Skills follow consistent format (YAML or Markdown)
+- [x] **SKILL-01**: Skill files loadable by agents at runtime
+- [x] **SKILL-02**: Skills minimal but sufficient (capability metadata, usage, parameters, examples)
+- [x] **SKILL-03**: Skills follow consistent format (YAML or Markdown)
 
 ### V. Execution Environment (EXEC)
 
@@ -120,13 +120,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AGENT-04 | Phase 3 | Complete |
 | AGENT-05 | Phase 3 | Complete |
 | AGENT-06 | Phase 1 | Complete |
-| AGENT-07 | Phase 4 | Pending |
-| CMD-01 | Phase 4 | Pending |
-| CMD-02 | Phase 4 | Pending |
-| CMD-03 | Phase 4 | Pending |
-| SKILL-01 | Phase 4 | Pending |
-| SKILL-02 | Phase 4 | Pending |
-| SKILL-03 | Phase 4 | Pending |
+| AGENT-07 | Phase 4 | Complete |
+| CMD-01 | Phase 4 | Complete |
+| CMD-02 | Phase 4 | Complete |
+| CMD-03 | Phase 4 | Complete |
+| SKILL-01 | Phase 4 | Complete |
+| SKILL-02 | Phase 4 | Complete |
+| SKILL-03 | Phase 4 | Complete |
 | EXEC-01 | Phase 1 | Complete |
 | EXEC-02 | Phase 1 | Complete |
 | EXEC-03 | Phase 1 | Complete |

@@ -229,9 +229,9 @@ Plans:
 **Plans:** 3 plans in 2 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Shell command bridge scripts (common.sh + 10 commands + status) (Wave 1)
-- [ ] 04-02-PLAN.md — Agent Skills files (.github/skills/) (Wave 1)
-- [ ] 04-03-PLAN.md — Integration smoke test + experimental docs (Wave 2)
+- [x] 04-01-PLAN.md — Shell command bridge scripts (common.sh + 10 commands + status) (Wave 1)
+- [x] 04-02-PLAN.md — Agent Skills files (.opencode/skills/) (Wave 1)
+- [x] 04-03-PLAN.md — Integration smoke test + experimental docs (Wave 2)
 
 **Success Criteria:**
 
@@ -313,13 +313,13 @@ Plans:
 | AGENT-04 | Phase 3 | Pending |
 | AGENT-05 | Phase 3 | Pending |
 | AGENT-06 | Phase 1 | Pending |
-| AGENT-07 | Phase 4 | Pending |
-| CMD-01 | Phase 4 | Pending |
-| CMD-02 | Phase 4 | Pending |
-| CMD-03 | Phase 4 | Pending |
-| SKILL-01 | Phase 4 | Pending |
-| SKILL-02 | Phase 4 | Pending |
-| SKILL-03 | Phase 4 | Pending |
+| AGENT-07 | Phase 4 | Complete |
+| CMD-01 | Phase 4 | Complete |
+| CMD-02 | Phase 4 | Complete |
+| CMD-03 | Phase 4 | Complete |
+| SKILL-01 | Phase 4 | Complete |
+| SKILL-02 | Phase 4 | Complete |
+| SKILL-03 | Phase 4 | Complete |
 | EXEC-01 | Phase 1 | Pending |
 | EXEC-02 | Phase 1 | Pending |
 | EXEC-03 | Phase 1 | Pending |
@@ -342,7 +342,7 @@ Plans:
 | 1 | Foundation | Complete ✓ | 10 | None |
 | 2 | Core Pipeline | Complete ✓ | 12 | None |
 | 3 | Agent Infrastructure | Complete ✓ | 6 | None |
-| 4 | Integration | Not Started | 7 | Phase 3 complete |
+| 4 | Integration | Complete ✓ | 7 | None |
 | 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
 
 ---
