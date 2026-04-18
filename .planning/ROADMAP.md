@@ -226,6 +226,13 @@ Plans:
 **Blockers:**
 - ⚠️ **Phase 3 complete** — Requires working agents to receive commands
 
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 04-01-PLAN.md — Shell command bridge scripts (common.sh + 10 commands + status) (Wave 1)
+- [ ] 04-02-PLAN.md — Agent Skills files (.github/skills/) (Wave 1)
+- [ ] 04-03-PLAN.md — Integration smoke test + experimental docs (Wave 2)
+
 **Success Criteria:**
 
 1. **Slash Commands Trigger Stages**
