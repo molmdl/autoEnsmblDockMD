@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 4 - Integration |
-| **Current Plan** | 2 of 3 (04-02 completed) |
-| **Last Activity** | 2026-04-19 - Completed 04-02-PLAN.md |
-| **Progress** | ███████████████░ 23/24 plans complete (96%) |
+| **Current Plan** | 3 of 3 (04-03 completed) |
+| **Last Activity** | 2026-04-19 - Completed 04-03-PLAN.md |
+| **Progress** | ████████████████ 24/24 plans complete (100%) |
 | **Phase 4 Blocker** | None ✓ |
-| **Status** | In progress |
+| **Status** | Phase complete |
 
 ---
 
@@ -46,6 +46,8 @@
 | `/status` inspects workspace artifacts directly (no agent dispatch) | Status is read-only introspection and should be lightweight | 4 |
 | Pipeline skill metadata uses canonical WorkflowStage values | Preserves terminology alignment with agent schemas/handoffs | 4 |
 | Skill parameter docs map to `scripts/config.ini.template` keys | Keeps runtime guidance consistent with config-driven scripts | 4 |
+| Integration validation remains wiring-focused (no heavy stage runs) | Confirms command→agent→skill chain correctness without unnecessary compute | 4 |
+| Agent support is explicitly documented as experimental | Aligns AGENT-07 while preserving script-first stable usage guidance | 4 |
 
 ### Research Flags (Areas for Planning)
 
@@ -65,15 +67,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 02:59 +0800
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-19 03:27 +0800
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 4 execution in progress.**
+**Phase 4 execution complete.**
 
-**Recommend:** Execute `04-03-PLAN.md`.
+**Recommend:** Start Phase 5 planning/execution.
 
 ### Recent Milestones
 
@@ -83,6 +85,7 @@ Resume file: None
 - 2026-04-19: Phase 4 context discussion completed (04-CONTEXT.md)
 - 2026-04-19: Phase 4 plan 01 executed (command bridge scripts)
 - 2026-04-19: Phase 4 plan 02 executed (Agent Skills files)
+- 2026-04-19: Phase 4 plan 03 executed (integration smoke test + experimental docs)
 
 ### Planning Status
 
@@ -92,14 +95,14 @@ Resume file: None
 - [x] Phase 3 planned and executed
 - [x] Phase 4 context discussed
 - [x] Phase 4 planned
-- [ ] Phase 4 executed
+- [x] Phase 4 executed
 - [ ] Phase 5 planned/executed
 
 ### Checkpoints
 
 | Checkpoint | Trigger | Status |
 |------------|---------|--------|
-| Stage Complete | Each phase completes | Phase 1-3 Complete ✓; Phase 4 Plan 1-2 Complete ✓ |
+| Stage Complete | Each phase completes | Phase 1-4 Complete ✓ |
 | Human Verification | Between stages | Active |
 | Agent Context Dump | Session continuity | Active |
 
@@ -114,5 +117,5 @@ Resume file: None
 ---
 
 *State updated: 2026-04-19*
-*Last phase: 04-integration (execution in progress)*
-*Last action: Completed 04-02-PLAN.md and created 04-02-SUMMARY.md*
+*Last phase: 04-integration (complete)*
+*Last action: Completed 04-03-PLAN.md and created 04-03-SUMMARY.md*
