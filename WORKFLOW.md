@@ -37,15 +37,81 @@ B. Blind docking
 ## Complete Workflow
 
 ### Mode A. Reference Pocket Docking
-1. process receptor with pdb2pqr
-2. gaff2 atomtypes already inserted manually into the amberff ffnonbonded.itp by the user. files in expected is also the example of using amber forcefield
-3. reference redock
-4. interested lig dock
-5. en ensemble, cluster, select, align
-6. intermediate analysis step
-7. ensemble docking, from all ensemble out select best rec-lig combination
-8. conversion and setup for md
-9. using slurm for hpc, and run local option
+Targeted docking workflow using AMBER19SB/GAFF2 force field with pocket defined by reference ligand.
+
+**Required Inputs:**
+1. Receptor PDB file in `rec/` directory (processed with pdb2pqr)
+2. Reference ligand structure (PDB) for pocket definition and validation
+3. Reference ligand coordinates (.gro) and topology files in `lig/ref/`
+4. New ligand coordinates (.gro) and topology files in `lig/new/LIGAND_ID/` directories
+5. Force field directory `amber19SB_OL21_OL3_lipid17.ff/`
+6. GAFF2 atom types manually inserted into `ffnonbonded.itp`
+7. Ligand bonded parameters `.itp` files from ACPYPE or equivalent
+
+**Directory Structure:**
+- `rec/` - Receptor ensemble generation workspace
+- `lig/ref/` - Reference ligand input files
+- `lig/new/` - New ligands to evaluate organized by ligand ID
+- `dock/` - Docking runs and results (ref validation + new ligands)
+- `com_md/` - Complex MD simulations and MM/PBSA calculations
+- `com_ana/` - Comparative analysis across ligands
+- `scripts/rec/` - Receptor ensemble generation scripts
+- `scripts/dock/` - Docking workflow scripts (gnina + conversion)
+- `scripts/com/` - Complex MD and analysis scripts
+
+**Workflow Stages:**
+
+**Stage 0: Reference Ligand Redocking (Validation)**
+1. Convert receptor to Gromacs format: `pdb2pqr` then `gmx pdb2gmx`
+2. Validate reference ligand redocking: `bash scripts/dock/gnina_test.sh`
+   - Uses `--autobox_ligand ref.pdb --autobox_add 8` for pocket definition
+   - Validation: RMSD < 2.0 Å from crystal structure
+3. Verify GAFF2 parameters in `ffnonbonded.itp`
+
+**Stage 1: Generate Receptor Ensemble**
+1. Prepare input and submit equilibration job: `bash scripts/rec/prep.sh`
+2. Submit 4 parallel trials for equilibration + production sampling: `bash scripts/rec/pr_rec.sh`
+3. Convert trajectories and run basic analysis: `bash scripts/rec/ana.sh`
+4. Perform clustering to extract diverse conformations: `bash scripts/rec/cluster.sh`
+5. Align ensemble structures to reference: `python scripts/rec/align_structures.py`
+   - Critical for maintaining pocket geometry across ensemble
+
+**Stage 2: Ensemble Docking with Reference Pocket**
+1. Convert ligands from GRO to MOL2 format: `python scripts/dock/gro_itp_to_mol2.py`
+   - AMBER-specific: Uses bypass_angle_type3.py internally
+2. Redock reference ligand to ensemble (validation): `bash scripts/dock/gnina_0.sh`
+   - Confirms pocket definition generalizes across ensemble
+3. Dock new ligands to ensemble with reference-defined pocket:
+   - `bash scripts/dock/gnina_1.sh` and `bash scripts/dock/gnina_2.sh`
+   - Pocket: `--autobox_ligand ref.pdb --autobox_add 8`
+4. Generate docking reports and rankings: `bash scripts/dock/dock_report.sh`
+
+**Stage 3: Run Complex MD and MM/PBSA**
+1. Extract ligand topology and prepare receptor-ligand complex:
+   - Reference ligand: `bash scripts/dock/dock2com_2_ref.sh`
+   - New ligands: `bash scripts/dock/dock2com_2.sh`
+   - Applies bypass_angle_type3.py for AMBER topology compatibility
+2. Prepare complex system (solvation, ionization, minimization): `bash scripts/com/prep_com.sh` then `bash scripts/com/prep.sh`
+3. Run equilibration and production MD: `bash scripts/com/pr_prod.sh`
+4. Prepare trajectories and submit MM/PBSA calculations: `bash scripts/com/sub_mmpbsa.sh`
+5. Run trajectory analysis and plot results: `bash scripts/com/ana.sh`
+
+**Output Structure:**
+- `rec/rec_md/` - Receptor MD trajectories and analysis
+- `rec/ensemble/` - Clustered conformations (hsa0-hsa9.pdb/gro), aligned to reference
+- `dock/REF_LIGAND/` - Reference redocking validation results
+- `dock/LIGAND_ID/` - Docking poses (SDF), scores, logs per ligand
+- `com_md/LIGAND_ID/` - Complex MD trajectories, energy files, MM/PBSA results
+- `com_ana/` - Cross-ligand comparison plots and per-ligand analysis
+
+**Key Differences from Blind Docking (Mode B):**
+1. Pocket definition via `--autobox_ligand ref.pdb` instead of whole protein
+2. Reference redocking validation stage (Stage 0)
+3. Ensemble alignment required via `align_structures.py`
+4. AMBER force field requires GAFF2 manual insertion in `ffnonbonded.itp`
+5. AMBER topology processing via `bypass_angle_type3.py`
+6. Ligand conversion via `gro_itp_to_mol2.py` (not generic gro2mol2.sh)
+7. Ligand organization: `lig/ref/` and `lig/new/` instead of flat `lig/LIGAND_ID/`
 
 ### Mode B. Blind docking
 Blind docking workflow using CHARMM36m/CGenFF force field with whole protein as binding pocket.
