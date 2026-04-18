@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 3 - Agent Infrastructure |
-| **Plan** | 3 of 4 in current phase |
-| **Status** | In progress |
-| **Progress** | ███████████████░ 20/21 plans complete (95%) |
+| **Plan** | 4 of 4 in current phase |
+| **Status** | Phase complete ✓ |
+| **Progress** | ████████████████ 21/21 plans complete (100%) |
 | **Phase 3 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-19 - Completed 03-03-PLAN.md |
+| **Last Activity** | 2026-04-19 - Completed 03-04-PLAN.md |
 
 ---
 
@@ -25,8 +25,8 @@
 |-------|---------|-----------------|
 | 1 | Complete | ✓ Delivered |
 | 2 | Complete | ✓ Delivered |
-| 3 | None | In progress |
-| 4 | Phase 3 complete | Wait for Phase 3 |
+| 3 | Complete | ✓ Delivered |
+| 4 | None | Ready to start |
 | 5 | WORKFLOW.md, End-to-end test | Finalize workflow, run full pipeline |
 
 ---
@@ -84,6 +84,8 @@
 | Analyzer stage analysis registry | Uses explicit STAGE_ANALYSIS_MAP with optional custom hook discovery for deterministic/extensible analysis execution | 3 |
 | Checker default validation baseline with registry override | Applies common checks for outputs/return code/log/file sizes while permitting stage-specific check extension | 3 |
 | Debugger persists handoff-shaped diagnostics under .debug_reports | Produces reproducible, version-aware JSON debug artifacts consumable by downstream orchestration | 3 |
+| scripts.agents registry as single role authority | Keeps CLI and runtime instantiation aligned through one AGENT_REGISTRY/get_agent path | 3, 4 |
+| JSON handoff CLI entrypoint for agents | `python -m scripts.agents` provides config-backed invocation with deterministic JSON I/O for orchestration layers | 3, 4 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -103,16 +105,16 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 01:39 +0800
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-04-19 01:41 +0800
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 3 in progress.** Plans 03-01 through 03-03 completed with foundational schemas, orchestrator/runner execution, and specialized analyzer/checker/debugger roles.
+**Phase 3 complete.** Plans 03-01 through 03-04 completed with foundational schemas, all five concrete agent roles, and package/CLI invocation surface.
 
 **Next recommended action:**
-- Execute 03-04-PLAN.md (agent registry, CLI entrypoint, and integration smoke test)
+- Begin Phase 4 integration planning/execution (slash commands + skills wiring)
 
 ### Recent Milestones
 
@@ -121,6 +123,7 @@ Resume file: None
 - 2026-04-19: Phase 3 execution started with 03-01 completed
 - 2026-04-19: 03-02 completed (orchestrator and runner agents)
 - 2026-04-19: 03-03 completed (analyzer, checker, and debugger agents)
+- 2026-04-19: 03-04 completed (agent registry, CLI entrypoint, smoke validation) and Phase 3 closed
 
 ### Planning Status
 
@@ -128,7 +131,7 @@ Resume file: None
 - [x] Phase 1 planned and executed
 - [x] Phase 2 planned and executed
 - [x] Phase 3 planned
-- [ ] Phase 3 executed (in progress: 03-01 to 03-03 complete)
+- [x] Phase 3 executed
 - [ ] Phase 4 planned/executed
 - [ ] Phase 5 planned/executed
 
@@ -149,6 +152,6 @@ Resume file: None
 ---
 
 *State updated: 2026-04-19*
-*Last phase: 03-agent-infrastructure (IN PROGRESS)*
-*Last plan: 03-03 (analyzer, checker, and debugger agents)*
+*Last phase: 03-agent-infrastructure (COMPLETE)*
+*Last plan: 03-04 (agent registry, CLI entrypoint, integration smoke test)*
 *Last quick task: quick-002 (2026-04-18)*
