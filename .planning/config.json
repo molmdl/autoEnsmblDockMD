@@ -7,19 +7,19 @@
     "active_profile": "balanced",
     "presets": {
       "quality": {
-        "planning": "github-copilot/claude-sonnet-4.5",
+        "planning": "github-copilot/claude-opus-4.6",
         "execution": "github-copilot/gpt-5.3-codex",
         "verification": "github-copilot/claude-sonnet-4.5"
       },
       "balanced": {
-        "planning": "openrouter/z-ai/glm-5",
-        "execution": "openrouter/z-ai/glm-5",
-        "verification": "openrouter/minimax/minimax-m2.5"
+        "planning": "github-copilot/claude-sonnet-4.5",
+        "execution": "github-copilot/gpt-5.3-codex",
+        "verification": "github-copilot/claude-sonnet-4.5"
       },
       "budget": {
-        "planning": "openrouter/minimax/minimax-m2.5",
-        "execution": "openrouter/minimax/minimax-m2.5",
-        "verification": "github-copilot/minimax-m2.5"
+        "planning": "github-copilot/claude-sonnet-4.5",
+        "execution": "github-copilot/gpt-5.3-codex",
+        "verification": "github-copilot/gpt-5.4-mini"
       }
     },
     "custom_overrides": {
