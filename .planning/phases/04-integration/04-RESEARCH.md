@@ -53,17 +53,20 @@ The established patterns for agent integration in VS Code Copilot ecosystem:
 
 ### Recommended Project Structure
 ```
-.github/
-├── skills/                # Workspace skills (discovered by VS Code Copilot)
+.opencode/
+├── skills/                # Workspace skills (discovered by OpenCode)
 │   ├── dock-run/
 │   │   ├── SKILL.md      # Metadata + instructions
 │   │   └── examples/     # Optional: example configs
 │   ├── rec-ensemble/
 │   │   └── SKILL.md
 │   └── ...
-└── commands/              # Slash command definitions (if needed for OpenCode)
-    ├── rec-ensemble.md
-    └── dock-run.md
+└── ...                    # Other OpenCode config (opencode.json, etc.)
+
+# NOTE: OpenCode also discovers from .agents/skills/ and .claude/skills/
+# Primary path is .opencode/skills/<name>/SKILL.md
+# Frontmatter fields: name (required), description (required), license, compatibility, metadata (string-to-string map)
+# Name must match directory, lowercase alphanumeric + single hyphens, 1-64 chars
 
 scripts/
 ├── agents/                # Phase 3 agents (existing)
