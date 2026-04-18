@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 3 - Agent Infrastructure |
-| **Plan** | 1 of 4 in current phase |
+| **Plan** | 2 of 4 in current phase |
 | **Status** | In progress |
-| **Progress** | █████████████░░░ 18/21 plans complete (86%) |
+| **Progress** | ██████████████░░ 19/21 plans complete (90%) |
 | **Phase 3 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-19 - Completed 03-01-PLAN.md |
+| **Last Activity** | 2026-04-19 - Completed 03-02-PLAN.md |
 
 ---
 
@@ -79,6 +79,8 @@
 | Config template as authoritative parameter reference | Centralized INI documentation reduces misconfiguration across receptor/docking/complex stages | 2, 3 |
 | Dataclass handoff schema for agent communication | Enforces consistent JSON handoff shape with explicit status enum serialization | 3 |
 | BaseAgent reuses Phase 1 persistence primitives | Avoids reimplementation by wiring AgentState and CheckpointManager directly in shared agent base | 3 |
+| Orchestrator gate check before transition routing | Prevents stage advancement when previous stage verification is pending/rejected | 3 |
+| Runner emits subprocess-backed structured handoff payloads | Standardizes stage execution outcomes with captured outputs, metrics, and warnings | 3 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -98,22 +100,23 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 01:26 +0800
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-19 01:32 +0800
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 3 started.** Plan 03-01 completed with foundational agent schemas, BaseAgent abstraction, and stage routing.
+**Phase 3 in progress.** Plans 03-01 and 03-02 completed with foundational schemas plus orchestrator/runner implementations.
 
 **Next recommended action:**
-- Execute 03-02-PLAN.md (Orchestrator and Runner agents)
+- Execute 03-03-PLAN.md (Analyzer, Checker, and Debugger agents)
 
 ### Recent Milestones
 
 - 2026-03-25: Phase 1 completed (01-01 through 01-06)
 - 2026-04-19: Phase 2 completed (02-01 through 02-11)
 - 2026-04-19: Phase 3 execution started with 03-01 completed
+- 2026-04-19: 03-02 completed (orchestrator and runner agents)
 
 ### Planning Status
 
@@ -121,7 +124,7 @@ Resume file: None
 - [x] Phase 1 planned and executed
 - [x] Phase 2 planned and executed
 - [x] Phase 3 planned
-- [ ] Phase 3 executed (in progress: 03-01 complete)
+- [ ] Phase 3 executed (in progress: 03-01 and 03-02 complete)
 - [ ] Phase 4 planned/executed
 - [ ] Phase 5 planned/executed
 
@@ -136,7 +139,6 @@ Resume file: None
 ---
 
 ## Notes
-
 - Agent support marked experimental throughout
 - SCRIPT-02 explicitly deferred to v2
 
@@ -144,5 +146,5 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Last phase: 03-agent-infrastructure (IN PROGRESS)*
-*Last plan: 03-01 (base agent class, schemas, routing)*
+*Last plan: 03-02 (orchestrator and runner agents)*
 *Last quick task: quick-002 (2026-04-18)*
