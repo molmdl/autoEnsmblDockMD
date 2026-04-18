@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 7 of 11 in current phase |
+| **Plan** | 9 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | ████████░░ 13/17 plans complete (76%) |
+| **Progress** | ████████░░ 14/17 plans complete (82%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-05-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-09-PLAN.md |
 
 ---
 
@@ -80,6 +80,8 @@
 | Preserve angle bypass conversion logic while expanding interfaces | Existing topology conversion behavior is validated; only CLI/config/validation layers were generalized | 2 |
 | Post-docking report script uses bash entrypoint + embedded Python parser | Keeps stage-level shell interface consistency while handling structured SDF parsing robustly | 2 |
 | Wrapper module for numeric dotted script import interoperability | Preserves planned numeric filenames while enabling reliable Python module imports | 2 |
+| Unified complex trajectory analysis orchestrator | One `3_ana.sh` entrypoint runs both GROMACS baseline and MDAnalysis advanced metrics with config toggles | 2 |
+| Dynamic loading for numeric selection module | Uses importlib loading of `3_selection_defaults.py` to preserve numeric naming and reusable library behavior | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -99,8 +101,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 21:04 +0800
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-04-18 21:10 +0800
+Stopped at: Completed 02-09-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -126,6 +128,7 @@ Continue Phase 2 execution with 02-08-PLAN.md.
 | 02-05 | Post-docking scoring and dock2com Python core | 2026-04-18 | Added docking score reporting plus SDF→GRO, topology parsing/assembly, and ligand posre Python utilities |
 | 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
 | 02-06 | Dock-to-complex shell wrappers | 2026-04-18 | Added config-driven wrappers for new/reference dock2com conversion pipeline with standardized com outputs |
+| 02-09 | Complex MD trajectory analysis scripts | 2026-04-18 | Added unified GROMACS+MDAnalysis trajectory analysis scripts with reusable selection defaults and plot generation |
 
 
 - [x] PROJECT.md created
@@ -163,5 +166,5 @@ Continue Phase 2 execution with 02-08-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-05 (post-docking scoring and dock2com Python core)*
+*Last plan: 02-09 (complex MD trajectory analysis scripts)*
 *Last quick task: quick-002 (2026-04-18)*
