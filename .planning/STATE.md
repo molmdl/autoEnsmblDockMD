@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 11 of 11 in current phase |
-| **Status** | Complete ✓ |
-| **Progress** | ████░░░░░░░░░░░░ 2/5 phases complete |
-| **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-19 - Phase 2 verified and complete |
+| **Current Phase** | 3 - Agent Infrastructure |
+| **Plan** | 1 of 4 in current phase |
+| **Status** | In progress |
+| **Progress** | █████████████░░░ 18/21 plans complete (86%) |
+| **Phase 3 Blocker** | None ✓ |
+| **Last Activity** | 2026-04-19 - Completed 03-01-PLAN.md |
 
 ---
 
@@ -25,20 +25,9 @@
 |-------|---------|-----------------|
 | 1 | Complete | ✓ Delivered |
 | 2 | Complete | ✓ Delivered |
-| 3 | WORKFLOW.md | Finalize workflow, then begin Phase 3 |
+| 3 | None | In progress |
 | 4 | Phase 3 complete | Wait for Phase 3 |
 | 5 | WORKFLOW.md, End-to-end test | Finalize workflow, run full pipeline |
-
----
-
-## Performance Metrics
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Requirements Mapped** | 37/37 | 100% coverage |
-| **Phases Defined** | 5 | Comprehensive depth |
-| **Deferred to v2** | 1 | SCRIPT-02 (ligand prep) |
-| **Research Flags** | 3 | Phase 2 (docking, MMPBSA), Phase 3 (Slurm) |
 
 ---
 
@@ -88,6 +77,8 @@
 | MDAnalysis-based contact fingerprints for post-analysis | Reuses existing trajectory stack and avoids new hard dependencies while providing matrix + heatmap outputs | 2 |
 | Stable wrapper stage interface with --list-stages | Machine-readable stage discovery enables scriptable orchestration and future agent automation | 2, 3, 4 |
 | Config template as authoritative parameter reference | Centralized INI documentation reduces misconfiguration across receptor/docking/complex stages | 2, 3 |
+| Dataclass handoff schema for agent communication | Enforces consistent JSON handoff shape with explicit status enum serialization | 3 |
+| BaseAgent reuses Phase 1 persistence primitives | Avoids reimplementation by wiring AgentState and CheckpointManager directly in shared agent base | 3 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -107,59 +98,32 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 00:08 +0800
-Stopped at: Completed 02-11-PLAN.md
+Last session: 2026-04-19 01:26 +0800
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 2 COMPLETE.** All 11 plans executed and verified (64/64 must-haves passed).
+**Phase 3 started.** Plan 03-01 completed with foundational agent schemas, BaseAgent abstraction, and stage routing.
 
-**Phase 3 blockers:**
-- WORKFLOW.md needs finalization (remove "TO BE FINALIZED" banner)
-- Phase 2 complete ✓
+**Next recommended action:**
+- Execute 03-02-PLAN.md (Orchestrator and Runner agents)
 
-**Recommend:** User should finalize WORKFLOW.md before starting Phase 3 (Agent Infrastructure).
+### Recent Milestones
 
-### Quick Tasks Completed
+- 2026-03-25: Phase 1 completed (01-01 through 01-06)
+- 2026-04-19: Phase 2 completed (02-01 through 02-11)
+- 2026-04-19: Phase 3 execution started with 03-01 completed
 
-| Task | Description | Date | Summary |
-|------|-------------|------|---------|
-| quick-001 | Update WORKFLOW.md template | 2026-03-23 | Added agent integration, requirement traceability, script categorization |
-| quick-002 | Finalize targeted docking workflow documentation | 2026-04-18 | Filled AMBER README placeholders, rewrote Mode A workflow, added scripts context inventory |
-| 01-01 | Create config and state management | 2026-03-24 | ConfigManager for INI parsing, AgentState for JSON persistence |
-| 01-02 | Create checkpoint management | 2026-03-24 | CheckpointManager for workflow state persistence with atomic writes |
-| 01-03 | Create execution backend manager | 2026-03-24 | LocalExecutor/SlurmExecutor for command execution |
-| 01-04 | Create job log monitor | 2026-03-24 | LogMonitor for error/warning detection and job status tracking |
-| 01-05 | Create verification gate system | 2026-03-25 | VerificationGate for human checkpoints with concurrent access protection |
-| 01-06 | Integrate infrastructure modules | 2026-03-25 | Public API exports, integration tests, Phase 1 complete |
-| 02-01 | Bash config loader and common utilities | 2026-04-18 | Added shared sourceable shell libraries for INI config access, logging, validation, and execution helpers |
-| 02-04 | Docking execution scripts | 2026-04-18 | Added generalized receptor docking prep plus unified gnina launcher for test/blind/targeted modes with per-ligand Slurm submission |
-| 02-02 | Receptor ensemble generation scripts | 2026-04-18 | Added generalized receptor prep/production/analysis/clustering scripts and MDAnalysis-based ensemble alignment utility |
-| 02-03 | Docking ligand conversion scripts | 2026-04-18 | Added GRO→MOL2 and SDF→GRO wrappers plus generalized AMBER GRO+ITP→MOL2 converter with CLI and importable API |
-| 02-05 | Post-docking scoring and dock2com Python core | 2026-04-18 | Added docking score reporting plus SDF→GRO, topology parsing/assembly, and ligand posre Python utilities |
-| 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
-| 02-06 | Dock-to-complex shell wrappers | 2026-04-18 | Added config-driven wrappers for new/reference dock2com conversion pipeline with standardized com outputs |
-| 02-09 | Complex MD trajectory analysis scripts | 2026-04-18 | Added unified GROMACS+MDAnalysis trajectory analysis scripts with reusable selection defaults and plot generation |
-| 02-08 | Production MD and MM/PBSA pipeline scripts | 2026-04-18 | Added unified production submission chain plus trajectory processing and Slurm-array MM/PBSA orchestration scripts |
-| 02-10 | Supporting utilities: fingerprints, archive, rerun | 2026-04-18 | Added fingerprint analysis utility and wrappers plus archive/rerun selection scripts for post-analysis operations |
-| 02-11 | Pipeline wrapper and config template | 2026-04-19 | Added unified run_pipeline.sh wrapper, comprehensive config.ini template, and synchronized scripts inventory |
+### Planning Status
 
-
-- [x] PROJECT.md created
-- [x] Requirements defined
-- [x] Research completed
-- [x] Roadmap created
-- [x] Phase 1 planned
-- [x] Phase 1 executed (01-01, 01-02, 01-03, 01-04, 01-05, 01-06 complete)
-- [x] Phase 2 planned
-- [x] Phase 2 executed (02-01 through 02-11 complete, verified ✓)
-- [ ] Phase 3 planned
-- [ ] Phase 3 executed
-- [ ] Phase 4 planned
-- [ ] Phase 4 executed
-- [ ] Phase 5 planned
-- [ ] Phase 5 executed
+- [x] PROJECT.md, ROADMAP.md, and research baselines created
+- [x] Phase 1 planned and executed
+- [x] Phase 2 planned and executed
+- [x] Phase 3 planned
+- [ ] Phase 3 executed (in progress: 03-01 complete)
+- [ ] Phase 4 planned/executed
+- [ ] Phase 5 planned/executed
 
 ### Checkpoints
 
@@ -173,13 +137,12 @@ Resume file: None
 
 ## Notes
 
-- WORKFLOW.md is marked "TO BE FINALIZED" — do not plan related stages until user removes banner
 - Agent support marked experimental throughout
 - SCRIPT-02 explicitly deferred to v2
 
 ---
 
 *State updated: 2026-04-19*
-*Last phase: 02-core-pipeline (COMPLETE)*
-*Last plan: 02-11 (pipeline wrapper and config template)*
+*Last phase: 03-agent-infrastructure (IN PROGRESS)*
+*Last plan: 03-01 (base agent class, schemas, routing)*
 *Last quick task: quick-002 (2026-04-18)*
