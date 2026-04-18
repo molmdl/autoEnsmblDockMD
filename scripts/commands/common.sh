@@ -38,10 +38,19 @@ find_workspace_root() {
 
 ensure_env() {
   local setenv_path
+  local had_nounset
   setenv_path="${PROJECT_ROOT}/scripts/setenv.sh"
   if [[ -f "$setenv_path" ]]; then
+    had_nounset=false
+    if [[ $- == *u* ]]; then
+      had_nounset=true
+      set +u
+    fi
     # shellcheck disable=SC1090
     source "$setenv_path"
+    if [[ "$had_nounset" == true ]]; then
+      set -u
+    fi
   fi
 }
 
