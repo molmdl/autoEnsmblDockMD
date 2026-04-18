@@ -1,18 +1,11 @@
 # Contents in this directory
+This directory contains the symbolic links to sample results of a more manual run.
 
-## ibp
-reference ligand ibp related files, use exact scripts in it. Order of execution:
-(0. copying related files from receptor preparation, ligand preparation, docking output to here)
-1. `bash dock2com.sh`
-2. `bash prep.sh`
-3. `sbatch pr.sh`
-4. `sbatch prod.sh`
+## ref
+dzp results
 
-## dzp
-files of reference ligand dzp simulation, 
-
-## lig
-this is actually dzp selected from ensemble docking results
+## new
+ibp and dzp results.
 
 ## amber19SB_OL21_OL3_lipid17.ff
 symbolic link to ff directory
