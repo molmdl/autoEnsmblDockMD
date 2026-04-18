@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 2 - Core Pipeline |
-| **Plan** | 3 of 11 in current phase |
+| **Plan** | 5 of 11 in current phase |
 | **Status** | In progress |
-| **Progress** | █████░░░░░ 9/17 plans complete (53%) |
+| **Progress** | ██████░░░░ 11/17 plans complete (65%) |
 | **Phase 2 Blocker** | None ✓ |
-| **Last Activity** | 2026-04-18 - Completed 02-03-PLAN.md |
+| **Last Activity** | 2026-04-18 - Completed 02-07-PLAN.md |
 
 ---
 
@@ -76,6 +76,8 @@
 | MDAnalysis alignment utility retained as importable CLI tool | Supports both scripted pipeline execution and library reuse for alignment tasks | 2 |
 | Preserve AMBER converter core logic while generalizing interfaces | Existing GRO+ITP→MOL2 parser and mapping code encodes critical edge-case handling, so interface-focused changes reduce regression risk | 2 |
 | Wrapper import path for numeric converter script | Keeps numeric workflow naming while providing stable library import `scripts.dock.gro_itp_to_mol2:convert` | 2 |
+| Unified complex prep entrypoint for AMBER and CHARMM | One script with mode switch reduces force-field-specific drift and preserves config-driven control | 2 |
+| Preserve angle bypass conversion logic while expanding interfaces | Existing topology conversion behavior is validated; only CLI/config/validation layers were generalized | 2 |
 
 ### Research Flags (Areas Needing Deeper Research)
 
@@ -95,8 +97,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-18 20:56 +0800
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-04-18 21:02 +0800
+Stopped at: Completed 02-07-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -119,6 +121,7 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 | 02-04 | Docking execution scripts | 2026-04-18 | Added generalized receptor docking prep plus unified gnina launcher for test/blind/targeted modes with per-ligand Slurm submission |
 | 02-02 | Receptor ensemble generation scripts | 2026-04-18 | Added generalized receptor prep/production/analysis/clustering scripts and MDAnalysis-based ensemble alignment utility |
 | 02-03 | Docking ligand conversion scripts | 2026-04-18 | Added GRO→MOL2 and SDF→GRO wrappers plus generalized AMBER GRO+ITP→MOL2 converter with CLI and importable API |
+| 02-07 | Complex MD preparation scripts | 2026-04-18 | Added unified AMBER/CHARMM complex preparation workflow and generalized AMBER angle type bypass utility |
 
 
 - [x] PROJECT.md created
@@ -156,5 +159,5 @@ Continue Phase 2 execution with 02-05-PLAN.md.
 
 *State updated: 2026-04-18*
 *Last phase: 02-core-pipeline (IN PROGRESS)*
-*Last plan: 02-03 (docking ligand conversion scripts)*
+*Last plan: 02-07 (complex MD preparation scripts)*
 *Last quick task: quick-002 (2026-04-18)*
