@@ -83,6 +83,16 @@ This pattern supports resumable execution and minimizes context overflow risk.
 
 ---
 
+## Skill File Contract
+
+Skill files referenced in this document are stored at `.opencode/skills/{skill-name}/SKILL.md` and follow the restored YAML-frontmatter format.
+
+- Frontmatter starts/ends with `---` and includes: `name`, `description`, `license`, `compatibility`, and `metadata`.
+- The `name` field is the canonical skill identifier and must match slash-command/agent references.
+- Body sections use the current structure (for example: **When to use this skill**, **Prerequisites**, **Usage**, **Parameters**, **Expected Output**, **Troubleshooting** where applicable).
+
+---
+
 ## Slash Commands → Script Wrappers
 
 | Slash Command | Script Wrapper | Primary Skill Reference |
