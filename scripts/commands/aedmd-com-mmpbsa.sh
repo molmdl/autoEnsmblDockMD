@@ -10,5 +10,5 @@ WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
 parse_flags "$@"
 
-dispatch_agent "runner" "com_mmpbsa"
-check_handoff_result "com_mmpbsa"
+dispatch_agent "runner" "complex_mmpbsa"
+check_handoff_result "complex_mmpbsa"

@@ -9,19 +9,39 @@ VERBOSE=false
 EXTRA_PARAMS='{}'
 
 # Stage→script mapping for agent dispatch
+# Canonical stage tokens align with scripts/agents/schemas/state.py::WorkflowStage.
+# Legacy aliases are retained for backwards compatibility with older wrappers/handoffs.
 declare -A STAGE_SCRIPT_MAP
-STAGE_SCRIPT_MAP[rec_ensemble]="${PROJECT_ROOT}/scripts/rec/0_prep.sh"
-STAGE_SCRIPT_MAP[rec_prod]="${PROJECT_ROOT}/scripts/rec/1_pr_rec.sh"
+STAGE_SCRIPT_MAP[receptor_prep]="${PROJECT_ROOT}/scripts/rec/0_prep.sh"
+STAGE_SCRIPT_MAP[receptor_md]="${PROJECT_ROOT}/scripts/rec/1_pr_rec.sh"
+STAGE_SCRIPT_MAP[receptor_cluster]="${PROJECT_ROOT}/scripts/rec/4_cluster.sh"
+STAGE_SCRIPT_MAP[docking_run]="${PROJECT_ROOT}/scripts/dock/2_gnina.sh"
+STAGE_SCRIPT_MAP[complex_prep]="${PROJECT_ROOT}/scripts/com/0_prep.sh"
+STAGE_SCRIPT_MAP[complex_md]="${PROJECT_ROOT}/scripts/com/1_pr_prod.sh"
+STAGE_SCRIPT_MAP[complex_mmpbsa]="${PROJECT_ROOT}/scripts/com/2_run_mmpbsa.sh"
+STAGE_SCRIPT_MAP[complex_analysis]="${PROJECT_ROOT}/scripts/com/3_ana.sh"
+
+# Legacy aliases (do not remove until all callers are migrated)
+STAGE_SCRIPT_MAP[rec_ensemble]="${STAGE_SCRIPT_MAP[receptor_prep]}"
+STAGE_SCRIPT_MAP[rec_prod]="${STAGE_SCRIPT_MAP[receptor_md]}"
 STAGE_SCRIPT_MAP[rec_ana]="${PROJECT_ROOT}/scripts/rec/3_ana.sh"
-STAGE_SCRIPT_MAP[rec_cluster]="${PROJECT_ROOT}/scripts/rec/4_cluster.sh"
+STAGE_SCRIPT_MAP[rec_cluster]="${STAGE_SCRIPT_MAP[receptor_cluster]}"
 STAGE_SCRIPT_MAP[rec_align]="${PROJECT_ROOT}/scripts/rec/5_align.py"
-STAGE_SCRIPT_MAP[dock_run]="${PROJECT_ROOT}/scripts/dock/2_gnina.sh"
-STAGE_SCRIPT_MAP[com_setup]="${PROJECT_ROOT}/scripts/com/0_prep.sh"
-STAGE_SCRIPT_MAP[com_md]="${PROJECT_ROOT}/scripts/com/1_pr_prod.sh"
-STAGE_SCRIPT_MAP[com_mmpbsa]="${PROJECT_ROOT}/scripts/com/2_run_mmpbsa.sh"
-STAGE_SCRIPT_MAP[com_analyze]="${PROJECT_ROOT}/scripts/com/3_ana.sh"
+STAGE_SCRIPT_MAP[dock_run]="${STAGE_SCRIPT_MAP[docking_run]}"
+STAGE_SCRIPT_MAP[com_setup]="${STAGE_SCRIPT_MAP[complex_prep]}"
+STAGE_SCRIPT_MAP[com_md]="${STAGE_SCRIPT_MAP[complex_md]}"
+STAGE_SCRIPT_MAP[com_mmpbsa]="${STAGE_SCRIPT_MAP[complex_mmpbsa]}"
+STAGE_SCRIPT_MAP[com_analyze]="${STAGE_SCRIPT_MAP[complex_analysis]}"
 STAGE_SCRIPT_MAP[checker_validate]="${PROJECT_ROOT}/scripts/agents/checker.py"
 STAGE_SCRIPT_MAP[debugger_diagnose]="${PROJECT_ROOT}/scripts/agents/debugger.py"
+
+declare -A STAGE_HANDOFF_ALIAS
+STAGE_HANDOFF_ALIAS[receptor_prep]="rec_ensemble"
+STAGE_HANDOFF_ALIAS[docking_run]="dock_run"
+STAGE_HANDOFF_ALIAS[complex_prep]="com_setup"
+STAGE_HANDOFF_ALIAS[complex_md]="com_md"
+STAGE_HANDOFF_ALIAS[complex_mmpbsa]="com_mmpbsa"
+STAGE_HANDOFF_ALIAS[complex_analysis]="com_analyze"
 
 resolve_stage_script() {
   local stage="$1"
@@ -170,13 +190,25 @@ dispatch_agent() {
 }
 
 check_handoff_result() {
-  local stage handoff_file status
+  local stage handoff_file status alias_stage alias_file
   stage="$1"
   handoff_file=".handoffs/${stage}.json"
 
   if [[ ! -f "$handoff_file" ]]; then
-    printf 'Handoff status: missing (%s)\n' "$handoff_file" >&2
-    return 1
+    alias_stage="${STAGE_HANDOFF_ALIAS[$stage]:-}"
+    alias_file=""
+    if [[ -n "$alias_stage" ]]; then
+      alias_file=".handoffs/${alias_stage}.json"
+      if [[ -f "$alias_file" ]]; then
+        handoff_file="$alias_file"
+      else
+        printf 'Handoff status: missing (%s, fallback %s)\n' "$handoff_file" "$alias_file" >&2
+        return 1
+      fi
+    else
+      printf 'Handoff status: missing (%s)\n' "$handoff_file" >&2
+      return 1
+    fi
   fi
 
   status="$(jq -r '.status // "unknown"' "$handoff_file")"
