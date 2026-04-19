@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/com-mmpbsa.sh - Bridge for /com-mmpbsa slash command
+# scripts/commands/aedmd-dock-run.sh - Bridge for /aedmd-dock-run slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,5 +10,5 @@ WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
 parse_flags "$@"
 
-dispatch_agent "runner" "com_mmpbsa"
-check_handoff_result "com_mmpbsa"
+dispatch_agent "runner" "dock_run"
+check_handoff_result "dock_run"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/orchestrator-resume.sh - Bridge for /orchestrator-resume slash command
+# scripts/commands/aedmd-com-md.sh - Bridge for /aedmd-com-md slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,5 +10,5 @@ WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
 parse_flags "$@"
 
-dispatch_agent "orchestrator" "orchestrator_resume"
-check_handoff_result "orchestrator_resume"
+dispatch_agent "runner" "com_md"
+check_handoff_result "com_md"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/rec-ensemble.sh - Bridge for /rec-ensemble slash command
+# scripts/commands/aedmd-com-setup.sh - Bridge for /aedmd-com-setup slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,5 +10,5 @@ WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
 parse_flags "$@"
 
-dispatch_agent "runner" "rec_ensemble"
-check_handoff_result "rec_ensemble"
+dispatch_agent "runner" "com_setup"
+check_handoff_result "com_setup"

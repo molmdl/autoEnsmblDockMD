@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/debugger-diagnose.sh - Bridge for /debugger-diagnose slash command
+# scripts/commands/aedmd-debugger-diagnose.sh - Bridge for /aedmd-debugger-diagnose slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

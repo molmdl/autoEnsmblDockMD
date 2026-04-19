@@ -27,11 +27,11 @@ autoEnsmblDockMD uses agents to orchestrate and validate workflow stages, while 
 Owns global workflow state, routes stage work to specialist agents, and pauses/resumes at checkpoints.
 
 - Tracks current phase/stage and execution status.
-- Spawns runner/checker/debugger pathways based on handoff data.
+- Spawns runner/analyzer/checker/debugger pathways based on handoff data.
 - Handles resume logic and state recovery from prior sessions.
 - Skills:
-  - `.opencode/skills/orchestrator-resume/SKILL.md`
-  - `.opencode/skills/status/SKILL.md`
+  - `.opencode/skills/aedmd-orchestrator-resume/SKILL.md`
+  - `.opencode/skills/aedmd-status/SKILL.md`
 
 ### 2) Runner
 
@@ -41,14 +41,22 @@ Executes stage scripts through slash command wrappers and returns structured out
 - Passes validated parameters/config to script layer.
 - Produces deterministic stage outputs and run metadata.
 - Skills:
-  - `.opencode/skills/rec-ensemble/SKILL.md`
-  - `.opencode/skills/dock-run/SKILL.md`
-  - `.opencode/skills/com-setup/SKILL.md`
-  - `.opencode/skills/com-md/SKILL.md`
-  - `.opencode/skills/com-mmpbsa/SKILL.md`
-  - `.opencode/skills/com-analyze/SKILL.md`
+  - `.opencode/skills/aedmd-rec-ensemble/SKILL.md`
+  - `.opencode/skills/aedmd-dock-run/SKILL.md`
+  - `.opencode/skills/aedmd-com-setup/SKILL.md`
+  - `.opencode/skills/aedmd-com-md/SKILL.md`
+  - `.opencode/skills/aedmd-com-mmpbsa/SKILL.md`
 
-### 3) Checker
+### 3) Analyzer
+
+Interprets completed simulation outputs into comparative scientific signals for downstream decisions.
+
+- Runs trajectory-analysis workflows after production MD/MM-PBSA.
+- Produces ligand-level comparative summaries (RMSD/RMSF/contacts/H-bonds/fingerprints).
+- Skills:
+  - `.opencode/skills/aedmd-com-analyze/SKILL.md`
+
+### 4) Checker
 
 Validates results against protocol expectations and quality thresholds before downstream progression.
 
@@ -56,9 +64,9 @@ Validates results against protocol expectations and quality thresholds before do
 - Flags warnings/failures and recommends acceptance criteria decisions.
 - Supports human verification checkpoints with concise evidence.
 - Skill:
-  - `.opencode/skills/checker-validate/SKILL.md`
+  - `.opencode/skills/aedmd-checker-validate/SKILL.md`
 
-### 4) Debugger
+### 5) Debugger
 
 Diagnoses failed stages, traces root causes, and proposes fixes with tool/version awareness.
 
@@ -66,7 +74,7 @@ Diagnoses failed stages, traces root causes, and proposes fixes with tool/versio
 - Uses version-aware reasoning for GROMACS/gnina/gmx_MMPBSA issues.
 - Produces remediation actions that preserve workflow compatibility.
 - Skill:
-  - `.opencode/skills/debugger-diagnose/SKILL.md`
+  - `.opencode/skills/aedmd-debugger-diagnose/SKILL.md`
 
 ---
 
@@ -76,7 +84,7 @@ Agents exchange state through files, not long in-memory threads.
 
 - **HandoffRecord JSON:** structured payload describing stage, status, inputs/outputs, and next action.
 - **Checkpoint files:** persisted pause/resume markers for human verification and continuation.
-- **Workspace artifacts:** generated outputs in stage directories (`rec/`, `dock/`, `com_md/`, `mmpbsa/`) serve as execution evidence.
+- **Workspace artifacts:** generated outputs in stage directories (`rec/`, `dock/`, `com/`) serve as execution evidence.
 - **Planning state artifacts:** `.planning/STATE.md`, phase summaries, and related metadata preserve cross-session continuity.
 
 This pattern supports resumable execution and minimizes context overflow risk.
@@ -97,16 +105,16 @@ Skill files referenced in this document are stored at `.opencode/skills/{skill-n
 
 | Slash Command | Script Wrapper | Primary Skill Reference |
 |---|---|---|
-| `/rec-ensemble` | `scripts/commands/rec-ensemble.sh` | `.opencode/skills/rec-ensemble/SKILL.md` |
-| `/dock-run` | `scripts/commands/dock-run.sh` | `.opencode/skills/dock-run/SKILL.md` |
-| `/com-setup` | `scripts/commands/com-setup.sh` | `.opencode/skills/com-setup/SKILL.md` |
-| `/com-md` | `scripts/commands/com-md.sh` | `.opencode/skills/com-md/SKILL.md` |
-| `/com-mmpbsa` | `scripts/commands/com-mmpbsa.sh` | `.opencode/skills/com-mmpbsa/SKILL.md` |
-| `/com-analyze` | `scripts/commands/com-analyze.sh` | `.opencode/skills/com-analyze/SKILL.md` |
-| `/checker-validate` | `scripts/commands/checker-validate.sh` | `.opencode/skills/checker-validate/SKILL.md` |
-| `/debugger-diagnose` | `scripts/commands/debugger-diagnose.sh` | `.opencode/skills/debugger-diagnose/SKILL.md` |
-| `/orchestrator-resume` | `scripts/commands/orchestrator-resume.sh` | `.opencode/skills/orchestrator-resume/SKILL.md` |
-| `/status` | `scripts/commands/status.sh` | `.opencode/skills/status/SKILL.md` |
+| `/aedmd-rec-ensemble` | `scripts/commands/aedmd-rec-ensemble.sh` | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
+| `/aedmd-dock-run` | `scripts/commands/aedmd-dock-run.sh` | `.opencode/skills/aedmd-dock-run/SKILL.md` |
+| `/aedmd-com-setup` | `scripts/commands/aedmd-com-setup.sh` | `.opencode/skills/aedmd-com-setup/SKILL.md` |
+| `/aedmd-com-md` | `scripts/commands/aedmd-com-md.sh` | `.opencode/skills/aedmd-com-md/SKILL.md` |
+| `/aedmd-com-mmpbsa` | `scripts/commands/aedmd-com-mmpbsa.sh` | `.opencode/skills/aedmd-com-mmpbsa/SKILL.md` |
+| `/aedmd-com-analyze` | `scripts/commands/aedmd-com-analyze.sh` | `.opencode/skills/aedmd-com-analyze/SKILL.md` |
+| `/aedmd-checker-validate` | `scripts/commands/aedmd-checker-validate.sh` | `.opencode/skills/aedmd-checker-validate/SKILL.md` |
+| `/aedmd-debugger-diagnose` | `scripts/commands/aedmd-debugger-diagnose.sh` | `.opencode/skills/aedmd-debugger-diagnose/SKILL.md` |
+| `/aedmd-orchestrator-resume` | `scripts/commands/aedmd-orchestrator-resume.sh` | `.opencode/skills/aedmd-orchestrator-resume/SKILL.md` |
+| `/aedmd-status` | `scripts/commands/aedmd-status.sh` | `.opencode/skills/aedmd-status/SKILL.md` |
 
 ---
 

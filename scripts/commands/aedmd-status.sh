@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/status.sh - Workspace status inspection for /status slash command
+# scripts/commands/aedmd-status.sh - Workspace status inspection for /aedmd-status slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

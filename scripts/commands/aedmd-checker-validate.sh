@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/commands/com-md.sh - Bridge for /com-md slash command
+# scripts/commands/aedmd-checker-validate.sh - Bridge for /aedmd-checker-validate slash command
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,5 +10,5 @@ WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
 parse_flags "$@"
 
-dispatch_agent "runner" "com_md"
-check_handoff_result "com_md"
+dispatch_agent "checker" "checker_validate"
+check_handoff_result "checker_validate"

@@ -98,9 +98,10 @@ parse_flags() {
 }
 
 dispatch_agent() {
-  local agent stage handoff_input
+  local agent stage handoff_input handoff_file
   agent="$1"
   stage="$2"
+  handoff_file=".handoffs/${stage}.json"
 
   handoff_input="$(jq -n \
     --arg stage "$stage" \
@@ -112,7 +113,9 @@ dispatch_agent() {
     printf 'Dispatching agent=%s stage=%s config=%s\n' "$agent" "$stage" "$CONFIG" >&2
   fi
 
-  python -m scripts.agents --agent "$agent" --workspace "$(pwd)" --config "$CONFIG" --input <(printf '%s\n' "$handoff_input")
+  mkdir -p .handoffs
+
+  python -m scripts.agents --agent "$agent" --workspace "$(pwd)" --config "$CONFIG" --input <(printf '%s\n' "$handoff_input") --output "$handoff_file"
 }
 
 check_handoff_result() {
