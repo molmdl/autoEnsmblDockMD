@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 4 - Integration |
-| **Current Plan** | 3 of 3 (04-03 completed) |
-| **Last Activity** | 2026-04-19 - Completed 04-03-PLAN.md |
-| **Progress** | ████████████████ 24/24 plans complete (100%) |
-| **Phase 4 Blocker** | None ✓ |
-| **Status** | Phase complete |
+| **Current Phase** | 5 - Polish |
+| **Current Plan** | 2 of 7 (05-02 completed) |
+| **Last Activity** | 2026-04-19 - Completed 05-02-PLAN.md |
+| **Progress** | █████████████░░░ 25/31 plans complete (81%) |
+| **Phase 5 Blocker** | End-to-end test artifacts pending |
+| **Status** | In progress |
 
 ---
 
@@ -49,6 +49,13 @@
 | Integration validation remains wiring-focused (no heavy stage runs) | Confirms command→agent→skill chain correctness without unnecessary compute | 4 |
 | Agent support is explicitly documented as experimental | Aligns AGENT-07 while preserving script-first stable usage guidance | 4 |
 
+### Key Decisions (Phase 5)
+
+| Decision | Rationale | Phase Affected |
+|----------|-----------|----------------|
+| Restructure AGENTS.md by agent role instead of requirement category | Improves agent discoverability and keeps AGENTS.md readable at load time | 5 |
+| Keep AGENTS.md overview-only with links to skill/WORKFLOW/PROJECT docs | Avoids duplication and keeps implementation specifics in authoritative files | 5 |
+
 ### Research Flags (Areas for Planning)
 
 1. **Phase 4 - Skills:** YAML vs Markdown vs Hybrid; how gsd-agents structure skills
@@ -67,15 +74,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 03:27 +0800
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-04-19 10:32 +0800
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 4 execution complete.**
+**Phase 5 is in progress.**
 
-**Recommend:** Start Phase 5 planning/execution.
+**Recommend:** Continue with 05-03-PLAN.md.
 
 ### Recent Milestones
 
@@ -86,6 +93,7 @@ Resume file: None
 - 2026-04-19: Phase 4 plan 01 executed (command bridge scripts)
 - 2026-04-19: Phase 4 plan 02 executed (Agent Skills files)
 - 2026-04-19: Phase 4 plan 03 executed (integration smoke test + experimental docs)
+- 2026-04-19: Phase 5 plan 02 executed (AGENTS.md role-based restructure)
 
 ### Planning Status
 
@@ -96,7 +104,8 @@ Resume file: None
 - [x] Phase 4 context discussed
 - [x] Phase 4 planned
 - [x] Phase 4 executed
-- [ ] Phase 5 planned/executed
+- [x] Phase 5 planned
+- [ ] Phase 5 executed
 
 ### Checkpoints
 
@@ -117,5 +126,5 @@ Resume file: None
 ---
 
 *State updated: 2026-04-19*
-*Last phase: 04-integration (complete)*
-*Last action: Completed 04-03-PLAN.md and created 04-03-SUMMARY.md*
+*Current phase: 05-polish (in progress)*
+*Last action: Completed 05-02-PLAN.md and created 05-02-SUMMARY.md*
