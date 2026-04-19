@@ -267,18 +267,75 @@ build_sys_top() {
     local ligand_itp_basename="$2"
     local ligand_molname="$3"
 
-    cat > "${output_top}" <<EOF
-; unified complex topology
-#include "${FF_INCLUDE}"
-#include "${ligand_itp_basename}"
+    python - "${RECEPTOR_TOP}" "${output_top}" "${FF_INCLUDE}" "${ligand_itp_basename}" "${ligand_molname}" <<'PY'
+import pathlib
+import re
+import sys
 
-[ system ]
-Protein-Ligand complex
+receptor_top = pathlib.Path(sys.argv[1])
+output_top = pathlib.Path(sys.argv[2])
+ff_include = sys.argv[3]
+ligand_itp = sys.argv[4]
+ligand_molname = sys.argv[5]
 
-[ molecules ]
-Protein    1
-${ligand_molname}    1
-EOF
+lines = receptor_top.read_text().splitlines()
+
+ff_idx = -1
+mol_idx = -1
+include_re = re.compile(r'^\s*#include\s+["<]([^">]+)[">]')
+
+for idx, raw in enumerate(lines):
+    match = include_re.match(raw)
+    if match and match.group(1) == ff_include:
+        ff_idx = idx
+        break
+
+if ff_idx == -1:
+    for idx, raw in enumerate(lines):
+        if include_re.match(raw):
+            ff_idx = idx
+            break
+
+if ff_idx == -1:
+    raise SystemExit(
+        f"Failed to extract receptor topology block: no #include found in {receptor_top}"
+    )
+
+for idx in range(ff_idx + 1, len(lines)):
+    if lines[idx].strip().lower() == "[ molecules ]":
+        mol_idx = idx
+        break
+
+if mol_idx == -1:
+    raise SystemExit(
+        f"Failed to extract receptor topology block: [ molecules ] not found in {receptor_top}"
+    )
+
+receptor_block = lines[ff_idx + 1:mol_idx]
+content = [
+    "; unified complex topology",
+    f'#include "{ff_include}"',
+]
+
+if receptor_block:
+    content.extend(receptor_block)
+
+content.extend(
+    [
+        f'#include "{ligand_itp}"',
+        "",
+        "[ system ]",
+        "Protein-Ligand complex",
+        "",
+        "[ molecules ]",
+        "Protein    1",
+        f"{ligand_molname}    1",
+        "",
+    ]
+)
+
+output_top.write_text("\n".join(content))
+PY
 }
 
 submit_prepare_job() {
@@ -288,7 +345,7 @@ submit_prepare_job() {
     local ligand_gro_file="$4"
 
     local prep_dir="${COMPLEX_WORKDIR}/${ligand_name}"
-    local local_lig_itp local_lig_gro ligand_molname job_script job_id
+    local local_lig_itp local_lig_gro ligand_molname job_script job_id solvate_cs
 
     ensure_dir "${prep_dir}"
 
@@ -305,6 +362,11 @@ submit_prepare_job() {
         log_info "Running AMBER angle bypass for ${ligand_name}"
         python "${BYPASS_SCRIPT}" --input "${local_lig_itp}" --output "${bypass_out}"
         local_lig_itp="${bypass_out}"
+    fi
+
+    solvate_cs="${WATER_MODEL:-}"
+    if [[ -z "${solvate_cs}" ]]; then
+        solvate_cs="spc216"
     fi
 
     ligand_molname="$(extract_molecule_name_from_itp "${local_lig_itp}")"
@@ -325,7 +387,7 @@ set -euo pipefail
 cd "${prep_dir}"
 
 gmx editconf -f com.gro -o box.gro -d ${BOX_DISTANCE} -bt dodecahedron -c
-gmx solvate -p sys.top -cp box.gro -cs spc216 -o solv.gro
+gmx solvate -p sys.top -cp box.gro -cs ${solvate_cs} -o solv.gro
 gmx grompp -f em.mdp -c solv.gro -p sys.top -o ion.tpr -maxwarn 2
 echo SOL | gmx genion -s ion.tpr -p sys.top -neutral -nname CL -pname NA -conc ${ION_CONC} -o ion.gro
 gmx grompp -f em.mdp -c ion.gro -p sys.top -o em.tpr -maxwarn 2
