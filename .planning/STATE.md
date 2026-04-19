@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 5 of 5 (Polish) |
-| **Current Plan** | 11 of 12 in current phase |
-| **Last Activity** | 2026-04-19 - Completed 05-11-PLAN.md |
-| **Progress** | ████████████████ 35/35 plans complete (100%) |
-| **Phase 5 Blocker** | None |
-| **Status** | In progress — 05-12 remaining |
+| **Current Phase** | 5.1 of 6 (Critical Correctness and Namespace Fixes) |
+| **Current Plan** | 1 of 6 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 5.1-01-PLAN.md |
+| **Progress** | █████████████░░░░ 35/42 plans complete (83%) |
+| **Phase 5.1 Blocker** | None |
+| **Status** | In progress — 5.1-02 through 5.1-06 remaining |
 
 ---
 
@@ -70,6 +70,13 @@
 | Remediate missing required `Parameters` sections during structural validation | Ensures all skills satisfy enforced contract (including CLI Flag/Default columns) | 5 |
 | Single document AGENT-WORKFLOW.md covers full pipeline orchestration | Avoids multi-file traversal for orchestrator agents; HandoffRecord schema enables file-based state passing | 5 |
 
+### Key Decisions (Phase 5.1)
+
+| Decision | Rationale | Phase Affected |
+|----------|-----------|----------------|
+| Generate `sys.top` by injecting receptor topology block from `RECEPTOR_TOP` between force-field include and receptor `[ molecules ]` section | Ensures receptor moleculetype definitions are present for valid `gmx solvate/grompp` preprocessing | 5.1 |
+| Use `WATER_MODEL` for `gmx solvate -cs` with fallback to `spc216` when unset | Restores config-driven solvent behavior while preserving backward compatibility | 5.1 |
+
 ### Research Flags (Areas for Planning)
 
 1. **Phase 4 - Skills:** YAML vs Markdown vs Hybrid; how gsd-agents structure skills
@@ -88,15 +95,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 08:29 UTC
-Stopped at: Completed 05-11-PLAN.md
+Last session: 2026-04-19 10:08 UTC
+Stopped at: Completed 5.1-01-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 5 is in progress — 05-12-PLAN.md remaining.**
+**Phase 5.1 is in progress — 5.1-02-PLAN.md next.**
 
-**Next:** Execute 05-12-PLAN.md (E2E functional testing of slash commands + skills).
+**Next:** Execute 5.1-02-PLAN.md (MM/PBSA group-ID propagation fix).
 
 ### Recent Milestones
 
@@ -117,6 +124,7 @@ Resume file: None
 - 2026-04-19: Phase 5 plan 09 executed (cross-doc compatibility alignment with restored skill format)
 - 2026-04-19: Phase 5 plan 10 executed (end-to-end structural validation + report)
 - 2026-04-19: Phase 5 plan 11 executed (agent-targeted workflow document AGENT-WORKFLOW.md)
+- 2026-04-19: Phase 5.1 plan 01 executed (0_prep topology assembly + water_model fix)
 
 ### Planning Status
 
@@ -150,7 +158,7 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-10-PLAN.md and created 05-10-SUMMARY.md*
+*Last action: Completed 5.1-01-PLAN.md and created 5.1-01-SUMMARY.md*
 
 ---
 
