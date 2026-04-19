@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 6 of 6 (5.1-critical-correctness-and-namespace-fixes) |
-| **Current Plan** | 4 of 6 in current phase |
-| **Last Activity** | 2026-04-19 - Completed 5.1-03-PLAN.md |
-| **Progress** | █████████░░ 36/42 plans complete (86%) |
+| **Current Plan** | 5 of 6 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 5.1-05-PLAN.md |
+| **Progress** | █████████░░ 37/42 plans complete (88%) |
 | **Phase 5.1 Blocker** | None |
-| **Status** | In progress — 5.1-05, 5.1-06 remaining |
+| **Status** | In progress — 5.1-06 remaining |
 
 ---
 
@@ -41,6 +41,7 @@
 | Treat any GRO↔ITP atom-count or atom-name/order mismatch as a hard error | Prevent silent misapplication of ligand position restraints |
 | Map `com_ana` stage to `ligand` forwarding mode in `run_pipeline.sh` | Keep dispatcher/callee CLI contract consistent for per-ligand analysis targeting |
 | Compute advanced RMSD with superposition before displacement measurement | Remove translational/rotational drift inflation from RMSD timeseries |
+| Namespace all public skills and slash-command wrappers with `aedmd-*` | Prevent collisions with generic OpenCode command names and keep project command ownership explicit |
 
 ### Known Pitfalls
 
@@ -52,13 +53,13 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:10 UTC
-Stopped at: Completed 5.1-03-PLAN.md
+Last session: 2026-04-19 11:32 UTC
+Stopped at: Completed 5.1-05-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Execute `5.1-05-PLAN.md` (rename skills/commands to `aedmd-*` namespace).
+Execute `5.1-06-PLAN.md` (docs namespace and consistency updates).
 
 ---
 
@@ -71,4 +72,4 @@ Execute `5.1-05-PLAN.md` (rename skills/commands to `aedmd-*` namespace).
 
 *State updated: 2026-04-19*
 *Current phase: 5.1-critical-correctness-and-namespace-fixes (in progress)*
-*Last action: Completed 5.1-03-PLAN.md and created 5.1-03-SUMMARY.md*
+*Last action: Completed 5.1-05-PLAN.md and created 5.1-05-SUMMARY.md*
