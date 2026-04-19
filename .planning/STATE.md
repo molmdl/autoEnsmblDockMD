@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 5 - Polish |
-| **Current Plan** | 4 of 7 (05-01, 05-02, 05-03, 05-04 completed) |
-| **Last Activity** | 2026-04-19 - Completed 05-04-PLAN.md |
-| **Progress** | ██████████████░░ 28/31 plans complete (90%) |
+| **Current Plan** | 5 of 7 (05-01, 05-02, 05-03, 05-04, 05-05 completed) |
+| **Last Activity** | 2026-04-19 - Completed 05-05-PLAN.md |
+| **Progress** | ███████████████░ 29/31 plans complete (94%) |
 | **Phase 5 Blocker** | End-to-end test artifacts pending |
 | **Status** | In progress |
 
@@ -60,6 +60,8 @@
 | Use implemented script inventory as WORKFLOW.md source of truth | Removes legacy command drift and keeps workflow docs aligned with runnable scripts | 5 |
 | Put Mode A/Mode B differences inside each stage section | Keeps mode-specific operator guidance next to execution steps | 5 |
 | Use README as fast onboarding and route deep details to WORKFLOW/GUIDE | Keeps first-run path concise while preserving complete reference docs | 5 |
+| Document GUIDE config reference directly from `scripts/config.ini.template` | Prevents key drift between runtime config and human guide | 5 |
+| Treat `[production]` as the explicit MD section in GUIDE | Preserves template accuracy while satisfying MD documentation intent | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -79,15 +81,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:40 +0800
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-04-19 10:42 +0800
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None
 
 ### Next Action
 
 **Phase 5 is in progress.**
 
-**Recommend:** Continue with 05-05-PLAN.md.
+**Recommend:** Continue with 05-06-PLAN.md.
 
 ### Recent Milestones
 
@@ -102,6 +104,7 @@ Resume file: None
 - 2026-04-19: Phase 5 plan 02 executed (AGENTS.md role-based restructure)
 - 2026-04-19: Phase 5 plan 03 executed (SKILL.md metadata standardization)
 - 2026-04-19: Phase 5 plan 04 executed (README.md comprehensive onboarding rewrite)
+- 2026-04-19: Phase 5 plan 05 executed (GUIDE.md Part 1 config/input/workspace reference)
 
 ### Planning Status
 
@@ -135,4 +138,4 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-04-PLAN.md and created 05-04-SUMMARY.md*
+*Last action: Completed 05-05-PLAN.md and created 05-05-SUMMARY.md*
