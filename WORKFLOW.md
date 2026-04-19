@@ -26,9 +26,9 @@ source ./scripts/setenv.sh
   - [GROMACS official website](https://www.gromacs.org/)
 - **gnina** (tested with v1.1, since our hardware CUDA does not support newer version)
   - [Gnina github](https://github.com/gnina/gnina)
-- **gmx_MMPBSA** (automatically installed if you create the conda environment using env.yml)
+- **gmx_MMPBSA** (automatically installed if you create the conda environment using `scripts/env.yml`)
   - [gmx_MMPBSA Documentation](https://valdes-tresanco-ms.github.io/gmx_MMPBSA/dev/)
-- Python dependencies used by scripts (e.g., MDAnalysis), also automatically installed with env.yml.
+- Python dependencies used by scripts (e.g., MDAnalysis), also automatically installed with `scripts/env.yml`.
 - Optional: Open Babel for `scripts/dock/0_sdf2gro.sh`
 
 ### Required user inputs
@@ -70,6 +70,41 @@ Script roots:
 
 ## Stage Reference
 
+## Execution Model (important)
+
+`scripts/run_pipeline.sh` dispatches stage scripts in sequence, but not all stages are synchronous in HPC/Slurm workflows.
+
+- Asynchronous submission stages commonly include `rec_prod`, `com_prod`, and `com_mmpbsa`.
+- These stages may return after `sbatch` submission while jobs continue in the scheduler.
+- Do **not** assume downstream input artifacts are ready when the wrapper command returns.
+
+Recommended check pattern before advancing to dependent stages:
+
+```bash
+squeue -u "$USER"
+sacct -j <jobid> --format=JobID,State,Elapsed,ExitCode
+```
+
+Dispatcher reference (`scripts/run_pipeline.sh`):
+
+| Stage alias | Dispatched script |
+|---|---|
+| `rec_prep` | `scripts/rec/0_prep.sh` |
+| `rec_prod` | `scripts/rec/1_pr_rec.sh` |
+| `rec_ana` | `scripts/rec/3_ana.sh` |
+| `rec_cluster` | `scripts/rec/4_cluster.sh` |
+| `rec_align` | `scripts/rec/5_align.py` |
+| `dock_convert` | `scripts/dock/0_gro2mol2.sh` |
+| `dock_run` | `scripts/dock/2_gnina.sh` |
+| `dock_report` | `scripts/dock/3_dock_report.sh` |
+| `dock2com` | `scripts/dock/4_dock2com.sh` |
+| `com_prep` | `scripts/com/0_prep.sh` |
+| `com_prod` | `scripts/com/1_pr_prod.sh` |
+| `com_mmpbsa` | `scripts/com/2_run_mmpbsa.sh` |
+| `com_ana` | `scripts/com/3_ana.sh` |
+| `com_fp` (optional utility) | `scripts/com/4_cal_fp.sh` |
+| `com_archive` (optional utility) | `scripts/com/5_arc_sel.sh` |
+
 ### Stage 0 — Input preparation
 
 **Purpose:** validate config, paths, and file readiness before compute-heavy steps.
@@ -92,13 +127,13 @@ Script roots:
 2. `scripts/rec/1_pr_rec.sh`
 3. `scripts/rec/3_ana.sh`
 4. `scripts/rec/4_cluster.sh`
-5. `scripts/rec/5_align.py` (optional)
+5. `scripts/rec/5_align.py`
 
 **Inputs/config:** `[receptor] workdir, input_pdb, ff, water_model, mdp_dir, n_trials, ensemble_size`, plus `analysis_*`, `cluster_*`, `align_*`; `[slurm] partition, ntomp, gpus`.
 
 **Outputs:** receptor topology/coordinates, per-trial trajectories, merged/fit trajectories, clustered `rec*` conformers, optional aligned structures.
 
-**Mode notes:** A often requires alignment to stabilize pocket frame; B uses clustered conformers directly.
+**Mode notes:** `rec_align` is part of the default pipeline stage sequence in `scripts/run_pipeline.sh`. It can still behave as optional in practice when `align_structures`/`align_reference` are not configured for a given run setup.
 
 ### Stage 2 — Docking (conversion → gnina → scoring → pose selection)
 
@@ -109,16 +144,15 @@ Script roots:
 1. `scripts/dock/0_gro2mol2.sh`
 2. `scripts/dock/0_gro_itp_to_mol2.py`
 3. `scripts/dock/0_sdf2gro.sh` (optional utility)
-4. `scripts/dock/1_rec4dock.sh`
-5. `scripts/dock/2_gnina.sh`
-6. `scripts/dock/3_dock_report.sh`
-7. `scripts/dock/4_dock2com_1.py`
+4. `scripts/dock/2_gnina.sh`
+5. `scripts/dock/3_dock_report.sh`
+6. `scripts/dock/4_dock2com_1.py`
 
 **Inputs/config:** `[dock] ligand_dir, output_dir, gro_pattern, converter_script`; `[docking] dock_dir, ligands_dir, mode, receptor_dir, receptor_prefix, autobox_*`; `[docking] reference_ligand` for Mode A targeted/test.
 
 **Outputs:** MOL2 docking inputs, receptor PDB conformers, gnina SDF/log outputs, ranked docking report, selected pose files.
 
-**Mode notes:** A uses `mode=targeted`/`mode=test`; B uses `mode=blind`.
+**Mode notes:** A uses `mode=targeted`/`mode=test`; B uses `mode=blind`. `scripts/dock/1_rec4dock.sh` is an implemented helper but is not dispatched by default in `scripts/run_pipeline.sh`.
 
 ### Stage 3 — Complex setup (dock2com → topology assembly → solvation/ions/minimization)
 
@@ -163,11 +197,13 @@ Script roots:
 3. `scripts/com/2_sub_mmpbsa.sh`
 4. `scripts/com/2_mmpbsa.sh`
 
-**Inputs/config:** `[mmpbsa] workdir, ligand_dir, n_chunks, chunk_dir_prefix, source_xtc_pattern, source_tpr_pattern, mmpbsa_input, amber_topology_file, charmm_topology_file`.
+**Inputs/config:** `[mmpbsa] workdir, ligand_dir, n_chunks, chunk_dir_prefix, source_xtc_pattern, source_tpr_pattern, mmpbsa_input, amber_topology_file, charmm_topology_file, group_ids_file`.
 
 **Outputs:** chunk folders (`mmpbsa_*`), processed trajectories, MM/PBSA result files/summaries.
 
 **Mode notes:** A resolves AMBER topology path; B resolves CHARMM topology path.
+
+**Execution note:** `scripts/com/2_sub_mmpbsa.sh` is an async submission step and may return before chunk jobs complete.
 
 ### Stage 6 — Analysis (RMSD, RMSF, contacts, H-bonds, fingerprints)
 
@@ -183,7 +219,7 @@ Script roots:
 6. `scripts/com/5_arc_sel.sh` (optional)
 7. `scripts/com/5_rerun_sel.sh` (optional)
 
-**Inputs/config:** `[analysis] run_rmsd, run_rmsf, run_hbond, run_advanced, contact_cutoff, selections`; optional `[fingerprint]`, `[archive]`, `[rerun]`.
+**Inputs/config:** `[analysis] run_rmsd, run_rmsf, run_hbond, run_advanced, contact_cutoff, selections, distance_reference`; optional `[fingerprint]`, `[archive]`, `[rerun]`.
 
 **Outputs:** per-ligand analysis outputs/plots, optional fingerprint matrices/heatmaps, optional archive/rerun helper outputs.
 
@@ -215,7 +251,7 @@ Inputs (receptor + ligands + FF + MDP + config.ini)
                     |
                     v
 [1] Receptor ensemble generation
-   scripts/rec/0_prep.sh -> 1_pr_rec.sh -> 3_ana.sh -> 4_cluster.sh -> 5_align.py(optional)
+   scripts/rec/0_prep.sh -> 1_pr_rec.sh -> 3_ana.sh -> 4_cluster.sh -> 5_align.py
                     |
                     v
               Mode decision
@@ -226,7 +262,7 @@ Inputs (receptor + ligands + FF + MDP + config.ini)
                     |
                     v
 [2] Docking
-   scripts/dock/0_gro2mol2.sh -> 0_gro_itp_to_mol2.py -> 1_rec4dock.sh
+   scripts/dock/0_gro2mol2.sh -> 0_gro_itp_to_mol2.py
    -> 2_gnina.sh -> 3_dock_report.sh -> 4_dock2com_1.py
                     |
                     v

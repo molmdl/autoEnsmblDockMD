@@ -60,6 +60,11 @@ bash scripts/run_pipeline.sh --config work/test/config.ini --list-stages
 bash scripts/run_pipeline.sh --config work/test/config.ini
 ```
 
+> [!IMPORTANT]
+> `scripts/run_pipeline.sh` dispatches stage scripts in sequence, but several stages are asynchronous on Slurm-backed runs.
+> In particular, receptor and complex production/MM-PBSA submission stages may return after `sbatch` submission rather than waiting for job completion.
+> Before proceeding to downstream dependent stages, verify completion with `squeue`/`sacct` and stage output checks.
+
 For stage-by-stage execution and full script details, see [WORKFLOW.md](./WORKFLOW.md).
 
 ## Pipeline Overview
@@ -141,7 +146,7 @@ Both modes share the same stage structure; differences are encoded through confi
   - [GROMACS official website](https://www.gromacs.org/)
 - **gnina** (tested with v1.1, since our hardware CUDA does not support newer version)
   - [Gnina github](https://github.com/gnina/gnina)
-- **gmx_MMPBSA** (automatically installed if you create the conda environment using env.yml)
+- **gmx_MMPBSA** (automatically installed if you create the conda environment using `scripts/env.yml`)
   - [gmx_MMPBSA Documentation](https://valdes-tresanco-ms.github.io/gmx_MMPBSA/dev/)
 - Optional utilities depending on stage usage (for example Open Babel for specific conversion helpers)
 
@@ -187,6 +192,12 @@ Use the workflow reference as your authoritative stage manual:
 4. Run either full pipeline or selected stage with `scripts/run_pipeline.sh`
 5. Inspect stage outputs under your configured `workdir`
 6. Continue to MM/PBSA and analysis outputs for ranking/interpretation
+
+Async stage note:
+
+- `rec_prod`, `com_prod`, and `com_mmpbsa` commonly submit Slurm jobs and return immediately.
+- Treat these as submission checkpoints; do not assume downstream artifacts are ready at wrapper return time.
+- Use `squeue -u "$USER"` (live queue) and `sacct -j <jobid>` (historical status) before continuing.
 
 If you are new to this project, start with the full run once, then switch to stage-specific reruns as needed.
 
