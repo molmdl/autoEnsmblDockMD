@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | All phases complete |
-| **Current Plan** | All 34 plans complete (Phase 5 remediation included) |
-| **Last Activity** | 2026-04-19 - Completed Phase 5-Polish |
-| **Progress** | ████████████████ 34/34 plans complete (100%) |
-| **Phase 5 Blocker** | None - verification passed |
-| **Status** | Milestone ready for audit |
+| **Current Phase** | 5 of 5 (Polish) |
+| **Current Plan** | 11 of 12 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 05-11-PLAN.md |
+| **Progress** | ████████████████ 35/35 plans complete (100%) |
+| **Phase 5 Blocker** | None |
+| **Status** | In progress — 05-12 remaining |
 
 ---
 
@@ -68,7 +68,7 @@
 | Add explicit Skill File Contract section in AGENTS.md | Locks canonical path/frontmatter schema in agent-facing documentation | 5 |
 | Add YAML-frontmatter skill references in README/GUIDE with minimal edits | Aligns surviving docs to restored SKILL.md format without broad rewrites | 5 |
 | Remediate missing required `Parameters` sections during structural validation | Ensures all skills satisfy enforced contract (including CLI Flag/Default columns) | 5 |
-| Add `scripts/com/mmpbsa.in` as canonical default input template | Resolves config/doc runtime reference to existing in-repo artifact | 5 |
+| Single document AGENT-WORKFLOW.md covers full pipeline orchestration | Avoids multi-file traversal for orchestrator agents; HandoffRecord schema enables file-based state passing | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -88,15 +88,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 15:43 +0800
-Stopped at: Completed 05-10-PLAN.md
+Last session: 2026-04-19 08:29 UTC
+Stopped at: Completed 05-11-PLAN.md
 Resume file: None
 
 ### Next Action
 
-**Phase 5 is in progress.**
+**Phase 5 is in progress — 05-12-PLAN.md remaining.**
 
-**Recommend:** Collect end-to-end test artifacts to close remaining Phase 5 blocker.
+**Next:** Execute 05-12-PLAN.md (E2E functional testing of slash commands + skills).
 
 ### Recent Milestones
 
@@ -116,6 +116,7 @@ Resume file: None
 - 2026-04-19: Phase 5 plan 08 executed (SKILL.md restoration + invalidated summary cleanup)
 - 2026-04-19: Phase 5 plan 09 executed (cross-doc compatibility alignment with restored skill format)
 - 2026-04-19: Phase 5 plan 10 executed (end-to-end structural validation + report)
+- 2026-04-19: Phase 5 plan 11 executed (agent-targeted workflow document AGENT-WORKFLOW.md)
 
 ### Planning Status
 
