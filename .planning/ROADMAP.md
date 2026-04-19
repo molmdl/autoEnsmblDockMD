@@ -312,7 +312,7 @@ Plans (remediation):
 **Goal:** Address critical code correctness issues and establish project namespace for skills before production use.
 
 **Depends on:** Phase 5
-**Plans:** 0 plans (to be planned)
+**Plans:** 6 plans in 2 waves
 
 **Scope:**
 
@@ -345,10 +345,12 @@ This urgent phase addresses critical findings from codebase analysis (`.planning
 - Better to fix now (Phase 5 polish context) than after 05-12 E2E testing reveals failures
 
 Plans:
-- [ ] TBD (run `/gsd-plan-phase 5.1` to break down)
-
-**Details:**
-[To be added during planning]
+- [ ] 5.1-01-PLAN.md — Fix 0_prep.sh topology generation and water_model usage (Wave 1)
+- [ ] 5.1-02-PLAN.md — Fix MM/PBSA group-ID propagation (Wave 1)
+- [ ] 5.1-03-PLAN.md — Fix dock2com artifact contract and atom-order validation (Wave 1)
+- [ ] 5.1-04-PLAN.md — Fix run_pipeline.sh arg forwarding and RMSD alignment (Wave 1)
+- [ ] 5.1-05-PLAN.md — Rename all skills/commands to aedmd-* namespace (Wave 2)
+- [ ] 5.1-06-PLAN.md — Update docs with aedmd-* namespace and fix doc consistency (Wave 2)
 
 ---
 
