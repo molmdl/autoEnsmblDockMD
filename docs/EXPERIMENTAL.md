@@ -10,7 +10,9 @@ Agent support is available for integration testing and iterative workflow develo
 
 - Agent-based workflow orchestration across pipeline stages.
 - Slash command wrappers that dispatch into the Python agent CLI.
-- Skill-based capability loading from `.opencode/skills/`.
+- Skill-based capability loading from `.opencode/skills/aedmd-*/`.
+
+Project slash commands are namespaced with `aedmd-` (for example `/aedmd-status`, `/aedmd-rec-ensemble`, and `/aedmd-dock-run`) to avoid collisions with generic command names.
 
 ## What is stable
 

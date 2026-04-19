@@ -14,16 +14,16 @@ Stages execute in order. Each stage maps to one slash command, one skill, and on
 
 | # | Stage ID | Slash Command | Skill File | Script Entry | Agent Type |
 |---|----------|---------------|------------|--------------|------------|
-| 0 | `input_prep` | `/status` | `.opencode/skills/status/SKILL.md` | `scripts/infra/config_loader.sh` | orchestrator |
-| 1 | `receptor_prep` | `/rec-ensemble` | `.opencode/skills/rec-ensemble/SKILL.md` | `scripts/rec/0_prep.sh` | runner |
-| 2 | `receptor_md` | `/rec-ensemble` | `.opencode/skills/rec-ensemble/SKILL.md` | `scripts/rec/1_pr_rec.sh` | runner |
-| 3 | `receptor_cluster` | `/rec-ensemble` | `.opencode/skills/rec-ensemble/SKILL.md` | `scripts/rec/4_cluster.sh` | runner |
-| 4 | `receptor_align` | `/rec-ensemble` | `.opencode/skills/rec-ensemble/SKILL.md` | `scripts/rec/5_align.py` | runner |
-| 5 | `docking` | `/dock-run` | `.opencode/skills/dock-run/SKILL.md` | `scripts/dock/2_gnina.sh` | runner |
-| 6 | `complex_setup` | `/com-setup` | `.opencode/skills/com-setup/SKILL.md` | `scripts/com/0_prep.sh` | runner |
-| 7 | `complex_md` | `/com-md` | `.opencode/skills/com-md/SKILL.md` | `scripts/com/1_pr_prod.sh` | runner |
-| 8 | `mmpbsa` | `/com-mmpbsa` | `.opencode/skills/com-mmpbsa/SKILL.md` | `scripts/com/2_run_mmpbsa.sh` | runner |
-| 9 | `analysis` | `/com-analyze` | `.opencode/skills/com-analyze/SKILL.md` | `scripts/com/3_ana.sh` | runner |
+| 0 | `input_prep` | `/aedmd-status` | `.opencode/skills/aedmd-status/SKILL.md` | `scripts/infra/config_loader.sh` | orchestrator |
+| 1 | `receptor_prep` | `/aedmd-rec-ensemble` | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` | `scripts/rec/0_prep.sh` | runner |
+| 2 | `receptor_md` | `/aedmd-rec-ensemble` | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` | `scripts/rec/1_pr_rec.sh` | runner |
+| 3 | `receptor_cluster` | `/aedmd-rec-ensemble` | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` | `scripts/rec/4_cluster.sh` | runner |
+| 4 | `receptor_align` | `/aedmd-rec-ensemble` | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` | `scripts/rec/5_align.py` | runner |
+| 5 | `docking` | `/aedmd-dock-run` | `.opencode/skills/aedmd-dock-run/SKILL.md` | `scripts/dock/2_gnina.sh` | runner |
+| 6 | `complex_setup` | `/aedmd-com-setup` | `.opencode/skills/aedmd-com-setup/SKILL.md` | `scripts/com/0_prep.sh` | runner |
+| 7 | `complex_md` | `/aedmd-com-md` | `.opencode/skills/aedmd-com-md/SKILL.md` | `scripts/com/1_pr_prod.sh` | runner |
+| 8 | `mmpbsa` | `/aedmd-com-mmpbsa` | `.opencode/skills/aedmd-com-mmpbsa/SKILL.md` | `scripts/com/2_run_mmpbsa.sh` | runner |
+| 9 | `analysis` | `/aedmd-com-analyze` | `.opencode/skills/aedmd-com-analyze/SKILL.md` | `scripts/com/3_ana.sh` | analyzer |
 
 ### Valid Transitions
 
@@ -60,7 +60,7 @@ Every stage produces a HandoffRecord JSON written to `.handoffs/{stage_id}.json`
 {
   "$schema": "handoff-record-v1",
   "stage": "<string: stage_id from table above>",
-  "status": "<string: pending | running | complete | failed | needs_review | blocked>",
+  "status": "<string: success | needs_review | failure | blocked>",
   "inputs": {
     "config": "<string: path to config.ini>",
     "workdir": "<string: workspace root directory>",
@@ -70,7 +70,7 @@ Every stage produces a HandoffRecord JSON written to `.handoffs/{stage_id}.json`
     "artifacts": ["<string: glob pattern or explicit path>"],
     "summary": "<string: human-readable stage outcome>",
     "warnings": ["<string: non-fatal issues>"],
-    "errors": ["<string: fatal issues, present if status=failed>"]
+    "errors": ["<string: fatal issues, present if status=failure>"]
   },
   "next_action": "<string: recommended next stage_id or 'human_review' or 'debug'>",
   "error": "<string | null: error message, null if no error>",
@@ -84,14 +84,14 @@ Every stage produces a HandoffRecord JSON written to `.handoffs/{stage_id}.json`
 | Field | Type | Required | Values |
 |-------|------|----------|--------|
 | `stage` | string | yes | stage_id from state machine table |
-| `status` | string | yes | `pending`, `running`, `complete`, `failed`, `needs_review`, `blocked` |
+| `status` | string | yes | `success`, `needs_review`, `failure`, `blocked` |
 | `inputs.config` | string | yes | path to config.ini |
 | `inputs.workdir` | string | yes | absolute workspace path |
 | `inputs.params` | object | no | arbitrary key-value overrides |
 | `outputs.artifacts` | array[string] | yes | file paths or globs produced |
 | `outputs.summary` | string | yes | one-line stage outcome |
 | `outputs.warnings` | array[string] | no | non-fatal issues |
-| `outputs.errors` | array[string] | no | fatal errors (if status=failed) |
+| `outputs.errors` | array[string] | no | fatal errors (if status=failure) |
 | `next_action` | string | yes | next stage_id or `human_review` or `debug` |
 | `error` | string\|null | yes | error message or null |
 | `recommendations` | array[string] | no | remediation steps on failure |
@@ -103,7 +103,7 @@ Every stage produces a HandoffRecord JSON written to `.handoffs/{stage_id}.json`
 {
   "$schema": "handoff-record-v1",
   "stage": "docking",
-  "status": "complete",
+  "status": "success",
   "inputs": {
     "config": "config.ini",
     "workdir": "/work/test",
@@ -136,21 +136,19 @@ Given current stage + status, determine next action:
 
 | Current Stage | Status | Next Action |
 |---------------|--------|-------------|
-| any | `pending` | Load skill → invoke slash command |
-| any | `running` | Monitor job → wait → re-check handoff |
-| any | `complete` | Invoke `checker-validate` → if pass: advance; if fail: invoke `debugger-diagnose` |
-| any | `needs_review` | Invoke `checker-validate` → present warnings → await human gate |
-| any | `failed` | Invoke `debugger-diagnose` → apply fix → retry stage |
+| any | `success` | Invoke `aedmd-checker-validate` → if pass: advance; if fail: invoke `aedmd-debugger-diagnose` |
+| any | `needs_review` | Invoke `aedmd-checker-validate` → present warnings → await human gate |
+| any | `failure` | Invoke `aedmd-debugger-diagnose` → apply fix → retry stage |
 | any | `blocked` | Inspect handoff errors → resolve dependency → retry |
-| `analysis` | `complete` | All stages complete → generate final report |
+| `analysis` | `success` | All stages complete → generate final report |
 
 ### 3.2 Checker-Validate Gate
 
 ```
-Stage completes (status = complete)
+Stage completes (status = success)
     │
     ▼
-Invoke checker-validate:
+Invoke aedmd-checker-validate:
   scripts/commands/checker-validate.sh --config config.ini --stage <stage_id>
     │
     ├── PASS  → Advance to next stage
@@ -158,18 +156,18 @@ Invoke checker-validate:
     └── WARN  → Present warnings to human
                    │
                    ├── Human approves  → Advance to next stage
-                   └── Human rejects   → Invoke debugger-diagnose → retry
+                    └── Human rejects   → Invoke aedmd-debugger-diagnose → retry
     │
-    └── FAIL  → Invoke debugger-diagnose → apply fix → retry stage
+    └── FAIL  → Invoke aedmd-debugger-diagnose → apply fix → retry stage
 ```
 
 ### 3.3 Debugger-Diagnose Recovery
 
 ```
-Stage fails (status = failed)
+Stage fails (status = failure)
     │
     ▼
-Invoke debugger-diagnose:
+Invoke aedmd-debugger-diagnose:
   scripts/commands/debugger-diagnose.sh --config config.ini --stage <stage_id>
     │
     ├── Fix identified → Apply fix → Retry stage (max 2 retries)
@@ -181,7 +179,7 @@ Invoke debugger-diagnose:
 ### 3.4 Workflow Completion
 
 ```
-analysis stage → status = complete → checker-validate passes
+analysis stage → status = success → aedmd-checker-validate passes
     │
     ▼
 Generate final report:
@@ -199,8 +197,8 @@ Generate final report:
 
 | | Detail |
 |--|--------|
-| **Command** | `scripts/commands/status.sh` |
-| **Skill** | `.opencode/skills/status/SKILL.md` |
+| **Command** | `scripts/commands/aedmd-status.sh` |
+| **Skill** | `.opencode/skills/aedmd-status/SKILL.md` |
 | **Required inputs** | `config.ini` (from `scripts/config.ini.template`) |
 | **Required env** | `source ./scripts/setenv.sh` |
 | **Required config sections** | `[general]`, `[slurm]`, `[receptor]`, `[dock]`, `[docking]` |
@@ -212,7 +210,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/rec-ensemble.sh` |
-| **Skill** | `.opencode/skills/rec-ensemble/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
 | **Script** | `scripts/rec/0_prep.sh` |
 | **Required inputs** | `[receptor] input_pdb` (*.pdb); FF files |
 | **Required env** | GROMACS ≥ 2022; conda env active |
@@ -224,7 +222,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/rec-ensemble.sh` |
-| **Skill** | `.opencode/skills/rec-ensemble/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
 | **Script** | `scripts/rec/1_pr_rec.sh` |
 | **Required inputs** | Equilibrated receptor from `receptor_prep`; `[receptor] n_trials` |
 | **Required env** | GROMACS ≥ 2022; Slurm (HPC) or local |
@@ -236,7 +234,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/rec-ensemble.sh` |
-| **Skill** | `.opencode/skills/rec-ensemble/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
 | **Script** | `scripts/rec/4_cluster.sh` |
 | **Required inputs** | Merged trajectory from `3_ana.sh`; `[receptor] cluster_*` config |
 | **Required env** | GROMACS ≥ 2022; MDAnalysis |
@@ -248,7 +246,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/rec-ensemble.sh` |
-| **Skill** | `.opencode/skills/rec-ensemble/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
 | **Script** | `scripts/rec/5_align.py` |
 | **Required inputs** | Receptor ensemble from `receptor_cluster`; reference structure |
 | **Required env** | MDAnalysis; python 3.10+ |
@@ -260,7 +258,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/dock-run.sh` |
-| **Skill** | `.opencode/skills/dock-run/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-dock-run/SKILL.md` |
 | **Scripts** | `scripts/dock/0_gro2mol2.sh` → `1_rec4dock.sh` → `2_gnina.sh` → `3_dock_report.sh` → `4_dock2com_1.py` |
 | **Required inputs** | Receptor conformers (`rec/rec*.pdb`); ligand files in `[dock] ligand_dir` |
 | **Required env** | gnina; GROMACS ≥ 2022; Open Babel (optional) |
@@ -272,7 +270,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/com-setup.sh` |
-| **Skill** | `.opencode/skills/com-setup/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-com-setup/SKILL.md` |
 | **Scripts** | `scripts/dock/4_dock2com*.sh` + `4_dock2com_2*.py` → `scripts/com/0_prep.sh` |
 | **Required inputs** | Selected poses from `docking`; `[complex]` config section |
 | **Required env** | GROMACS ≥ 2022; FF files (AMBER or CHARMM36m/CGenFF) |
@@ -284,7 +282,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/com-md.sh` |
-| **Skill** | `.opencode/skills/com-md/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-com-md/SKILL.md` |
 | **Script** | `scripts/com/1_pr_prod.sh` |
 | **Required inputs** | Complex systems from `complex_setup`; `[production]` config |
 | **Required env** | GROMACS ≥ 2022; Slurm or local |
@@ -296,7 +294,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/com-mmpbsa.sh` |
-| **Skill** | `.opencode/skills/com-mmpbsa/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-com-mmpbsa/SKILL.md` |
 | **Scripts** | `scripts/com/2_run_mmpbsa.sh` → `2_trj4mmpbsa.sh` → `2_sub_mmpbsa.sh` → `2_mmpbsa.sh` |
 | **Required inputs** | Production trajectories; `[mmpbsa]` config; AMBER or CHARMM topology |
 | **Required env** | gmx_MMPBSA; GROMACS ≥ 2022; `scripts/com/mmpbsa.in` template |
@@ -308,7 +306,7 @@ Generate final report:
 | | Detail |
 |--|--------|
 | **Command** | `scripts/commands/com-analyze.sh` |
-| **Skill** | `.opencode/skills/com-analyze/SKILL.md` |
+| **Skill** | `.opencode/skills/aedmd-com-analyze/SKILL.md` |
 | **Scripts** | `scripts/com/3_ana.sh` → `3_com_ana_trj.py` → `4_cal_fp.sh` / `4_fp.py` |
 | **Required inputs** | Production trajectories; `[analysis]` config |
 | **Required env** | MDAnalysis; python 3.10+; matplotlib |
@@ -340,7 +338,7 @@ LATEST=$(ls -t .handoffs/*.json 2>/dev/null | head -1)
 
 - If `LATEST` exists: parse `stage` + `status` fields → determine resume point
 - If no handoffs: start from `input_prep`
-- For resume: load `orchestrator-resume` skill @ `.opencode/skills/orchestrator-resume/SKILL.md`
+- For resume: load `aedmd-orchestrator-resume` skill @ `.opencode/skills/aedmd-orchestrator-resume/SKILL.md`
 - Invoke: `scripts/commands/orchestrator-resume.sh --config config.ini`
 
 ### Step 3: Determine Current Stage
@@ -348,12 +346,12 @@ LATEST=$(ls -t .handoffs/*.json 2>/dev/null | head -1)
 ```python
 # Decision logic (pseudo-code)
 def next_stage(handoff):
-    if handoff.status in ("complete",):
+    if handoff.status in ("success",):
         if checker_validate(handoff.stage) == "pass":
             return TRANSITIONS[handoff.stage]  # advance
         else:
             return "debug"
-    elif handoff.status == "failed":
+    elif handoff.status == "failure":
         return "debug"
     elif handoff.status == "needs_review":
         return "human_review"
@@ -366,13 +364,13 @@ def next_stage(handoff):
 ```bash
 # Load appropriate skill based on stage
 # Skill paths by stage:
-# input_prep       → .opencode/skills/status/SKILL.md
-# receptor_*       → .opencode/skills/rec-ensemble/SKILL.md
-# docking          → .opencode/skills/dock-run/SKILL.md
-# complex_setup    → .opencode/skills/com-setup/SKILL.md
-# complex_md       → .opencode/skills/com-md/SKILL.md
-# mmpbsa           → .opencode/skills/com-mmpbsa/SKILL.md
-# analysis         → .opencode/skills/com-analyze/SKILL.md
+# input_prep       → .opencode/skills/aedmd-status/SKILL.md
+# receptor_*       → .opencode/skills/aedmd-rec-ensemble/SKILL.md
+# docking          → .opencode/skills/aedmd-dock-run/SKILL.md
+# complex_setup    → .opencode/skills/aedmd-com-setup/SKILL.md
+# complex_md       → .opencode/skills/aedmd-com-md/SKILL.md
+# mmpbsa           → .opencode/skills/aedmd-com-mmpbsa/SKILL.md
+# analysis         → .opencode/skills/aedmd-com-analyze/SKILL.md
 
 # Invoke command (example for docking):
 scripts/commands/dock-run.sh --config config.ini
@@ -390,16 +388,18 @@ check_handoff_result "docking"   # uses scripts/commands/common.sh::check_handof
 #   2 → needs_review
 ```
 
+`scripts/commands/common.sh` persists stage handoffs to `.handoffs/{stage}.json` by invoking `python -m scripts.agents ... --output .handoffs/{stage}.json` in `dispatch_agent`.
+
 ### Step 6: Run Checker-Validate
 
 ```bash
 scripts/commands/checker-validate.sh --config config.ini --stage docking
 ```
 
-- Load skill: `.opencode/skills/checker-validate/SKILL.md`
+- Load skill: `.opencode/skills/aedmd-checker-validate/SKILL.md`
 - On pass → update HandoffRecord `next_action` → advance to next stage
 - On warn → present to human; await approval
-- On fail → proceed to debugger-diagnose
+- On fail → proceed to aedmd-debugger-diagnose
 
 ### Step 7: Handle Failure (if needed)
 
@@ -407,7 +407,7 @@ scripts/commands/checker-validate.sh --config config.ini --stage docking
 scripts/commands/debugger-diagnose.sh --config config.ini --stage docking
 ```
 
-- Load skill: `.opencode/skills/debugger-diagnose/SKILL.md`
+- Load skill: `.opencode/skills/aedmd-debugger-diagnose/SKILL.md`
 - Apply recommended fix
 - Retry stage (max 2 retries)
 - If still failing: write `status=blocked` HandoffRecord; escalate to human
@@ -419,7 +419,7 @@ scripts/commands/debugger-diagnose.sh --config config.ini --stage docking
 # Repeat Steps 3–7 for each stage until analysis completes
 
 # On workflow completion:
-# Write .handoffs/workflow_complete.json with status=complete
+# Write .handoffs/workflow_complete.json with status=success
 # Generate summary from all stage HandoffRecords
 ```
 
@@ -429,31 +429,31 @@ scripts/commands/debugger-diagnose.sh --config config.ini --stage docking
 
 | Skill | Path |
 |-------|------|
-| rec-ensemble | `.opencode/skills/rec-ensemble/SKILL.md` |
-| dock-run | `.opencode/skills/dock-run/SKILL.md` |
-| com-setup | `.opencode/skills/com-setup/SKILL.md` |
-| com-md | `.opencode/skills/com-md/SKILL.md` |
-| com-mmpbsa | `.opencode/skills/com-mmpbsa/SKILL.md` |
-| com-analyze | `.opencode/skills/com-analyze/SKILL.md` |
-| checker-validate | `.opencode/skills/checker-validate/SKILL.md` |
-| debugger-diagnose | `.opencode/skills/debugger-diagnose/SKILL.md` |
-| orchestrator-resume | `.opencode/skills/orchestrator-resume/SKILL.md` |
-| status | `.opencode/skills/status/SKILL.md` |
+| aedmd-rec-ensemble | `.opencode/skills/aedmd-rec-ensemble/SKILL.md` |
+| aedmd-dock-run | `.opencode/skills/aedmd-dock-run/SKILL.md` |
+| aedmd-com-setup | `.opencode/skills/aedmd-com-setup/SKILL.md` |
+| aedmd-com-md | `.opencode/skills/aedmd-com-md/SKILL.md` |
+| aedmd-com-mmpbsa | `.opencode/skills/aedmd-com-mmpbsa/SKILL.md` |
+| aedmd-com-analyze | `.opencode/skills/aedmd-com-analyze/SKILL.md` |
+| aedmd-checker-validate | `.opencode/skills/aedmd-checker-validate/SKILL.md` |
+| aedmd-debugger-diagnose | `.opencode/skills/aedmd-debugger-diagnose/SKILL.md` |
+| aedmd-orchestrator-resume | `.opencode/skills/aedmd-orchestrator-resume/SKILL.md` |
+| aedmd-status | `.opencode/skills/aedmd-status/SKILL.md` |
 
 ## 7. All Command Script Paths (Quick Reference)
 
 | Command | Script |
 |---------|--------|
-| `/rec-ensemble` | `scripts/commands/rec-ensemble.sh` |
-| `/dock-run` | `scripts/commands/dock-run.sh` |
-| `/com-setup` | `scripts/commands/com-setup.sh` |
-| `/com-md` | `scripts/commands/com-md.sh` |
-| `/com-mmpbsa` | `scripts/commands/com-mmpbsa.sh` |
-| `/com-analyze` | `scripts/commands/com-analyze.sh` |
-| `/checker-validate` | `scripts/commands/checker-validate.sh` |
-| `/debugger-diagnose` | `scripts/commands/debugger-diagnose.sh` |
-| `/orchestrator-resume` | `scripts/commands/orchestrator-resume.sh` |
-| `/status` | `scripts/commands/status.sh` |
+| `/aedmd-rec-ensemble` | `scripts/commands/rec-ensemble.sh` |
+| `/aedmd-dock-run` | `scripts/commands/dock-run.sh` |
+| `/aedmd-com-setup` | `scripts/commands/com-setup.sh` |
+| `/aedmd-com-md` | `scripts/commands/com-md.sh` |
+| `/aedmd-com-mmpbsa` | `scripts/commands/com-mmpbsa.sh` |
+| `/aedmd-com-analyze` | `scripts/commands/com-analyze.sh` |
+| `/aedmd-checker-validate` | `scripts/commands/checker-validate.sh` |
+| `/aedmd-debugger-diagnose` | `scripts/commands/debugger-diagnose.sh` |
+| `/aedmd-orchestrator-resume` | `scripts/commands/orchestrator-resume.sh` |
+| `/aedmd-status` | `scripts/commands/aedmd-status.sh` |
 
 **Shared utilities:** `scripts/commands/common.sh` (sourced by all above).
 

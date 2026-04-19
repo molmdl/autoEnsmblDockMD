@@ -390,7 +390,7 @@ bash scripts/run_pipeline.sh --config work/my_project/config.ini --list-stages
 Then inspect workspace status via the project status command wrapper:
 
 ```bash
-bash scripts/commands/status.sh --workdir work/my_project
+bash scripts/commands/aedmd-status.sh --workdir work/my_project
 ```
 
 If `status` or `--list-stages` reports missing config keys/paths, fix those first to avoid expensive failed jobs.
@@ -402,7 +402,7 @@ For script paths, stage aliases, and full command inventory, always cross-check 
 
 ### Agent skill reference format (for slash-command users)
 
-If you use agent/slash-command workflows, skill references point to `.opencode/skills/{name}/SKILL.md`.
+If you use agent/slash-command workflows, skill references point to `.opencode/skills/aedmd-{name}/SKILL.md`.
 These skill files use YAML frontmatter with `name`, `description`, `license`, `compatibility`, and `metadata`, followed by operational sections such as **When to use this skill**, **Prerequisites**, **Usage**, **Parameters**, and troubleshooting guidance.
 
 ### How to use this section with `WORKFLOW.md`
@@ -424,7 +424,7 @@ These skill files use YAML frontmatter with `name`, `description`, `license`, `c
 **Key commands to run**
 - `source ./scripts/setenv.sh`
 - `bash scripts/run_pipeline.sh --config work/my_project/config.ini --list-stages`
-- Optional workspace readiness check: `bash scripts/commands/status.sh --workdir work/my_project`
+- Optional workspace readiness check: `bash scripts/commands/aedmd-status.sh --workdir work/my_project`
 - See `WORKFLOW.md` Stage 0 for infra-level script references.
 
 **Check before proceeding**

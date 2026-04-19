@@ -203,7 +203,8 @@ If you are new to this project, start with the full run once, then switch to sta
 Agent-based execution is available but remains experimental.
 The stable baseline for reproducible scientific runs is still the script workflow documented in [WORKFLOW.md](./WORKFLOW.md).
 If you use slash commands or agent skills, treat them as orchestration accelerators around the same underlying scripts.
-Skill definitions are stored at `.opencode/skills/{name}/SKILL.md` and use YAML frontmatter (`name`, `description`, `license`, `compatibility`, `metadata`).
+Skill definitions are stored at `.opencode/skills/aedmd-{name}/SKILL.md` and use YAML frontmatter (`name`, `description`, `license`, `compatibility`, `metadata`).
+Project slash commands use the `aedmd-` namespace (for example `/aedmd-status`, `/aedmd-dock-run`, and `/aedmd-com-setup`) to avoid collisions with generic command names.
 See [AGENTS.md](./AGENTS.md) for role boundaries, handoff pattern, and command mapping.
 
 ## Contributing
