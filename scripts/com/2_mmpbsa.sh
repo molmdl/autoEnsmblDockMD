@@ -94,8 +94,11 @@ LIGAND_DIR="$(get_config mmpbsa ligand_dir "${MMPBSA_WORKDIR}")"
 CHUNK_DIR_PREFIX="$(get_config mmpbsa chunk_dir_prefix "mmpbsa_")"
 INDEX_FILE_NAME="$(get_config mmpbsa index_file "index.ndx")"
 MMPBSA_INPUT_NAME="$(get_config mmpbsa mmpbsa_input "mmpbsa.in")"
-RECEPTOR_GROUP_ID="$(get_config mmpbsa receptor_group_id "1")"
-LIGAND_GROUP_ID="$(get_config mmpbsa ligand_group_id "12")"
+GROUP_IDS_FILE_NAME="$(get_config mmpbsa group_ids_file "mmpbsa_groups.dat")"
+RECEPTOR_GROUP_NAME="$(get_config mmpbsa receptor_group "Protein")"
+LIGAND_GROUP_NAME="$(get_config mmpbsa ligand_group "Other")"
+RECEPTOR_GROUP_ID=""
+LIGAND_GROUP_ID=""
 MPI_RANKS="$(get_config mmpbsa mpi_ranks "16")"
 
 FF_MODE="$(get_config mmpbsa ff "$(get_config complex ff "charmm")")"
@@ -162,6 +165,128 @@ resolve_topology() {
     exit 1
 }
 
+resolve_group_ids_from_index() {
+    local index_path="$1"
+    local receptor_group="$2"
+    local ligand_group="$3"
+
+    python - "${index_path}" "${receptor_group}" "${ligand_group}" <<'PY'
+import re
+import sys
+
+index_path, receptor_name, ligand_name = sys.argv[1:4]
+group_names = []
+with open(index_path, "r", encoding="utf-8") as handle:
+    for line in handle:
+        match = re.match(r"^\s*\[(.+)\]\s*$", line)
+        if match:
+            group_names.append(match.group(1).strip())
+
+if not group_names:
+    print(f"ERROR: No groups found in index file: {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+def find_group_id(target: str):
+    for idx, name in enumerate(group_names):
+        if name == target:
+            return idx
+    return None
+
+receptor_id = find_group_id(receptor_name)
+if receptor_id is None:
+    print(f"ERROR: Receptor group '{receptor_name}' not found in {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+ligand_id = find_group_id(ligand_name)
+if ligand_id is None:
+    print(f"ERROR: Ligand group '{ligand_name}' not found in {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"receptor_group_id={receptor_id}")
+print(f"ligand_group_id={ligand_id}")
+PY
+}
+
+resolve_mmpbsa_groups() {
+    local lig_path="$1"
+    local index_path="$2"
+    local groups_file="${lig_path}/${GROUP_IDS_FILE_NAME}"
+    local cfg_receptor cfg_ligand
+    local has_cfg_receptor=0
+    local has_cfg_ligand=0
+    local file_receptor=""
+    local file_ligand=""
+    local parsed=""
+
+    cfg_receptor="$(get_config mmpbsa receptor_group_id "1")"
+    cfg_ligand="$(get_config mmpbsa ligand_group_id "12")"
+    if config_has mmpbsa receptor_group_id; then
+        has_cfg_receptor=1
+    fi
+    if config_has mmpbsa ligand_group_id; then
+        has_cfg_ligand=1
+    fi
+
+    if [[ ${has_cfg_receptor} -eq 1 && ${has_cfg_ligand} -eq 1 && ( "${cfg_receptor}" != "1" || "${cfg_ligand}" != "12" ) ]]; then
+        if ! [[ "${cfg_receptor}" =~ ^[0-9]+$ ]] || ! [[ "${cfg_ligand}" =~ ^[0-9]+$ ]]; then
+            log_error "Configured [mmpbsa] receptor_group_id/ligand_group_id must be integers (got '${cfg_receptor}'/'${cfg_ligand}')"
+            exit 1
+        fi
+        RECEPTOR_GROUP_ID="${cfg_receptor}"
+        LIGAND_GROUP_ID="${cfg_ligand}"
+        log_info "Using configured MM/PBSA group IDs (override): receptor=${RECEPTOR_GROUP_ID}, ligand=${LIGAND_GROUP_ID}"
+        return
+    fi
+
+    if [[ -f "${groups_file}" ]]; then
+        file_receptor="$(python - "${groups_file}" <<'PY'
+import sys
+for line in open(sys.argv[1], 'r', encoding='utf-8'):
+    line = line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    k, v = line.split('=', 1)
+    if k.strip() == 'receptor_group_id':
+        print(v.strip())
+        break
+PY
+)"
+        file_ligand="$(python - "${groups_file}" <<'PY'
+import sys
+for line in open(sys.argv[1], 'r', encoding='utf-8'):
+    line = line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    k, v = line.split('=', 1)
+    if k.strip() == 'ligand_group_id':
+        print(v.strip())
+        break
+PY
+)"
+
+        if [[ "${file_receptor}" =~ ^[0-9]+$ ]] && [[ "${file_ligand}" =~ ^[0-9]+$ ]]; then
+            RECEPTOR_GROUP_ID="${file_receptor}"
+            LIGAND_GROUP_ID="${file_ligand}"
+            log_info "Using MM/PBSA group IDs from ${groups_file}: receptor=${RECEPTOR_GROUP_ID}, ligand=${LIGAND_GROUP_ID}"
+            return
+        fi
+
+        log_warn "Ignoring invalid group IDs in ${groups_file}; resolving from ${index_path}"
+    fi
+
+    parsed="$(resolve_group_ids_from_index "${index_path}" "${RECEPTOR_GROUP_NAME}" "${LIGAND_GROUP_NAME}")"
+    RECEPTOR_GROUP_ID="$(printf '%s\n' "${parsed}" | python -c 'import sys; kv=dict(line.strip().split("=", 1) for line in sys.stdin if "=" in line); print(kv.get("receptor_group_id", ""))')"
+    LIGAND_GROUP_ID="$(printf '%s\n' "${parsed}" | python -c 'import sys; kv=dict(line.strip().split("=", 1) for line in sys.stdin if "=" in line); print(kv.get("ligand_group_id", ""))')"
+
+    if ! [[ "${RECEPTOR_GROUP_ID}" =~ ^[0-9]+$ ]] || ! [[ "${LIGAND_GROUP_ID}" =~ ^[0-9]+$ ]]; then
+        log_error "Unable to resolve MM/PBSA receptor/ligand group IDs from ${index_path}"
+        log_error "Provide valid [mmpbsa] receptor_group_id/ligand_group_id overrides or regenerate ${GROUP_IDS_FILE_NAME} via 2_trj4mmpbsa.sh"
+        exit 1
+    fi
+
+    log_info "Using MM/PBSA group IDs resolved from ${index_path}: receptor=${RECEPTOR_GROUP_ID}, ligand=${LIGAND_GROUP_ID}"
+}
+
 lig_path="$(resolve_ligand_path "${LIGAND_OVERRIDE}")"
 chunk_dir="${lig_path}/${CHUNK_DIR_PREFIX}${CHUNK_OVERRIDE}"
 index_file="${lig_path}/${INDEX_FILE_NAME}"
@@ -171,6 +296,8 @@ require_dir "${chunk_dir}" "Missing chunk directory: ${chunk_dir}"
 require_file "${chunk_dir}/com.tpr" "Missing chunk topology: ${chunk_dir}/com.tpr"
 require_file "${chunk_dir}/com_traj.xtc" "Missing chunk trajectory: ${chunk_dir}/com_traj.xtc"
 require_file "${index_file}" "Missing index file: ${index_file}"
+
+resolve_mmpbsa_groups "${lig_path}" "${index_file}"
 
 mmpbsa_input="${chunk_dir}/${MMPBSA_INPUT_NAME}"
 if [[ ! -f "${mmpbsa_input}" ]]; then

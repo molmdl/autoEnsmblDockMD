@@ -88,6 +88,7 @@ RECEPTOR_GROUP="$(get_config mmpbsa receptor_group "Protein")"
 LIGAND_GROUP="$(get_config mmpbsa ligand_group "Other")"
 COMPLEX_GROUP_NAME="$(get_config mmpbsa complex_group_name "Protein_Other")"
 INDEX_FILE_NAME="$(get_config mmpbsa index_file "index.ndx")"
+GROUP_IDS_FILE_NAME="$(get_config mmpbsa group_ids_file "mmpbsa_groups.dat")"
 SOURCE_XTC_PATTERN="$(get_config mmpbsa source_xtc_pattern "prod_%d.xtc")"
 SOURCE_TPR_PATTERN="$(get_config mmpbsa source_tpr_pattern "prod_%d.tpr")"
 CHUNK_DIR_PREFIX="$(get_config mmpbsa chunk_dir_prefix "mmpbsa_")"
@@ -166,6 +167,74 @@ PY
     printf '%s\n' "${complex_group_id}"
 }
 
+resolve_group_ids_from_index() {
+    local index_file="$1"
+    local receptor_group="$2"
+    local ligand_group="$3"
+    local complex_group_name="$4"
+
+    python - "${index_file}" "${receptor_group}" "${ligand_group}" "${complex_group_name}" <<'PY'
+import re
+import sys
+
+index_path, receptor_name, ligand_name, complex_name = sys.argv[1:5]
+
+group_names = []
+with open(index_path, "r", encoding="utf-8") as handle:
+    for line in handle:
+        match = re.match(r"^\s*\[(.+)\]\s*$", line)
+        if match:
+            group_names.append(match.group(1).strip())
+
+if not group_names:
+    print(f"ERROR: No groups found in index file: {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+def find_group_id(target: str):
+    for idx, name in enumerate(group_names):
+        if name == target:
+            return idx
+    return None
+
+receptor_id = find_group_id(receptor_name)
+if receptor_id is None:
+    print(f"ERROR: Receptor group '{receptor_name}' not found in {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+ligand_id = find_group_id(ligand_name)
+if ligand_id is None:
+    print(f"ERROR: Ligand group '{ligand_name}' not found in {index_path}", file=sys.stderr)
+    sys.exit(1)
+
+complex_id = find_group_id(complex_name)
+if complex_id is None:
+    complex_id = len(group_names) - 1
+
+print(f"receptor_group_id={receptor_id}")
+print(f"ligand_group_id={ligand_id}")
+print(f"complex_group_id={complex_id}")
+PY
+}
+
+write_group_ids_file() {
+    local ligand_dir="$1"
+    local index_file="$2"
+    local receptor_group_id="$3"
+    local ligand_group_id="$4"
+    local complex_group_id="$5"
+    local group_ids_file="${ligand_dir}/${GROUP_IDS_FILE_NAME}"
+
+    cat >"${group_ids_file}" <<EOF
+receptor_group_id=${receptor_group_id}
+ligand_group_id=${ligand_group_id}
+complex_group_id=${complex_group_id}
+receptor_group=${RECEPTOR_GROUP}
+ligand_group=${LIGAND_GROUP}
+complex_group_name=${COMPLEX_GROUP_NAME}
+index_file=$(basename "${index_file}")
+EOF
+}
+
 process_chunk() {
     local ligand_dir="$1"
     local chunk_idx="$2"
@@ -210,16 +279,31 @@ for lig_path in "${TARGETS[@]}"; do
     lig_name="$(basename "${lig_path}")"
     first_tpr="${lig_path}/$(printf "${SOURCE_TPR_PATTERN}" 0)"
     index_file="${lig_path}/${INDEX_FILE_NAME}"
+    group_ids_out=""
+    receptor_group_id=""
+    ligand_group_id=""
     complex_group_id=""
 
     require_file "${first_tpr}" "Missing seed topology for index generation: ${first_tpr}"
-    complex_group_id="$(make_index_with_complex_group "${first_tpr}" "${index_file}")"
+    make_index_with_complex_group "${first_tpr}" "${index_file}" >/dev/null
+
+    group_ids_out="$(resolve_group_ids_from_index "${index_file}" "${RECEPTOR_GROUP}" "${LIGAND_GROUP}" "${COMPLEX_GROUP_NAME}")"
+    receptor_group_id="$(printf '%s\n' "${group_ids_out}" | python -c 'import sys; kv=dict(line.strip().split("=", 1) for line in sys.stdin if "=" in line); print(kv.get("receptor_group_id", ""))')"
+    ligand_group_id="$(printf '%s\n' "${group_ids_out}" | python -c 'import sys; kv=dict(line.strip().split("=", 1) for line in sys.stdin if "=" in line); print(kv.get("ligand_group_id", ""))')"
+    complex_group_id="$(printf '%s\n' "${group_ids_out}" | python -c 'import sys; kv=dict(line.strip().split("=", 1) for line in sys.stdin if "=" in line); print(kv.get("complex_group_id", ""))')"
+
+    if ! [[ "${receptor_group_id}" =~ ^[0-9]+$ ]] || ! [[ "${ligand_group_id}" =~ ^[0-9]+$ ]] || ! [[ "${complex_group_id}" =~ ^[0-9]+$ ]]; then
+        log_error "Failed to resolve receptor/ligand/complex group IDs from ${index_file}"
+        exit 1
+    fi
+
+    write_group_ids_file "${lig_path}" "${index_file}" "${receptor_group_id}" "${ligand_group_id}" "${complex_group_id}"
 
     for chunk in $(seq 0 $((N_CHUNKS - 1))); do
         process_chunk "${lig_path}" "${chunk}" "${index_file}" "${complex_group_id}"
     done
 
-    log_info "Prepared ${N_CHUNKS} MM/PBSA chunk(s) for ${lig_name} (complex group ${complex_group_id})"
+    log_info "Prepared ${N_CHUNKS} MM/PBSA chunk(s) for ${lig_name} (receptor/ligand/complex IDs: ${receptor_group_id}/${ligand_group_id}/${complex_group_id})"
 done
 
 log_info "Trajectory preparation for MM/PBSA complete"
