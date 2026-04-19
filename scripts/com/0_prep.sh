@@ -177,6 +177,7 @@ write_combined_gro() {
     local output_gro="$3"
     python - "$receptor_gro" "$ligand_gro" "$output_gro" <<'PY'
 import pathlib
+import re
 import sys
 
 rec = pathlib.Path(sys.argv[1]).read_text().splitlines()
@@ -192,9 +193,38 @@ try:
 except ValueError as exc:
     raise SystemExit(f"Invalid GRO atom count: {exc}")
 
-rec_coords = rec[2:2 + rec_n]
-lig_coords = lig[2:2 + lig_n]
-box = rec[-1].strip()
+if rec_n <= 0 or lig_n <= 0:
+    raise SystemExit("Invalid GRO atom count: receptor and ligand atom counts must be > 0")
+
+rec_box_idx = 2 + rec_n
+lig_box_idx = 2 + lig_n
+
+if len(rec) < rec_box_idx + 1:
+    raise SystemExit(
+        f"Receptor GRO is truncated: header declares {rec_n} atoms but file has insufficient coordinate/box lines"
+    )
+if len(lig) < lig_box_idx + 1:
+    raise SystemExit(
+        f"Ligand GRO is truncated: header declares {lig_n} atoms but file has insufficient coordinate/box lines"
+    )
+
+rec_coords = rec[2:rec_box_idx]
+lig_coords = lig[2:lig_box_idx]
+if len(rec_coords) != rec_n:
+    raise SystemExit(f"Receptor GRO coordinate count mismatch: header={rec_n}, lines={len(rec_coords)}")
+if len(lig_coords) != lig_n:
+    raise SystemExit(f"Ligand GRO coordinate count mismatch: header={lig_n}, lines={len(lig_coords)}")
+
+box = rec[rec_box_idx].strip()
+if not box:
+    raise SystemExit("Invalid receptor GRO: missing box line")
+
+box_tokens = box.split()
+if len(box_tokens) not in (3, 9):
+    raise SystemExit(f"Invalid GRO box line: expected 3 or 9 floats, got {len(box_tokens)} fields")
+for token in box_tokens:
+    if not re.match(r"^[+-]?(\d+\.\d*|\d*\.\d+|\d+)([eE][+-]?\d+)?$", token):
+        raise SystemExit(f"Invalid GRO box value: '{token}'")
 
 merged = []
 merged.append("Complex system")
@@ -202,6 +232,13 @@ merged.append(str(rec_n + lig_n))
 merged.extend(rec_coords)
 merged.extend(lig_coords)
 merged.append(box)
+
+merged_atom_count = len(merged[2:-1])
+expected_atom_count = rec_n + lig_n
+if merged_atom_count != expected_atom_count:
+    raise SystemExit(
+        f"Merged GRO atom count mismatch: expected {expected_atom_count}, produced {merged_atom_count}"
+    )
 
 out.write_text("\n".join(merged) + "\n")
 PY
