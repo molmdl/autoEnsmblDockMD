@@ -20,9 +20,9 @@ status() {
 
   if [[ -f "$config_file" ]]; then
     mode="$(awk -F'=' '
-      $0 ~ /^\[workflow\]/ { in_workflow=1; next }
-      /^\[/ { in_workflow=0 }
-      in_workflow && $1 ~ /^[[:space:]]*mode[[:space:]]*$/ {
+      $0 ~ /^\[docking\]/ { in_docking=1; next }
+      /^\[/ { in_docking=0 }
+      in_docking && $1 ~ /^[[:space:]]*mode[[:space:]]*$/ {
         gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2)
         print $2
         exit
