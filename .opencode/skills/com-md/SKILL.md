@@ -1,43 +1,50 @@
-# Skill: com-md
-**Stage:** complex_md
-**Agent:** runner
+---
+name: com-md
+description: Use when running equilibration and production molecular dynamics for prepared receptor-ligand complexes.
+license: MIT
+compatibility: Requires gnina, gromacs 2022+, python 3.10+
+metadata:
+  author: autoEnsmblDockMD
+  version: "1.0"
+  agent: runner
+  stage: complex_md
+---
 
-## Capability
-Run equilibration and production molecular dynamics for prepared receptor-ligand complexes across ligands and trials. Produce standardized trajectory outputs for MM/PBSA and analysis stages.
+# Complex MD Production
+
+This skill runs configured equilibration and production MD trials for each prepared complex, producing trajectories and simulation logs for downstream energy and structural analysis.
+
+## When to use this skill
+- Complex systems are prepared and ready for simulation.
+- You need production trajectories for MM/PBSA and trajectory analysis.
+- You want standardized multi-trial MD submission on local or Slurm environments.
+- You need to enforce configured MDP protocol across ligands.
+
+## Prerequisites
+- Complex preparation outputs exist in `complex.workdir`.
+- Required MDP files are available in `production.mdp_dir`.
+- `config.ini` contains a valid `[production]` section.
+
+## Usage
+Command: `scripts/commands/com-md.sh --config config.ini`
+Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters
-| Parameter | Config Key | Required | Description |
-|-----------|------------|----------|-------------|
-| Production workdir | `production.workdir` | Yes | Root directory containing prepared ligand complex jobs. |
-| Ligand source dir | `production.ligand_dir` | Yes | Directory scanned for ligand folders to execute MD runs. |
-| Ligand selector | `production.ligand_pattern` | Yes | Pattern used to select ligands for production execution. |
-| Number of trials | `production.n_trials` | Yes | Independent production trajectories per ligand. |
-| Equilibration stages | `production.n_equilibration_stages` | Yes | Number of additional equilibration stages after `pr0`. |
-| MDP directory | `production.mdp_dir` | Yes | Directory containing equilibration and production MDP files. |
-| Production MDP | `production.production_mdp` | Yes | MDP file used for production simulation jobs. |
-| OpenMP threads | `production.ntomp` | Yes | Thread count passed to GROMACS runtime/jobs. |
-| Slurm partition | `production.partition` | Yes | Cluster partition used for production submissions. |
-| GPU count | `production.gpus` | Yes | GPUs requested per production job when scheduled on Slurm. |
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Production workdir | `production.workdir` | `--workdir` | `${complex:workdir}` | Root directory containing ligand complex jobs. |
+| Number of trials | `production.n_trials` | `--n-trials` | `4` | Independent production trajectories per ligand. |
+| Equilibration stages | `production.n_equilibration_stages` | `--n-equil-stages` | `1` | Additional equilibration stages before production. |
+| Production MDP | `production.production_mdp` | `--production-mdp` | `md.mdp` | MDP file for production run. |
+| CPU threads | `production.ntomp` | `--ntomp` | `8` | OpenMP threads used by GROMACS jobs. |
+| Slurm partition | `production.partition` | `--partition` | `rtx4090` | Target partition for submitted jobs. |
 
-## Scripts
-| Script | Purpose |
-|--------|---------|
-| `scripts/commands/com-md.sh` | Command entrypoint that dispatches complex MD workflow. |
-| `scripts/com/1_pr_prod.sh` | Submit/execute equilibration and production MD runs with dependencies. |
+## Expected Output
+- Production trajectories (`prod_*.xtc`/`prod_*.tpr`) and logs per ligand.
+- Completed MD run directories under `com/LIGAND_ID/`.
+- Handoff record at `.handoffs/complex_md.json`.
 
-## Success Criteria
-- Production outputs (`prod_*.xtc`, `prod_*.tpr`, logs) are generated for configured ligands and trials.
-- Stage handoff `.handoffs/complex_md.json` confirms successful MD execution ready for downstream analysis.
-
-## Usage Example
-Slash command: `/com-md --config config.ini`
-
-Agent invocation: `python -m scripts.agents --agent runner --input handoff.json`
-
-## Workflow
-1. Validate that complex setup artifacts and required production MDP files are present.
-2. Resolve ligand targets from `production.ligand_dir` and selection keys.
-3. Launch equilibration sequence and production MD trials via configured scheduler/runtime settings.
-4. Monitor run completion and verify expected trajectory/topology outputs per ligand.
-5. Write handoff metadata for MM/PBSA and trajectory analysis consumers.
-6. On failure, inspect `grompp` inputs, scheduler resource constraints, and stability indications in logs.
+## Troubleshooting
+- `grompp` failure: validate ligand/receptor topology includes and index groups.
+- Jobs pending/failing on Slurm: verify `partition`, GPU, and CPU resource settings.
+- Unstable trajectories: review equilibration protocol and restraints in MDP files.

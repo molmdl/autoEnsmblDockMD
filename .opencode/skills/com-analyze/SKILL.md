@@ -1,45 +1,50 @@
-# Skill: com-analyze
-**Stage:** complex_analysis
-**Agent:** runner
+---
+name: com-analyze
+description: Use when analyzing complex MD trajectories to generate RMSD, RMSF, contact, and hydrogen-bond summaries for ligand comparison.
+license: MIT
+compatibility: Requires gnina, gromacs 2022+, python 3.10+
+metadata:
+  author: autoEnsmblDockMD
+  version: "1.0"
+  agent: analyzer
+  stage: complex_analysis
+---
 
-## Capability
-Perform post-MD complex trajectory analysis to generate RMSD, RMSF, hydrogen-bond, and contact metrics for ligand comparison. Produce standardized plots and summary artifacts for validation and reporting.
+# Complex Trajectory Analysis
+
+This skill runs standard post-MD analysis workflows and optional advanced trajectory analytics to produce per-ligand metrics, plots, and comparative summaries.
+
+## When to use this skill
+- Production MD and (optionally) MM/PBSA are complete.
+- You need RMSD/RMSF/H-bond trends for stability assessment.
+- You need contact metrics and analysis artifacts for reporting.
+- You want standardized analysis outputs before checker validation.
+
+## Prerequisites
+- Complex trajectory files exist in ligand run directories.
+- `config.ini` contains `[analysis]` settings and valid group selections.
+- GROMACS and Python analysis dependencies are available.
+
+## Usage
+Command: `scripts/commands/com-analyze.sh --config config.ini`
+Agent dispatch: `python -m scripts.agents --agent analyzer --input handoff.json`
 
 ## Parameters
-| Parameter | Config Key | Required | Description |
-|-----------|------------|----------|-------------|
-| Output subdirectory | `analysis.output_subdir` | Yes | Per-ligand subdirectory where analysis artifacts are written. |
-| Run RMSD block | `analysis.run_rmsd` | Yes | Enable RMSD calculations and associated plot/output generation. |
-| Run RMSF block | `analysis.run_rmsf` | Yes | Enable RMSF calculations and associated plot/output generation. |
-| Run H-bond block | `analysis.run_hbond` | Yes | Enable hydrogen-bond analysis between configured groups. |
-| Run advanced block | `analysis.run_advanced` | Yes | Enable MDAnalysis-based advanced analysis pipeline. |
-| Plot format | `analysis.plot_format` | Yes | Image format for generated analysis plots (e.g., `png`). |
-| Plot DPI | `analysis.plot_dpi` | Yes | Resolution used for plot rendering outputs. |
-| Contact cutoff | `analysis.contact_cutoff` | Yes | Distance threshold (Å) for contact calculations. |
-| RMSD reference group | `analysis.gmx_rmsd_ref_group` | Yes | GROMACS group ID used as RMSD reference selection. |
-| H-bond group B | `analysis.gmx_hbond_group_b` | Yes | GROMACS group ID for ligand/partner in H-bond analysis. |
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Output subdirectory | `analysis.output_subdir` | `--output-subdir` | `analysis` | Folder name for generated analysis artifacts. |
+| Run RMSD | `analysis.run_rmsd` | `--run-rmsd` | `true` | Enable RMSD calculations and plots. |
+| Run RMSF | `analysis.run_rmsf` | `--run-rmsf` | `true` | Enable RMSF calculations and plots. |
+| Run H-bond | `analysis.run_hbond` | `--run-hbond` | `true` | Enable hydrogen-bond analysis between groups. |
+| Run advanced | `analysis.run_advanced` | `--run-advanced` | `true` | Enable MDAnalysis-based advanced analytics. |
+| Contact cutoff | `analysis.contact_cutoff` | `--contact-cutoff` | `4.5` | Distance cutoff (Å) for contact analysis. |
 
-## Scripts
-| Script | Purpose |
-|--------|---------|
-| `scripts/commands/com-analyze.sh` | Command entrypoint that dispatches complex analysis workflow. |
-| `scripts/com/3_ana.sh` | Unified GROMACS + Python analysis runner for post-MD metrics. |
-| `scripts/com/3_com_ana_trj.py` | Advanced trajectory-analysis core for contact-centric metrics. |
-| `scripts/com/3_selection_defaults.py` | Default atom/group selection helper for analysis routines. |
+## Expected Output
+- Per-ligand plots/data under `com*/LIGAND_ID/analysis/`.
+- Comparative analysis artifacts in `com_ana/` when enabled by workflow.
+- Handoff record at `.handoffs/complex_analysis.json`.
 
-## Success Criteria
-- Requested analysis blocks complete and generate expected plots/data under configured output directories.
-- Stage handoff `.handoffs/complex_analysis.json` records successful analysis completion and artifact paths.
-
-## Usage Example
-Slash command: `/com-analyze --config config.ini`
-
-Agent invocation: `python -m scripts.agents --agent runner --input handoff.json`
-
-## Workflow
-1. Validate trajectory/topology inputs and required `[analysis]` configuration keys.
-2. Resolve target ligands and analysis toggles (RMSD/RMSF/H-bond/advanced).
-3. Run configured analysis blocks and generate per-ligand data/plots.
-4. Aggregate outputs and verify expected artifact files are present.
-5. Emit analysis handoff metadata for checker review.
-6. If outputs are incomplete, inspect group IDs, selection defaults, and advanced-analysis settings.
+## Troubleshooting
+- Missing analysis files: verify trajectory and topology filenames expected by analysis scripts.
+- Group selection errors: adjust `analysis.gmx_*` group IDs in config.
+- Empty advanced metrics: check atom selections and contact cutoff appropriateness.

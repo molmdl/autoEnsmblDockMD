@@ -1,33 +1,36 @@
-# Skill: status
-**Stage:** workspace_status
-**Agent:** orchestrator
+---
+name: status
+description: Use when inspecting current workspace progress, detected workflow mode, completed stages, pending stages, and last handoff status.
+license: MIT
+compatibility: Requires gnina, gromacs 2022+, python 3.10+
+metadata:
+  author: autoEnsmblDockMD
+  version: "1.0"
+  agent: none
+  stage: workspace_status
+---
 
-## Capability
-Inspect workspace execution progress and summarize detected workflow mode, completed stages, pending stages, and latest handoff outcomes. Provide lightweight read-only situational awareness before orchestration decisions.
+# Workspace Status Inspection
 
-## Parameters
-| Parameter | Config Key | Required | Description |
-|-----------|------------|----------|-------------|
-| Workspace root | `general.workdir` | Yes | Root workspace inspected for stage outputs and status signals. |
-| Docking mode | `docking.mode` | Conditional | Used to report relevant docking-path expectations in status summaries. |
-| Complex mode | `complex.mode` | Conditional | Used to report AMBER/CHARMM complex-path expectations in status summaries. |
+This skill summarizes workspace execution state without dispatching an agent, including mode/config detection and stage completion signals from handoff artifacts.
 
-## Scripts
-| Script | Purpose |
-|--------|---------|
-| `scripts/commands/status.sh` | Command entrypoint for workspace status introspection and reporting. |
+## When to use this skill
+- You need a quick snapshot before launching the next command.
+- You want to confirm which stages are complete vs pending.
+- You need to inspect the last handoff outcome after interruptions.
 
-## Success Criteria
-- Status output clearly identifies completed vs pending workflow stages.
-- Latest handoff/checkpoint state is reported with enough detail for next action selection.
+## Prerequisites
+- Workspace contains pipeline config and/or prior stage artifacts.
+- `scripts/commands/status.sh` is available.
 
-## Usage Example
-Slash command: `/status --config config.ini`
+## Usage
+Command: `scripts/commands/status.sh --config config.ini`
+Agent dispatch: `N/A (no agent dispatch for this command)`
 
-Agent invocation: `N/A (status is read-only introspection without runner dispatch)`
+## Expected Output
+- Human-readable summary of mode, completed stages, pending stages.
+- Last handoff status and path hints to relevant logs/artifacts.
 
-## Workflow
-1. Read config and workspace artifacts to infer workflow mode and stage context.
-2. Inspect handoff/checkpoint files to determine completion status per stage.
-3. Summarize latest stage outcome, pending stages, and likely next action.
-4. Return concise status report with pointers to relevant logs/artifacts when issues are detected.
+## Troubleshooting
+- Empty status: verify command is executed from a valid workspace root.
+- Missing mode info: ensure `config.ini` has workflow/docking mode settings.

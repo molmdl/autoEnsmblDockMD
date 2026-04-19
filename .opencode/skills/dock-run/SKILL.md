@@ -1,45 +1,50 @@
-# Skill: dock-run
-**Stage:** docking_run
-**Agent:** runner
+---
+name: dock-run
+description: Use when running gnina ensemble docking in targeted or blind mode after receptor ensemble preparation and ligand setup.
+license: MIT
+compatibility: Requires gnina, gromacs 2022+, python 3.10+
+metadata:
+  author: autoEnsmblDockMD
+  version: "1.0"
+  agent: runner
+  stage: docking_run
+---
 
-## Capability
-Run ensemble docking using gnina in blind, targeted, or test mode against prepared receptor conformers and ligands. Produce ranked docking outputs and handoff metadata for downstream setup stages.
+# Ensemble Docking Execution
+
+This skill executes ligand conversion/prep and gnina docking against receptor ensembles using configuration-driven mode selection (`blind`, `targeted`, or validation `test`).
+
+## When to use this skill
+- Receptor ensemble structures are ready and you need docking results.
+- You need targeted docking with reference-ligand autoboxing.
+- You need blind docking for exploratory binding-site discovery.
+- You want standardized docking reports and ranked poses.
+
+## Prerequisites
+- Receptor ensemble files are available for docking.
+- Ligand inputs are present in configured docking directories.
+- `config.ini` contains `[dock]` and `[docking]` sections.
+
+## Usage
+Command: `scripts/commands/dock-run.sh --config config.ini`
+Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters
-| Parameter | Config Key | Required | Description |
-|-----------|------------|----------|-------------|
-| Workspace root | `general.workdir` | Yes | Root workspace that contains docking directories and shared stage outputs. |
-| Docking workdir | `docking.dock_dir` | Yes | Main directory for receptor/ligand docking artifacts and reports. |
-| Docking mode | `docking.mode` | Yes | Docking mode selector: `blind`, `targeted`, or `test`. |
-| Ligand source directory | `docking.ligands_dir` | Yes | Directory from which ligands are discovered for docking jobs. |
-| Ligand discovery pattern | `docking.ligand_pattern` | Yes | Pattern used to select ligand folders/files. |
-| Receptor directory | `docking.receptor_dir` | Yes | Directory containing receptor conformers used for gnina runs. |
-| Exhaustiveness | `docking.exhaustiveness` | Yes | gnina search thoroughness for each ligand-receptor pair. |
-| Number of modes | `docking.num_modes` | Yes | Maximum poses generated per docking run. |
-| Autobox padding | `docking.autobox_add` | Yes | Padding added to autobox dimensions. |
-| Report output | `docking.report_output` | Yes | Output path for ranked docking report generation. |
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Docking mode | `docking.mode` | `--mode` | `blind` | Selects gnina workflow: `blind`, `targeted`, or `test`. |
+| Dock directory | `docking.dock_dir` | `--dock-dir` | `${general:workdir}/dock` | Workspace for receptor/ligand docking artifacts. |
+| Ligand pattern | `docking.ligand_pattern` | `--ligand-pattern` | `lig*` | Ligand discovery pattern under `docking.ligands_dir`. |
+| Exhaustiveness | `docking.exhaustiveness` | `--exhaustiveness` | `100` | gnina search thoroughness. |
+| Number of modes | `docking.num_modes` | `--num-modes` | `32` | Maximum poses generated per docking run. |
+| Autobox padding | `docking.autobox_add` | `--autobox-add` | `4` | Padding around autobox ligand or receptor. |
 
-## Scripts
-| Script | Purpose |
-|--------|---------|
-| `scripts/commands/dock-run.sh` | Command entrypoint that dispatches docking workflow. |
-| `scripts/dock/1_rec4dock.sh` | Prepare receptor ensemble files in docking workspace. |
-| `scripts/dock/2_gnina.sh` | Execute gnina docking in configured mode. |
-| `scripts/dock/3_dock_report.sh` | Parse pose scores and create ranked docking report. |
+## Expected Output
+- Docking poses/logs under `dock/LIGAND_ID/` directories.
+- Ranked docking report such as `${docking.report_output}`.
+- Handoff record at `.handoffs/docking_run.json`.
 
-## Success Criteria
-- Docking pose outputs and logs are generated for selected ligands under docking workspace folders.
-- Stage handoff `.handoffs/docking_run.json` indicates successful docking and report generation.
-
-## Usage Example
-Slash command: `/dock-run --config config.ini`
-
-Agent invocation: `python -m scripts.agents --agent runner --input handoff.json`
-
-## Workflow
-1. Validate that receptor conformers and ligand inputs exist in configured docking directories.
-2. Prepare docking workspace inputs (receptors/ligands) according to mode and config.
-3. Run gnina docking with configured search and scoring parameters.
-4. Generate ranked docking reports and persist output artifacts.
-5. Emit handoff metadata for downstream complex setup.
-6. Handle common failures by checking gnina availability, receptor discovery paths, and targeted-mode autobox settings.
+## Troubleshooting
+- `gnina` not found: source `scripts/setenv.sh` and verify CLI availability.
+- No receptors discovered: validate `docking.receptor_dir` and receptor prefix.
+- Targeted mode mis-boxed: confirm `docking.reference_ligand` and `autobox_ligand` settings.
