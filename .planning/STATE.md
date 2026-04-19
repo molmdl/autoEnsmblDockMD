@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 5 - Polish |
-| **Current Plan** | 7 of 10 (05-01, 05-02, 05-04, 05-05, 05-06, 05-08, 05-09 completed; 05-03 invalidated/reverted) |
-| **Last Activity** | 2026-04-19 - Completed 05-09-PLAN.md |
-| **Progress** | ██████████████░░ 31/34 plans complete (91%) |
+| **Current Plan** | 8 of 10 (05-01, 05-02, 05-04, 05-05, 05-06, 05-08, 05-09, 05-10 completed; 05-03 invalidated/reverted) |
+| **Last Activity** | 2026-04-19 - Completed 05-10-PLAN.md |
+| **Progress** | ███████████████░ 32/34 plans complete (94%) |
 | **Phase 5 Blocker** | End-to-end test artifacts pending |
 | **Status** | In progress |
 
@@ -67,6 +67,8 @@
 | Delete 05-03-SUMMARY.md after remediation | Prevents stale summary from representing reverted/invalidated changes | 5 |
 | Add explicit Skill File Contract section in AGENTS.md | Locks canonical path/frontmatter schema in agent-facing documentation | 5 |
 | Add YAML-frontmatter skill references in README/GUIDE with minimal edits | Aligns surviving docs to restored SKILL.md format without broad rewrites | 5 |
+| Remediate missing required `Parameters` sections during structural validation | Ensures all skills satisfy enforced contract (including CLI Flag/Default columns) | 5 |
+| Add `scripts/com/mmpbsa.in` as canonical default input template | Resolves config/doc runtime reference to existing in-repo artifact | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -86,15 +88,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 15:35 +0800
-Stopped at: Completed 05-09-PLAN.md
+Last session: 2026-04-19 15:43 +0800
+Stopped at: Completed 05-10-PLAN.md
 Resume file: None
 
 ### Next Action
 
 **Phase 5 is in progress.**
 
-**Recommend:** Continue with 05-10-PLAN.md.
+**Recommend:** Collect end-to-end test artifacts to close remaining Phase 5 blocker.
 
 ### Recent Milestones
 
@@ -113,6 +115,7 @@ Resume file: None
 - 2026-04-19: Phase 5 plan 06 executed (GUIDE.md Part 2 stage instructions + troubleshooting)
 - 2026-04-19: Phase 5 plan 08 executed (SKILL.md restoration + invalidated summary cleanup)
 - 2026-04-19: Phase 5 plan 09 executed (cross-doc compatibility alignment with restored skill format)
+- 2026-04-19: Phase 5 plan 10 executed (end-to-end structural validation + report)
 
 ### Planning Status
 
@@ -146,4 +149,4 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-09-PLAN.md and created 05-09-SUMMARY.md*
+*Last action: Completed 05-10-PLAN.md and created 05-10-SUMMARY.md*
