@@ -8,6 +8,7 @@ commands locally or submitting jobs to Slurm scheduler.
 
 import argparse
 import os
+import shlex
 import subprocess
 import sys
 import time
@@ -556,7 +557,7 @@ Examples:
         elif args.command == 'local':
             executor = LocalExecutor()
             # Parse command string into list
-            cmd = args.cmd.split()
+            cmd = shlex.split(args.cmd)
             
             ret, out, err = executor.run_command(
                 cmd,
