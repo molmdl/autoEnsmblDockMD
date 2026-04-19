@@ -192,6 +192,86 @@ find_first_match() {
     printf '%s\n' "${hits[0]}"
 }
 
+resolve_receptor_gro() {
+    local sdf_path="$1"
+    local ligand_dir="$2"
+    local sdf_name stem prefix
+    local -a candidates
+
+    sdf_name="$(basename "${sdf_path}")"
+    stem="${sdf_name%.*}"
+    prefix="${stem%%-*}"
+
+    candidates=(
+        "${ligand_dir}/${prefix}.pdb_ali.gro"
+        "${DOCK_DIR}/${prefix}.pdb_ali.gro"
+        "${WORKDIR}/${prefix}.pdb_ali.gro"
+        "${WORKDIR}/rec/${prefix}.pdb_ali.gro"
+    )
+
+    local candidate
+    for candidate in "${candidates[@]}"; do
+        if [[ -f "${candidate}" ]]; then
+            printf '%s\n' "${candidate}"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+merge_complex_gro() {
+    local rec_gro="$1"
+    local lig_gro="$2"
+    local out_gro="$3"
+
+    local rec_atoms rec_extra lig_atoms lig_extra
+    local rec_box_idx lig_box_idx total_atoms
+    local rec_lines_count lig_lines_count
+    local -a rec_lines lig_lines
+
+    mapfile -t rec_lines < "${rec_gro}"
+    mapfile -t lig_lines < "${lig_gro}"
+
+    rec_lines_count=${#rec_lines[@]}
+    lig_lines_count=${#lig_lines[@]}
+
+    if (( rec_lines_count < 3 || lig_lines_count < 3 )); then
+        log_error "Invalid GRO input while creating ${out_gro}: files are too short"
+        return 1
+    fi
+
+    read -r rec_atoms rec_extra <<< "${rec_lines[1]}"
+    read -r lig_atoms lig_extra <<< "${lig_lines[1]}"
+
+    if [[ ! "${rec_atoms}" =~ ^[0-9]+$ || ! "${lig_atoms}" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid GRO atom count while creating ${out_gro}"
+        return 1
+    fi
+
+    rec_box_idx=$((2 + rec_atoms))
+    lig_box_idx=$((2 + lig_atoms))
+    if (( rec_box_idx >= rec_lines_count || lig_box_idx >= lig_lines_count )); then
+        log_error "GRO atom-count/header mismatch while creating ${out_gro}"
+        return 1
+    fi
+
+    total_atoms=$((rec_atoms + lig_atoms))
+    {
+        printf 'Complex merged from %s and %s\n' "$(basename "${rec_gro}")" "$(basename "${lig_gro}")"
+        printf '%5d\n' "${total_atoms}"
+
+        local idx
+        for (( idx = 2; idx < rec_box_idx; idx++ )); do
+            printf '%s\n' "${rec_lines[idx]}"
+        done
+        for (( idx = 2; idx < lig_box_idx; idx++ )); do
+            printf '%s\n' "${lig_lines[idx]}"
+        done
+        printf '%s\n' "${rec_lines[rec_box_idx]}"
+    } > "${out_gro}"
+}
+
 ligand_list_cfg="$(get_config docking ligand_list "")"
 if [[ -n "${LIGAND_LIST_OVERRIDE}" ]]; then
     ligand_list_cfg="${LIGAND_LIST_OVERRIDE}"
@@ -258,6 +338,18 @@ for ligand_id in "${LIGANDS[@]}"; do
     log_info "[${ligand_id}] Build topology"
     python "${UTIL_TOPOLOGY}" --receptor-top "${REC_TOP}" --ligand-itp "${itp_path}" --output-top "${sys_top}" --ff "${FF_MODE}" --config "${CONFIG_FILE}"
 
+    if ! rec_gro="$(resolve_receptor_gro "${selected_sdf}" "${ligand_dir}")"; then
+        log_error "[${ligand_id}] Could not locate receptor GRO for ${selected_sdf}. Expected <prefix>.pdb_ali.gro near docking/receptor outputs."
+        exit 1
+    fi
+    require_file "${rec_gro}" "[${ligand_id}] Receptor GRO not found: ${rec_gro}"
+
+    log_info "[${ligand_id}] Create complex GRO: ${com_gro}"
+    if ! merge_complex_gro "${rec_gro}" "${lig_gro}" "${com_gro}"; then
+        log_error "[${ligand_id}] Failed to merge receptor+ligand GRO into ${com_gro}"
+        exit 1
+    fi
+
     if [[ ! -f "${com_gro}" && -f "${ligand_dir}/complex.gro" ]]; then
         com_gro="${ligand_dir}/complex.gro"
     fi
@@ -265,7 +357,7 @@ for ligand_id in "${LIGANDS[@]}"; do
     require_file "${com_gro}" "Complex GRO was not generated: ${com_gro}"
 
     log_info "[${ligand_id}] Generate ligand position restraints"
-    python "${UTIL_POSRE}" --gro "${lig_gro}" --force-constant "${FORCE_CONSTANT}" --output "${posre_lig}"
+    python "${UTIL_POSRE}" --gro "${lig_gro}" --itp "${itp_path}" --force-constant "${FORCE_CONSTANT}" --output "${posre_lig}"
     require_file "${posre_lig}" "Ligand position restraints were not generated: ${posre_lig}"
 
     out_dir="${COM_DIR}/${ligand_id}"
