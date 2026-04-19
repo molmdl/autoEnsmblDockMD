@@ -1,50 +1,46 @@
----
-name: com-mmpbsa
-description: Use when calculating binding free energies with MM/PBSA from completed complex MD trajectories.
-license: MIT
-compatibility: Requires gnina, gromacs 2022+, python 3.10+
-metadata:
-  author: autoEnsmblDockMD
-  version: "1.0"
-  agent: runner
-  stage: complex_mmpbsa
----
+# Skill: com-mmpbsa
+**Stage:** complex_mmpbsa
+**Agent:** runner
 
-# Complex MM/PBSA Calculation
-
-This skill prepares trajectories for MM/PBSA chunking and submits/runs binding free-energy calculations with configured topology and group selections.
-
-## When to use this skill
-- Complex MD trajectories are complete and quality-checked.
-- You need per-ligand binding energy estimates and decomposition outputs.
-- You want chunked MM/PBSA execution for parallel throughput.
-- You need standardized handoff outputs for checker/analyzer review.
-
-## Prerequisites
-- Production trajectories (`prod_*.xtc`/`prod_*.tpr`) are available.
-- Topology selection (AMBER/CHARMM) is configured correctly.
-- `config.ini` contains a valid `[mmpbsa]` section.
-
-## Usage
-Command: `scripts/commands/com-mmpbsa.sh --config config.ini`
-Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
+## Capability
+Calculate ligand binding free energies from completed complex MD trajectories using chunked MM/PBSA workflows. Prepare trajectory/index inputs and execute configured MM/PBSA jobs for scalable throughput.
 
 ## Parameters
-| Parameter | Config Key | CLI Flag | Default | Description |
-|-----------|------------|----------|---------|-------------|
-| MM/PBSA workdir | `mmpbsa.workdir` | `--workdir` | `${complex:workdir}` | Ligand directories containing production trajectories. |
-| Chunk count | `mmpbsa.n_chunks` | `--n-chunks` | `4` | Number of trajectory chunks per trial for parallel jobs. |
-| Receptor group | `mmpbsa.receptor_group` | `--receptor-group` | `Protein` | Group name used in index splitting. |
-| Ligand group | `mmpbsa.ligand_group` | `--ligand-group` | `Other` | Group name representing ligand atoms. |
-| MPI ranks | `mmpbsa.mpi_ranks` | `--mpi-ranks` | `16` | MPI ranks used in MM/PBSA chunk execution. |
-| Topology mode | `mmpbsa.ff` | `--ff` | `${complex:ff}` | Force-field mode controlling topology choice logic. |
+| Parameter | Config Key | Required | Description |
+|-----------|------------|----------|-------------|
+| MM/PBSA workdir | `mmpbsa.workdir` | Yes | Root directory containing ligand MD outputs used for MM/PBSA. |
+| Ligand source dir | `mmpbsa.ligand_dir` | Yes | Directory scanned for ligand targets for MM/PBSA execution. |
+| Ligand selector | `mmpbsa.ligand_pattern` | Yes | Pattern used to select ligand folders to process. |
+| Chunk count | `mmpbsa.n_chunks` | Yes | Number of trajectory chunks per trial for parallel MM/PBSA jobs. |
+| Chunk prefix | `mmpbsa.chunk_dir_prefix` | Yes | Prefix used when creating per-chunk MM/PBSA directories. |
+| Receptor group | `mmpbsa.receptor_group` | Yes | Index group name for receptor atoms. |
+| Ligand group | `mmpbsa.ligand_group` | Yes | Index group name for ligand atoms. |
+| MM/PBSA input file | `mmpbsa.mmpbsa_input` | Yes | Input configuration file consumed by gmx_MMPBSA runs. |
+| MPI ranks | `mmpbsa.mpi_ranks` | Yes | MPI ranks used for chunk-level MM/PBSA execution. |
+| Force-field selector | `mmpbsa.ff` | Yes | Force-field mode controlling topology-selection logic. |
 
-## Expected Output
-- MM/PBSA chunk directories (e.g., `mmpbsa_*/`) with energy outputs.
-- Per-ligand MM/PBSA result files and logs.
-- Handoff record at `.handoffs/complex_mmpbsa.json`.
+## Scripts
+| Script | Purpose |
+|--------|---------|
+| `scripts/commands/com-mmpbsa.sh` | Command entrypoint that dispatches MM/PBSA workflow. |
+| `scripts/com/2_run_mmpbsa.sh` | Orchestrate trajectory prep and chunked MM/PBSA submission flow. |
+| `scripts/com/2_trj4mmpbsa.sh` | Prepare trajectory/index files for chunk-based MM/PBSA jobs. |
+| `scripts/com/2_sub_mmpbsa.sh` | Submit chunk array jobs for MM/PBSA execution. |
+| `scripts/com/2_mmpbsa.sh` | Execute a chunk-level MM/PBSA calculation wrapper. |
 
-## Troubleshooting
-- Topology mismatch errors: ensure selected topology file matches trajectory system.
-- Missing index groups: confirm receptor/ligand groups exist in `index.ndx`.
-- Empty results: validate chunk submission completed and logs for each chunk are successful.
+## Success Criteria
+- MM/PBSA result files are generated for target ligands with chunk jobs completing successfully.
+- Stage handoff `.handoffs/complex_mmpbsa.json` reports completion and output paths for review.
+
+## Usage Example
+Slash command: `/com-mmpbsa --config config.ini`
+
+Agent invocation: `python -m scripts.agents --agent runner --input handoff.json`
+
+## Workflow
+1. Validate prerequisite MD outputs, topology selection keys, and required `[mmpbsa]` config fields.
+2. Resolve ligand targets and prepare trajectories/indexes for chunked MM/PBSA execution.
+3. Submit or run chunk-level MM/PBSA jobs using configured CPU/MPI settings.
+4. Collect MM/PBSA outputs and verify expected result files/logs exist.
+5. Write handoff metadata for downstream validation and analysis.
+6. If issues occur, inspect topology consistency, index group definitions, and chunk job logs.

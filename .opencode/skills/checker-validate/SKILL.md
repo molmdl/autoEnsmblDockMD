@@ -1,36 +1,36 @@
----
-name: checker-validate
-description: Use when validating outputs from any completed workflow stage, especially when quality or consistency concerns are reported.
-license: MIT
-compatibility: Requires gnina, gromacs 2022+, python 3.10+
-metadata:
-  author: autoEnsmblDockMD
-  version: "1.0"
-  agent: checker
-  stage: quality_validation
----
+# Skill: checker-validate
+**Stage:** quality_validation
+**Agent:** checker
 
-# Result Validation
+## Capability
+Validate outputs from completed workflow stages by inspecting handoff records, artifacts, and consistency signals. Return clear pass/warn/fail findings with actionable next-step recommendations.
 
-This skill runs on-demand quality checks by inspecting handoff records and generated outputs to flag anomalies and produce actionable validation feedback.
+## Parameters
+| Parameter | Config Key | Required | Description |
+|-----------|------------|----------|-------------|
+| Workspace root | `general.workdir` | Yes | Root workspace containing stage outputs to validate. |
+| Receptor workdir | `receptor.workdir` | Conditional | Used when validating receptor ensemble outputs. |
+| Docking workdir | `docking.dock_dir` | Conditional | Used when validating docking artifacts and reports. |
+| Complex workdir | `complex.workdir` | Conditional | Used when validating complex setup/MD/MMPBSA artifacts. |
+| Analysis output subdir | `analysis.output_subdir` | Conditional | Used when validating analysis result locations and completeness. |
 
-## When to use this skill
-- A stage completed but results seem suspicious or inconsistent.
-- You need structured quality checks before proceeding to next stage.
-- Warnings were emitted in `.handoffs/*.json` and require review.
+## Scripts
+| Script | Purpose |
+|--------|---------|
+| `scripts/commands/checker-validate.sh` | Command entrypoint for checker validation workflow. |
 
-## Prerequisites
-- At least one stage handoff record exists in `.handoffs/`.
-- Stage output files are present in workspace directories.
+## Success Criteria
+- Validation report is produced with explicit pass/warn/fail assessments and evidence.
+- Follow-up recommendations identify safe continuation path or required remediation.
 
-## Usage
-Command: `scripts/commands/checker-validate.sh --config config.ini`
-Agent dispatch: `python -m scripts.agents --agent checker --input handoff.json`
+## Usage Example
+Slash command: `/checker-validate --config config.ini`
 
-## Expected Output
-- Validation report summarizing pass/warn/fail findings.
-- Updated handoff/recommendations for next actions.
+Agent invocation: `python -m scripts.agents --agent checker --input handoff.json`
 
-## Troubleshooting
-- No handoff found: run a pipeline stage first to generate `.handoffs/{stage}.json`.
-- Incomplete report: verify referenced output paths still exist.
+## Workflow
+1. Load latest relevant handoff records and identify stage(s) requiring validation.
+2. Verify expected output files exist in stage-specific workspace directories.
+3. Check consistency/quality indicators and collect anomalies.
+4. Produce structured validation summary with severity and recommendations.
+5. If data is missing, request rerun or targeted diagnosis before continuation.
