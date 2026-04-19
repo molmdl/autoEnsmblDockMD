@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 6 of 6 (5.1-critical-correctness-and-namespace-fixes) |
-| **Current Plan** | 6 of 6 in current phase |
-| **Last Activity** | 2026-04-19 - Completed 5.1-06-PLAN.md |
-| **Progress** | ██████████░ 38/42 plans complete (90%) |
+| **Current Plan** | 7 of 7 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 5.1-07-PLAN.md |
+| **Progress** | ███████████░ 39/42 plans complete (93%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase complete |
 
@@ -43,6 +43,7 @@
 | Compute advanced RMSD with superposition before displacement measurement | Remove translational/rotational drift inflation from RMSD timeseries |
 | Namespace all public skills and slash-command wrappers with `aedmd-*` | Prevent collisions with generic OpenCode command names and keep project command ownership explicit |
 | Keep AGENT-WORKFLOW status vocabulary and handoff persistence docs aligned with common.sh parser/output behavior | Prevent documentation drift in orchestrator expectations and handoff status interpretation |
+| Keep `aedmd-status` wrapper-local `--workdir` parsing while forwarding remaining args to `parse_flags` | Adds documented workdir targeting without regressing shared command flag behavior |
 
 ### Known Pitfalls
 
@@ -54,8 +55,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 11:34 UTC
-Stopped at: Completed 5.1-06-PLAN.md
+Last session: 2026-04-19 12:15 UTC
+Stopped at: Completed 5.1-07-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -73,4 +74,4 @@ Phase 5.1 complete. Proceed to next roadmap phase selection.
 
 *State updated: 2026-04-19*
 *Current phase: 5.1-critical-correctness-and-namespace-fixes (in progress)*
-*Last action: Completed 5.1-06-PLAN.md and created 5.1-06-SUMMARY.md*
+*Last action: Completed 5.1-07-PLAN.md and created 5.1-07-SUMMARY.md*
