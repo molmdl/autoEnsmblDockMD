@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 5 - Polish |
-| **Current Plan** | 6 of 7 (05-01, 05-02, 05-03, 05-04, 05-05, 05-06 completed) |
-| **Last Activity** | 2026-04-19 - Completed 05-06-PLAN.md |
-| **Progress** | ███████████████░ 30/31 plans complete (97%) |
+| **Current Plan** | 6 of 10 (05-01, 05-02, 05-04, 05-05, 05-06, 05-08 completed; 05-03 invalidated/reverted) |
+| **Last Activity** | 2026-04-19 - Completed 05-08-PLAN.md |
+| **Progress** | █████████████░░░ 30/34 plans complete (88%) |
 | **Phase 5 Blocker** | End-to-end test artifacts pending |
 | **Status** | In progress |
 
@@ -63,6 +63,8 @@
 | Document GUIDE config reference directly from `scripts/config.ini.template` | Prevents key drift between runtime config and human guide | 5 |
 | Treat `[production]` as the explicit MD section in GUIDE | Preserves template accuracy while satisfying MD documentation intent | 5 |
 | Keep script-level details in WORKFLOW.md and use GUIDE.md for operator checks/interpretation | Avoids duplication and keeps human-facing troubleshooting easy to scan | 5 |
+| Restore all 10 SKILL.md files from origin/main as canonical baseline | Guarantees exact recovery of YAML frontmatter and required sections after 05-03 regression | 5 |
+| Delete 05-03-SUMMARY.md after remediation | Prevents stale summary from representing reverted/invalidated changes | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -82,15 +84,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:46 +0800
-Stopped at: Completed 05-06-PLAN.md
+Last session: 2026-04-19 15:29 +0800
+Stopped at: Completed 05-08-PLAN.md
 Resume file: None
 
 ### Next Action
 
 **Phase 5 is in progress.**
 
-**Recommend:** Continue with 05-07-PLAN.md.
+**Recommend:** Continue with 05-09-PLAN.md.
 
 ### Recent Milestones
 
@@ -107,6 +109,7 @@ Resume file: None
 - 2026-04-19: Phase 5 plan 04 executed (README.md comprehensive onboarding rewrite)
 - 2026-04-19: Phase 5 plan 05 executed (GUIDE.md Part 1 config/input/workspace reference)
 - 2026-04-19: Phase 5 plan 06 executed (GUIDE.md Part 2 stage instructions + troubleshooting)
+- 2026-04-19: Phase 5 plan 08 executed (SKILL.md restoration + invalidated summary cleanup)
 
 ### Planning Status
 
@@ -140,4 +143,4 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-06-PLAN.md and created 05-06-SUMMARY.md*
+*Last action: Completed 05-08-PLAN.md and created 05-08-SUMMARY.md*
