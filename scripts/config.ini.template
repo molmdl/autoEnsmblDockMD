@@ -211,6 +211,9 @@ ff = charmm36
 ; AMBER example: amber19sb.ff/forcefield.itp
 ff_include = charmm36.ff/forcefield.itp
 water_model = tip3p
+; Solvent coordinates passed to `gmx solvate -cs` (filename or absolute path)
+; Use coordinate source, not model label (e.g., spc216.gro)
+solvent_coordinates = spc216.gro
 box_distance = 1.0
 ion_conc = 0.15
 ; MDP directory and file names for complex prep

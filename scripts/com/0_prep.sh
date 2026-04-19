@@ -42,6 +42,7 @@ Config keys used:
     ff
     ff_include
     water_model
+    solvent_coordinates
     box_distance
     ion_conc
     mdp_dir
@@ -112,6 +113,7 @@ fi
 FF_NAME="$(get_config complex ff "${FF_DEFAULT}")"
 FF_INCLUDE="$(get_config complex ff_include "${FF_NAME}.ff/forcefield.itp")"
 WATER_MODEL="$(get_config complex water_model "tip3p")"
+SOLVENT_COORDS="$(get_config complex solvent_coordinates "spc216.gro")"
 BOX_DISTANCE="$(get_config complex box_distance "1.0")"
 ION_CONC="$(get_config complex ion_conc "0.15")"
 MDP_DIR="$(get_config complex mdp_dir "${SCRIPT_DIR}")"
@@ -404,9 +406,20 @@ submit_prepare_job() {
         local_lig_itp="${bypass_out}"
     fi
 
-    solvate_cs="${WATER_MODEL:-}"
+    solvate_cs="${SOLVENT_COORDS:-}"
     if [[ -z "${solvate_cs}" ]]; then
-        solvate_cs="spc216"
+        solvate_cs="spc216.gro"
+    fi
+
+    case "${solvate_cs,,}" in
+        tip3p|tip4p|tip4pew|tip5p|spc|spce)
+            log_error "Invalid [complex] solvent_coordinates='${solvate_cs}'. Expected solvent coordinate filename/path (e.g., spc216.gro), not water model label."
+            exit 1
+            ;;
+    esac
+
+    if [[ "${solvate_cs}" == *"/"* ]]; then
+        require_file "${solvate_cs}" "Solvent coordinate file not found: ${solvate_cs}"
     fi
 
     ligand_molname="$(extract_molecule_name_from_itp "${local_lig_itp}")"
