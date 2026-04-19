@@ -272,10 +272,10 @@ Plans:
 **Plans:** 7 plans in 4 waves
 
 Plans:
-- [ ] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1)
-- [ ] 05-02-PLAN.md — Restructure AGENTS.md by agent type with skill cross-references (Wave 1)
-- [ ] 05-03-PLAN.md — Audit and standardize all 10 SKILL.md metadata (Wave 1)
-- [ ] 05-04-PLAN.md — Write comprehensive README.md (Wave 2)
+- [x] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1)
+- [x] 05-02-PLAN.md — Restructure AGENTS.md by agent type with skill cross-references (Wave 1)
+- [x] 05-03-PLAN.md — Audit and standardize all 10 SKILL.md metadata (Wave 1)
+- [x] 05-04-PLAN.md — Write comprehensive README.md (Wave 2)
 - [ ] 05-05-PLAN.md — Create docs/GUIDE.md Part 1: config reference + input prep + workspace setup (Wave 2)
 - [ ] 05-06-PLAN.md — Complete docs/GUIDE.md Part 2: per-stage instructions + troubleshooting (Wave 3)
 - [ ] 05-07-PLAN.md — End-to-end structural validation + human review (Wave 4)
@@ -354,7 +354,7 @@ Plans:
 | 2 | Core Pipeline | Complete ✓ | 12 | None |
 | 3 | Agent Infrastructure | Complete ✓ | 6 | None |
 | 4 | Integration | Complete ✓ | 7 | None |
-| 5 | Polish | Not Started | 4 | WORKFLOW.md, End-to-end Test |
+| 5 | Polish | In progress | 4 | End-to-end Test |
 
 ---
 
