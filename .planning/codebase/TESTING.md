@@ -5,34 +5,35 @@
 ## Test Framework
 
 **Runner:**
-- No dedicated automated test runner is detected. No `pytest.ini`, `tox.ini`, `noxfile.py`, `jest.config.*`, `vitest.config.*`, or `*.test.*` / `*.spec.*` files are present under `/share/home/nglokwan/autoEnsmblDockMD`.
-- Validation is currently script-level and document-driven, centered on `.planning/phases/02-core-pipeline/02-VERIFICATION.md` and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- No dedicated automated unit-test runner is detected in the project root or under `scripts/`; `pytest.ini`, `tox.ini`, `jest.config.*`, `vitest.config.*`, and `tests/` are not present under `/share/home/nglokwan/autoEnsmblDockMD`.
+- Current verification is script-level and document-driven, centered on `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
 - Config: Not detected.
 
 **Assertion Library:**
-- Not applicable as a formal framework.
-- Verification relies on shell exit codes, syntax checks, help output, YAML/frontmatter validation, and checklist/report evidence in `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- Not applicable as a formal test framework.
+- Current assertions rely on shell exit codes, Python syntax compilation, artifact existence, JSON handoff status values, and verification report checklists in `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
 
 **Run Commands:**
 ```bash
-for cmd in scripts/commands/*.sh; do bash -n "$cmd"; done     # Shell syntax checks
-python -m py_compile scripts/com/3_com_ana_trj.py              # Python syntax check example
-bash scripts/commands/status.sh --help                         # Command help smoke test (env required)
+for cmd in scripts/commands/aedmd-*.sh; do bash -n "$cmd"; done   # Syntax-check command wrappers
+python -m py_compile scripts/agents/*.py scripts/infra/*.py         # Syntax-check Python modules
+source ./scripts/setenv.sh && bash scripts/commands/aedmd-status.sh --workdir work/my_project   # Wrapper smoke check after env init
 ```
 
 ## Test File Organization
 
 **Location:**
-- No co-located unit/integration test tree is detected in `scripts/`, `tests/`, or `src/`.
-- Validation artifacts live in planning docs such as `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- No co-located test tree is detected under `scripts/`, `tests/`, or `src/`.
+- Validation evidence is stored as planning artifacts under `.planning/phases/**`, especially `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
 
 **Naming:**
 - Verification documents use `*-VERIFICATION.md`, `*-SUMMARY.md`, and `*-e2e-test-report.md` naming under `.planning/phases/**`.
-- There are no `test_*.py`, `*.spec.py`, `*.test.sh`, or similar executable test module names.
+- No `test_*.py`, `*.spec.py`, `*.test.sh`, or `*.test.ts` files are present in the project code.
 
 **Structure:**
 ```text
 .planning/phases/<phase>/<plan>-VERIFICATION.md
+.planning/phases/<phase>/<plan>-SUMMARY.md
 .planning/phases/<phase>/<plan>-e2e-test-report.md
 ```
 
@@ -40,16 +41,17 @@ bash scripts/commands/status.sh --help                         # Command help sm
 
 **Suite Organization:**
 ```bash
-for cmd in scripts/commands/{rec-ensemble,dock-run,com-setup,com-md,com-mmpbsa,com-analyze,checker-validate,debugger-diagnose,orchestrator-resume,status}.sh; do
+for cmd in scripts/commands/aedmd-{rec-ensemble,dock-run,com-setup,com-md,com-mmpbsa,com-analyze,checker-validate,debugger-diagnose,orchestrator-resume,status}.sh; do
   bash -n "$cmd"
-  bash "$cmd" --help
 done
 ```
 
 **Patterns:**
-- Setup pattern: activate environment and source `scripts/setenv.sh` before command smoke tests, as documented in `README.md`, `AGENTS.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
-- Teardown pattern: no explicit teardown harness is detected; tests are mostly read-only syntax/help checks.
-- Assertion pattern: treat zero exit status, parseable output, and expected artifact presence as success. Examples are summarized in `.planning/phases/02-core-pipeline/02-VERIFICATION.md` and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- Setup pattern: initialize the environment with `source ./scripts/setenv.sh` before running wrapper smoke checks, as documented in `README.md`, `AGENTS.md`, and `docs/GUIDE.md`.
+- Setup pattern: create a disposable workspace from `scripts/config.ini.template`, following the workspace guidance in `README.md` and `AGENTS.md`.
+- Teardown pattern: no centralized teardown harness is detected; current checks are mostly syntax/help/report validation and read-only inspection.
+- Assertion pattern: treat a zero exit code, valid syntax, expected artifact presence, and correct handoff status strings (`success`, `needs_review`, `failure`, `blocked`) from `scripts/commands/common.sh` and `scripts/agents/schemas/handoff.py` as the primary pass/fail signals.
+- Regression pattern after the namespace fixes: verify documentation and wrappers use the `aedmd-*` command names shown in `README.md`, `docs/EXPERIMENTAL.md`, `docs/GUIDE.md`, `AGENTS.md`, and `.opencode/docs/AGENT-WORKFLOW.md`.
 
 ## Mocking
 
@@ -64,15 +66,18 @@ def check_return_code(data: Dict[str, Any]) -> CheckResult:
         return CheckResult(level="warning", message="returncode not provided for validation.")
     if int(returncode) != 0:
         return CheckResult(level="error", message=f"Stage returned non-zero exit code: {returncode}")
+    return CheckResult(level="info", message="Return code indicates success.")
 ```
-- The repository favors validating real outputs and handoff payloads over mocked dependencies. The example above is from `scripts/agents/checker.py` and shows the dominant style: inspect concrete execution results rather than simulated behavior.
+- The dominant pattern is to validate concrete execution results, logs, files, and handoff payloads rather than replacing dependencies with mocks. The example above comes from `scripts/agents/checker.py`.
 
 **What to Mock:**
-- Not documented in the codebase.
-- Current practice suggests avoiding mocks and validating real files, logs, and CLI results from `scripts/run_pipeline.sh`, `scripts/commands/*.sh`, and `scripts/agents/*.py`.
+- Not documented as a project convention.
+- If extra tests are added, mock only thin outer boundaries that are expensive or unavailable in CI, such as external executables (`gmx`, `gnina`, `gmx_MMPBSA`) invoked through `scripts/infra/common.sh` or `scripts/agents/debugger.py`.
 
 **What NOT to Mock:**
-- Do not replace handoff JSON, config parsing, or filesystem artifact checks when following existing patterns in `scripts/agents/schemas/handoff.py`, `scripts/infra/config.py`, and `scripts/agents/checker.py`.
+- Do not mock the JSON handoff shape defined in `scripts/agents/schemas/handoff.py`; tests should use real `HandoffRecord` payloads.
+- Do not mock gate state files when validating workflow gating; use the real file-backed behavior in `scripts/infra/verification.py`.
+- Do not replace wrapper flag handling with synthetic shortcuts; exercise `scripts/commands/common.sh:parse_flags` and the namespaced wrappers in `scripts/commands/aedmd-*.sh` directly.
 
 ## Fixtures and Factories
 
@@ -81,55 +86,56 @@ def check_return_code(data: Dict[str, Any]) -> CheckResult:
 mkdir -p work/test
 cp scripts/config.ini.template work/test/config.ini
 ```
-- The canonical temporary workspace pattern comes from `README.md` and `AGENTS.md`.
-- Reference artifacts also exist under `expected/` and `.reference/` for comparison-oriented work, as described in `AGENTS.md`.
+- Use `work/test/` as the disposable validation workspace, consistent with `AGENTS.md`.
+- Use `work/input/` for user-provided inputs and compare against example/reference outputs in `expected/` and `.reference/`, as documented in `AGENTS.md`.
 
 **Location:**
-- Working test workspace: `work/test/`
-- User-provided inputs: `work/input/`
-- Reference outputs/examples: `expected/` and `.reference/`
+- Working validation workspace: `work/test/`
+- User inputs: `work/input/`
+- Reference outputs and examples: `expected/` and `.reference/`
 
 ## Coverage
 
 **Requirements:**
-- No line or branch coverage tooling is enforced.
-- The closest thing to coverage is scenario/checklist coverage recorded in `.planning/phases/02-core-pipeline/02-VERIFICATION.md` and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- No line-coverage or branch-coverage tooling is enforced.
+- Current “coverage” is scenario coverage captured in `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- The most explicit command-wrapper regression coverage currently checks syntax, help-path behavior, YAML frontmatter, and command→skill cross-reference chains in `.planning/phases/05-polish/05-12-e2e-test-report.md`.
 
 **View Coverage:**
 ```bash
-grep -n "Quality Metrics" .planning/phases/02-core-pipeline/02-VERIFICATION.md
-grep -n "Overall Results" .planning/phases/05-polish/05-12-e2e-test-report.md
+rg -n "L1 Syntax|L2 Help|L3 YAML|L4 Cross-ref|Overall Results" .planning/phases/05-polish/05-12-e2e-test-report.md
 ```
 
 ## Test Types
 
 **Unit Tests:**
 - Not used as standalone files.
-- Small helper functions are written in a unit-test-friendly style (`scripts/com/3_com_ana_trj.py`, `scripts/dock/4_dock2com_2.py`, `scripts/infra/config.py`), but automated unit suites are not present.
+- Python helpers are still written in a unit-testable style in `scripts/agents/checker.py`, `scripts/agents/runner.py`, `scripts/infra/config.py`, `scripts/infra/verification.py`, `scripts/com/4_fp.py`, and `scripts/dock/4_dock2com_2.py`.
 
 **Integration Tests:**
-- Current integration testing is command and script verification:
-  - `bash -n` for shell syntax
-  - `python -m py_compile` for Python syntax
-  - `--help` smoke tests for CLIs
-  - command→skill cross-reference checks in `.planning/phases/05-polish/05-12-e2e-test-report.md`
+- Current integration testing is command and module verification:
+  - `bash -n` for `scripts/commands/aedmd-*.sh` and `scripts/commands/common.sh`
+  - `python -m py_compile` for Python modules under `scripts/agents/` and `scripts/infra/`
+  - `--help` smoke checks for namespaced wrappers after environment initialization
+  - command→skill→docs cross-reference checks in `.planning/phases/05-polish/05-12-e2e-test-report.md`
 
 **E2E Tests:**
-- Documented, manual/semiautomated E2E validation is used.
+- Manual or semi-automated workflow validation is the current E2E strategy.
 - Primary reference: `.planning/phases/05-polish/05-12-e2e-test-report.md`.
-- Supporting references: `.planning/phases/04-integration/04-VERIFICATION.md` and `.planning/phases/02-core-pipeline/02-VERIFICATION.md`.
+- Supporting references: `.planning/phases/02-core-pipeline/02-VERIFICATION.md` and `.planning/phases/04-integration/04-VERIFICATION.md`.
+- Environment-sensitive checks currently acknowledge the `ensure_env` → `scripts/setenv.sh` path in `scripts/commands/common.sh` and `scripts/setenv.sh`; this is why wrapper `--help` checks are recorded as `ENV_GATE` in `.planning/phases/05-polish/05-12-e2e-test-report.md` when Conda is not initialized.
 
 ## Common Patterns
 
 **Async Testing:**
 ```python
-gate = VerificationGate('docking', '.gates')
-gate.create_gate('Review docking results', metadata={'ligand_count': 5})
-gate.approve(notes='Looks good')
+gate = VerificationGate("docking", ".gates")
+gate.create_gate("Review docking results", metadata={"ligand_count": 5})
+gate.approve(notes="Looks good")
 assert gate.can_proceed()
 ```
-- The repository does not contain async test suites, but stateful workflow checks are illustrated with doctest-style examples in `scripts/infra/verification.py`.
-- For job-like behavior, polling logic lives in `scripts/infra/common.sh:wait_job` rather than in automated async tests.
+- There is no async test runner, but stateful workflow behavior is illustrated with doctest-style examples in `scripts/infra/verification.py`.
+- For job-like waiting behavior, runtime polling lives in `scripts/infra/common.sh:wait_job`; this behavior is not covered by an automated async test suite.
 
 **Error Testing:**
 ```python
@@ -139,7 +145,7 @@ def check_log_errors(data: Dict[str, Any]) -> CheckResult:
     if "error" in content.lower() or "fatal" in content.lower():
         return CheckResult(level="error", message=f"Detected ERROR/FATAL patterns in log file: {log_file}")
 ```
-- Error-focused validation inspects real logs and return codes instead of mock exceptions. See `scripts/agents/checker.py`, `scripts/agents/debugger.py`, and `scripts/infra/monitor.py`.
+- Error-oriented validation is built around real logs, return codes, and persisted artifacts in `scripts/agents/checker.py`, `scripts/agents/debugger.py`, `scripts/infra/monitor.py`, and `scripts/commands/common.sh`.
 
 ---
 

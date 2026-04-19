@@ -4,164 +4,175 @@
 
 ## Pattern Overview
 
-**Overall:** Configuration-driven, script-first staged scientific workflow with an optional agent orchestration layer.
+**Overall:** Configuration-driven, script-first staged scientific workflow with an experimental agent/slash-command orchestration overlay.
 
 **Key Characteristics:**
-- Use `scripts/run_pipeline.sh` as the canonical end-to-end entrypoint for the receptor → docking → complex MD → MM/PBSA → analysis pipeline.
-- Keep stage logic inside subsystem scripts under `scripts/rec/`, `scripts/dock/`, and `scripts/com/`; use `scripts/infra/` only for shared plumbing.
-- Treat `scripts/agents/` and `scripts/commands/` as an orchestration overlay around the same underlying pipeline, not as a replacement for the core scripts.
+- Use `scripts/run_pipeline.sh` as the canonical pipeline dispatcher for receptor preparation, docking, complex setup, production MD, MM/PBSA, and analysis.
+- Keep scientific stage logic in ordered subsystem scripts under `scripts/rec/`, `scripts/dock/`, and `scripts/com/`, with shared plumbing in `scripts/infra/`.
+- Treat `scripts/commands/*.sh`, `scripts/agents/*.py`, and `.opencode/skills/aedmd-*/SKILL.md` as a namespaced orchestration layer around the same pipeline, not as a replacement for the shell-script workflow.
 
 ## Layers
 
 **Documentation and planning layer:**
-- Purpose: Define workflow intent, operating constraints, and human-facing run guidance.
-- Location: `README.md`, `WORKFLOW.md`, `docs/GUIDE.md`, `AGENTS.md`, `.planning/`
-- Contains: Workflow reference, configuration guidance, planning state, phase artifacts.
-- Depends on: Current script inventory and workspace conventions.
-- Used by: Humans, slash-command agents, and future planning/execution tooling.
+- Purpose: Define workflow intent, operating rules, stage contracts, and planning context.
+- Location: `README.md`, `WORKFLOW.md`, `AGENTS.md`, `docs/GUIDE.md`, `docs/EXPERIMENTAL.md`, `.planning/STATE.md`, `.planning/scancode.md`
+- Contains: Human workflow guides, agent constraints, current project-state context, and generated codebase maps.
+- Depends on: Current script inventory in `scripts/` and workspace conventions in `work/`.
+- Used by: Human operators, GSD planning/execution commands, and OpenCode skill consumers.
 
-**Command entrypoint layer:**
-- Purpose: Provide stable user-invoked entrypoints for full-pipeline and slash-command execution.
-- Location: `scripts/run_pipeline.sh`, `scripts/commands/*.sh`, `scripts/run_oc.sh`
-- Contains: Stage registry, CLI parsing, agent dispatch bridges, OpenCode launcher wrapper.
-- Depends on: `scripts/infra/common.sh`, `scripts/agents/__main__.py`, stage scripts under `scripts/rec/`, `scripts/dock/`, `scripts/com/`.
-- Used by: Manual CLI runs and slash-command wrappers such as `scripts/commands/rec-ensemble.sh` and `scripts/commands/dock-run.sh`.
+**Pipeline entrypoint layer:**
+- Purpose: Expose stable CLI entrypoints for whole-pipeline or stage-specific execution.
+- Location: `scripts/run_pipeline.sh`, `scripts/setenv.sh`, `scripts/run_oc.sh`
+- Contains: Stage registry arrays, CLI parsing, environment bootstrap, and OpenCode launcher convenience script.
+- Depends on: `scripts/infra/common.sh`, `scripts/infra/config_loader.sh`, and stage scripts under `scripts/rec/`, `scripts/dock/`, and `scripts/com/`.
+- Used by: Manual runs from `README.md`, `WORKFLOW.md`, and workspace configs such as `work/test/config.ini`.
 
 **Infrastructure layer:**
-- Purpose: Centralize config loading, environment bootstrap, logging, execution helpers, persistence, monitoring, and verification gates.
-- Location: `scripts/infra/common.sh`, `scripts/infra/config_loader.sh`, `scripts/infra/config.py`, `scripts/infra/executor.py`, `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, `scripts/infra/monitor.py`, `scripts/infra/verification.py`
-- Contains: Bash helpers, Python config/state abstractions, Slurm/local execution support, log parsing, gate management.
-- Depends on: Filesystem state, Slurm commands, external scientific executables, JSON/INI serialization.
-- Used by: `scripts/run_pipeline.sh`, all major stage scripts, and agents in `scripts/agents/`.
+- Purpose: Centralize config loading, logging, filesystem validation, Slurm integration, and persisted workflow state.
+- Location: `scripts/infra/common.sh`, `scripts/infra/config_loader.sh`, `scripts/infra/config.py`, `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, `scripts/infra/verification.py`, `scripts/infra/executor.py`, `scripts/infra/monitor.py`
+- Contains: INI readers, shell guard helpers, job submission/wait helpers, JSON-backed state/checkpoint/gate managers, and Python execution utilities.
+- Depends on: Filesystem state under the active workspace, Conda/tooling from `scripts/setenv.sh`, and cluster commands such as `sbatch`, `squeue`, and `sacct` when batch execution is used.
+- Used by: `scripts/run_pipeline.sh`, subsystem scripts, and agents in `scripts/agents/`.
 
-**Stage workflow layer:**
-- Purpose: Execute domain-specific scientific work for each pipeline stage.
+**Scientific stage layer:**
+- Purpose: Execute domain-specific receptor, docking, complex, MM/PBSA, and analysis work.
 - Location: `scripts/rec/`, `scripts/dock/`, `scripts/com/`
-- Contains: Ordered shell and Python stage scripts with numeric prefixes such as `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, and `scripts/com/2_run_mmpbsa.sh`.
-- Depends on: `scripts/infra/common.sh`, `scripts/config.ini.template`, workspace inputs under `work/`, and external tools like GROMACS and gnina.
-- Used by: `scripts/run_pipeline.sh` directly and agent runner/analyzer flows indirectly.
+- Contains: Ordered shell/Python stage scripts such as `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/dock/4_dock2com_2.2.1.py`, `scripts/com/0_prep.sh`, `scripts/com/2_run_mmpbsa.sh`, and `scripts/com/3_com_ana_trj.py`.
+- Depends on: Runtime config in `scripts/config.ini.template`, workspace inputs under `work/`, external scientific tools, and shared helpers from `scripts/infra/`.
+- Used by: `scripts/run_pipeline.sh` directly and the runner/analyzer paths in `scripts/agents/` indirectly.
 
 **Agent orchestration layer:**
-- Purpose: Add resumable, role-based orchestration, checking, debugging, and analysis around the pipeline.
-- Location: `scripts/agents/`, `scripts/commands/*.sh`, `.opencode/skills/`
-- Contains: Base agent abstraction, role registry, handoff schema, workflow-stage routing, checkpoint/state storage, bridge scripts.
-- Depends on: `scripts/infra/` persistence utilities and workspace-local JSON artifacts such as `.agent_state.json`, `.checkpoints/`, `.gates/`, and handoff files.
-- Used by: Slash-command workflows and experimental agent-driven operation described in `AGENTS.md`.
+- Purpose: Add resumable role-based execution, validation, debugging, and workflow status inspection.
+- Location: `scripts/agents/__main__.py`, `scripts/agents/base.py`, `scripts/agents/orchestrator.py`, `scripts/agents/runner.py`, `scripts/agents/analyzer.py`, `scripts/agents/checker.py`, `scripts/agents/debugger.py`, `scripts/agents/schemas/`, `scripts/agents/utils/routing.py`
+- Contains: Agent registry, role implementations, workflow-stage enums, handoff schema, and stage-to-agent routing.
+- Depends on: `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, `scripts/infra/verification.py`, and workspace-local JSON artifacts.
+- Used by: Namespaced command bridges under `scripts/commands/` and experimental workflows documented in `AGENTS.md` and `docs/EXPERIMENTAL.md`.
+
+**Slash-command bridge layer:**
+- Purpose: Translate namespaced slash-command invocations into workspace-aware agent calls.
+- Location: `scripts/commands/common.sh`, `scripts/commands/aedmd-status.sh`, `scripts/commands/aedmd-rec-ensemble.sh`, `scripts/commands/aedmd-dock-run.sh`, `scripts/commands/aedmd-com-setup.sh`, `scripts/commands/aedmd-com-md.sh`, `scripts/commands/aedmd-com-mmpbsa.sh`, `scripts/commands/aedmd-com-analyze.sh`, `scripts/commands/aedmd-checker-validate.sh`, `scripts/commands/aedmd-debugger-diagnose.sh`, `scripts/commands/aedmd-orchestrator-resume.sh`
+- Contains: Common flag parsing, workspace discovery, environment sourcing, handoff file writing, and direct status inspection.
+- Depends on: `scripts/agents/__main__.py`, `scripts/setenv.sh`, and `.handoffs/*.json` inside the active workspace.
+- Used by: OpenCode slash commands listed in `AGENTS.md` and `.opencode/skills/aedmd-*/SKILL.md`.
 
 **Workspace artifact layer:**
-- Purpose: Hold run-specific inputs, intermediate artifacts, outputs, checkpoints, and review state.
-- Location: `work/`, especially `work/input/`, `work/test/`, and configured `workdir` trees like `work/test/rec`, `work/test/dock`, `work/test/com`
-- Contains: Config files, copied inputs, generated topologies, trajectories, reports, handoffs, and verification artifacts.
-- Depends on: The configured `[general] workdir` in `scripts/config.ini.template` and stage scripts writing deterministic outputs.
-- Used by: Every stage script, monitor/checker logic, and human review.
+- Purpose: Persist run inputs, stage outputs, handoffs, checkpoints, and review gates.
+- Location: `work/input/`, `work/test/`, `work/workspace/`, and configured runtime trees under `[general] workdir` in `scripts/config.ini.template`
+- Contains: Input receptors/ligands, `config.ini`, generated `rec/`, `dock/`, `com/`, optional `ref/` and `mdp/` subtrees, plus orchestration files such as `.agent_state.json`, `.checkpoints/*`, `.gates/*`, and `.handoffs/*.json`.
+- Depends on: Stage scripts and agent utilities writing deterministic files to the active workspace.
+- Used by: Every stage script, the status wrapper `scripts/commands/aedmd-status.sh`, and human review.
 
 ## Data Flow
 
-**Primary pipeline flow:**
+**Pipeline execution flow:**
 
-1. Load runtime configuration from a file based on `scripts/config.ini.template` through `scripts/run_pipeline.sh` and `scripts/infra/config_loader.sh`.
-2. Dispatch ordered stage scripts from `scripts/run_pipeline.sh` into `scripts/rec/`, `scripts/dock/`, and `scripts/com/` based on the built-in stage registry.
-3. Write stage outputs into the configured workspace under paths such as `work/test/rec`, `work/test/dock`, and `work/test/com`, then feed those artifacts into downstream stages.
+1. `scripts/run_pipeline.sh` loads a runtime INI file such as `work/test/config.ini`, validates required sections per stage, and resolves the stage script path from `STAGE_CMD`.
+2. The selected script in `scripts/rec/`, `scripts/dock/`, or `scripts/com/` runs with `--config` and optional ligand targeting, using `scripts/infra/common.sh` and `scripts/infra/config_loader.sh` for bootstrap and config access.
+3. Generated outputs are written into the configured workspace under paths like `work/test/rec`, `work/test/dock`, and `work/test/com`, where downstream stages consume them.
 
 **Receptor-to-docking flow:**
 
-1. `scripts/rec/0_prep.sh`, `scripts/rec/1_pr_rec.sh`, `scripts/rec/3_ana.sh`, `scripts/rec/4_cluster.sh`, and optionally `scripts/rec/5_align.py` generate receptor conformers in the receptor workspace.
-2. `scripts/dock/1_rec4dock.sh` and `scripts/dock/2_gnina.sh` consume receptor conformers and ligand inputs to produce docking pose files and reports in the docking workspace.
-3. `scripts/dock/4_dock2com.sh` and `scripts/dock/4_dock2com_ref.sh` convert selected docking poses into complex-ready files consumed by `scripts/com/0_prep.sh`.
+1. `scripts/rec/0_prep.sh`, `scripts/rec/1_pr_rec.sh`, `scripts/rec/3_ana.sh`, `scripts/rec/4_cluster.sh`, and optional `scripts/rec/5_align.py` produce receptor conformers and aligned structures.
+2. `scripts/dock/0_gro2mol2.sh`, `scripts/dock/1_rec4dock.sh`, and `scripts/dock/2_gnina.sh` prepare ligands/receptors and generate docked pose outputs.
+3. `scripts/dock/3_dock_report.sh`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_ref.sh`, and the `scripts/dock/4_dock2com_*.py` helpers transform selected poses into complex-ready inputs for `scripts/com/0_prep.sh`.
 
 **Complex-to-analysis flow:**
 
-1. `scripts/com/0_prep.sh` assembles receptor-ligand systems, writes `com.gro`, `sys.top`, and index/topology artifacts, then submits equilibration work.
-2. `scripts/com/1_pr_prod.sh` produces trial-based production trajectories and topologies such as `prod_*.xtc` and `prod_*.tpr`.
-3. `scripts/com/2_run_mmpbsa.sh` and `scripts/com/3_ana.sh` branch from the complex workspace to compute energies and trajectory analysis products.
+1. `scripts/com/0_prep.sh` assembles complex systems and writes core artifacts such as `com.gro`, `sys.top`, `index.ndx`, and ligand-specific preparation outputs.
+2. `scripts/com/1_pr_prod.sh` produces production MD inputs and trajectories, while `scripts/com/2_run_mmpbsa.sh` orchestrates MM/PBSA preprocessing and chunk execution.
+3. `scripts/com/3_ana.sh`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_cal_fp.sh`, `scripts/com/4_fp.py`, `scripts/com/5_arc_sel.sh`, and `scripts/com/5_rerun_sel.sh` convert simulation outputs into analysis artifacts.
 
 **Agent handoff flow:**
 
-1. `scripts/commands/*.sh` assemble lightweight JSON input and invoke `python -m scripts.agents` through `scripts/commands/common.sh`.
-2. `scripts/agents/__main__.py` loads config and handoff JSON, then instantiates a role from `scripts/agents/__init__.py`.
-3. Agents persist state to workspace-local files via `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, and `scripts/infra/verification.py`, then emit standardized handoffs via `scripts/agents/schemas/handoff.py`.
+1. A namespaced command bridge such as `scripts/commands/aedmd-dock-run.sh` or `scripts/commands/aedmd-com-md.sh` sources `scripts/commands/common.sh`, discovers the workspace root, and writes `.handoffs/<stage>.json`.
+2. `python -m scripts.agents` enters through `scripts/agents/__main__.py`, loads the config via `scripts/infra/config.py`, normalizes input JSON, and instantiates a role from `scripts/agents/__init__.py`.
+3. Agent roles persist state/checkpoints/gates through `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, and `scripts/infra/verification.py`, then return standardized handoff payloads from `scripts/agents/schemas/handoff.py`.
 
 **State Management:**
-- Use filesystem state, not in-memory orchestration, as the source of truth.
-- Keep pipeline configuration in INI files loaded by `scripts/infra/config_loader.sh` and `scripts/infra/config.py`.
-- Persist agent context in workspace files such as `.agent_state.json`, `.checkpoints/*_checkpoint_*.json`, `.gates/*_gate.json`, and handoff JSON emitted by `scripts/agents/schemas/handoff.py`.
-- Treat the stage workspace itself (`rec/`, `dock/`, `com/`) as the main artifact bus between stages.
+- Use filesystem-backed state as the source of truth: `.agent_state.json` via `scripts/infra/state.py`, `.checkpoints/*` via `scripts/infra/checkpoint.py`, `.gates/*` via `scripts/infra/verification.py`, and `.handoffs/*.json` via `scripts/commands/common.sh`.
+- Keep runtime parameters in INI files derived from `scripts/config.ini.template` and loaded in bash/Python through `scripts/infra/config_loader.sh` and `scripts/infra/config.py`.
+- Use stage workspace directories such as `rec/`, `dock/`, and `com/` as the primary artifact bus between compute stages.
 
 ## Key Abstractions
 
 **Stage registry:**
-- Purpose: Define the canonical pipeline order, required config sections, and ligand-targeting mode per stage.
+- Purpose: Define stage identity, required config sections, ligand forwarding mode, and execution order.
 - Examples: `scripts/run_pipeline.sh`
-- Pattern: Bash associative arrays (`STAGE_DESC`, `STAGE_CMD`, `STAGE_SECTIONS`, `STAGE_LIGAND_MODE`) plus ordered stage lists.
+- Pattern: Parallel bash associative arrays `STAGE_DESC`, `STAGE_CMD`, `STAGE_SECTIONS`, and `STAGE_LIGAND_MODE`, plus `ALL_STAGES` and `DEFAULT_PIPELINE_STAGES`.
+
+**Subsystem partitioning:**
+- Purpose: Separate receptor, docking, and complex work into clear directories.
+- Examples: `scripts/rec/`, `scripts/dock/`, `scripts/com/`
+- Pattern: Numeric stage prefixes (`0_`, `1_`, `2_`, `3_`, `4_`, `5_`) inside each subsystem to preserve execution order.
 
 **Config access abstraction:**
-- Purpose: Normalize INI access across bash and Python code.
-- Examples: `scripts/infra/config_loader.sh`, `scripts/infra/config.py`
-- Pattern: Bash `get_config`/`require_config` for stage scripts and Python `ConfigManager` for agent/utility code.
+- Purpose: Read the same INI config model from shell and Python code.
+- Examples: `scripts/infra/config_loader.sh`, `scripts/infra/config.py`, `scripts/config.ini.template`
+- Pattern: Shell `load_config`/`get_config`/`require_config` and Python `ConfigManager` over section-key storage.
 
 **Agent role abstraction:**
-- Purpose: Standardize orchestration behavior across orchestrator, runner, analyzer, checker, and debugger roles.
+- Purpose: Standardize execution across orchestrator, runner, analyzer, checker, and debugger roles.
 - Examples: `scripts/agents/base.py`, `scripts/agents/orchestrator.py`, `scripts/agents/runner.py`, `scripts/agents/analyzer.py`, `scripts/agents/checker.py`, `scripts/agents/debugger.py`
-- Pattern: Shared `BaseAgent` with per-role `execute()` implementations and standardized handoff creation.
+- Pattern: Shared `BaseAgent` plus role-specific `execute()` implementations selected from `scripts/agents/__init__.py`.
+
+**Workflow-stage enum abstraction:**
+- Purpose: Give agent orchestration a canonical stage vocabulary.
+- Examples: `scripts/agents/schemas/state.py`, `scripts/agents/utils/routing.py`
+- Pattern: Enum-based stage names mapped to handling roles by `STAGE_AGENT_MAP`.
 
 **Handoff record abstraction:**
-- Purpose: Serialize inter-agent communication in a durable, machine-readable format.
+- Purpose: Serialize agent-to-agent and command-to-review communication.
 - Examples: `scripts/agents/schemas/handoff.py`, `scripts/commands/common.sh`
-- Pattern: Dataclass-backed JSON payload with `from_agent`, `to_agent`, `status`, `stage`, `data`, `warnings`, `errors`, and `recommendations`.
+- Pattern: Dataclass-backed JSON with `from_agent`, `to_agent`, `status`, `stage`, `data`, `warnings`, `errors`, and `recommendations`.
 
 **Verification gate abstraction:**
-- Purpose: Pause workflow progression for human review between stages.
+- Purpose: Pause progression for human approval between workflow stages.
 - Examples: `scripts/infra/verification.py`, `scripts/agents/orchestrator.py`
-- Pattern: File-backed gate state machine with explicit `pending`, `approved`, `rejected`, and `paused` transitions.
-
-**Workspace-per-run abstraction:**
-- Purpose: Keep each run self-contained and reproducible under a chosen workdir.
-- Examples: `scripts/config.ini.template`, `WORKFLOW.md`, `work/test/config.ini`
-- Pattern: Root workdir configured in `[general] workdir`, with stage-local subtrees such as `rec/`, `dock/`, `com/`, `mdp/`, and optional `ref/`.
+- Pattern: File-backed gate state machine using `pending`, `approved`, `rejected`, and `paused` states under `.gates/`.
 
 ## Entry Points
 
 **Full pipeline CLI:**
 - Location: `scripts/run_pipeline.sh`
-- Triggers: Manual CLI invocation such as `bash scripts/run_pipeline.sh --config work/test/config.ini`.
-- Responsibilities: Validate required config sections, resolve stage commands, run one stage or the default ordered pipeline, and log start/end timestamps.
+- Triggers: Manual execution such as `bash scripts/run_pipeline.sh --config work/test/config.ini`.
+- Responsibilities: List available stages, validate stage config sections, dispatch one stage or the default ordered pipeline, and log stage boundaries.
 
-**Stage scripts:**
+**Scientific stage scripts:**
 - Location: `scripts/rec/*.sh`, `scripts/rec/*.py`, `scripts/dock/*.sh`, `scripts/dock/*.py`, `scripts/com/*.sh`, `scripts/com/*.py`
-- Triggers: Direct CLI use or dispatch from `scripts/run_pipeline.sh`.
-- Responsibilities: Perform scientific stage work and write deterministic artifacts into the workspace.
+- Triggers: Dispatch from `scripts/run_pipeline.sh` or direct manual invocation.
+- Responsibilities: Perform scientific work and write deterministic outputs into the active workspace.
 
 **Agent CLI:**
 - Location: `scripts/agents/__main__.py`
-- Triggers: `python -m scripts.agents --agent <role> --workspace <dir> ...`
-- Responsibilities: Load config/input payloads, instantiate the requested agent, execute role logic, and emit JSON output.
+- Triggers: `python -m scripts.agents --agent <role> --workspace <dir> --config <file> --input <json> --output <json>`.
+- Responsibilities: Parse CLI arguments, load config/input payloads, instantiate the requested role, execute it, and emit JSON output.
 
-**Slash-command bridges:**
-- Location: `scripts/commands/*.sh`
-- Triggers: Slash-command wrappers referenced in `AGENTS.md`, such as `scripts/commands/rec-ensemble.sh`, `scripts/commands/dock-run.sh`, and `scripts/commands/status.sh`.
-- Responsibilities: Ensure environment, resolve workspace root, parse generic flags, dispatch agent calls, and inspect handoff status.
+**Namespaced slash-command bridges:**
+- Location: `scripts/commands/aedmd-*.sh`
+- Triggers: Slash commands such as `/aedmd-status`, `/aedmd-dock-run`, `/aedmd-com-setup`, and `/aedmd-orchestrator-resume` referenced in `AGENTS.md`.
+- Responsibilities: Source environment, resolve workspace root, parse shared flags, dispatch to agents through `scripts/commands/common.sh`, or inspect handoff state directly in the case of `scripts/commands/aedmd-status.sh`.
 
 **Environment bootstrap:**
 - Location: `scripts/setenv.sh`
-- Triggers: Manual `source ./scripts/setenv.sh` and automatic sourcing through `scripts/infra/common.sh:init_script()` and `scripts/commands/common.sh:ensure_env()`.
-- Responsibilities: Activate the `autoEnsmblDockMD` Conda environment expected by the pipeline.
+- Triggers: Manual `source ./scripts/setenv.sh` and automatic sourcing from `scripts/infra/common.sh:init_script()` and `scripts/commands/common.sh:ensure_env()`.
+- Responsibilities: Prepare the Conda-based project environment required by stage scripts and agent wrappers.
 
 ## Error Handling
 
-**Strategy:** Fail fast in core scripts, then layer structured review/debug metadata on top in the agent stack.
+**Strategy:** Fail fast in shell/Python entrypoints, then persist machine-readable status for review and resumption.
 
 **Patterns:**
-- Use `set -euo pipefail` in shell entrypoints such as `scripts/run_pipeline.sh`, `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, and `scripts/com/0_prep.sh`.
-- Validate prerequisites early with `require_file`, `require_dir`, and `require_cmd` from `scripts/infra/common.sh`.
-- Surface orchestration failures through standardized statuses in `scripts/agents/schemas/handoff.py` and role implementations like `scripts/agents/checker.py` and `scripts/agents/debugger.py`.
+- Use `set -euo pipefail` in shell entrypoints such as `scripts/run_pipeline.sh`, `scripts/commands/common.sh`, `scripts/commands/aedmd-status.sh`, and stage scripts across `scripts/rec/`, `scripts/dock/`, and `scripts/com/`.
+- Validate early with `require_file`, `require_dir`, and `require_cmd` from `scripts/infra/common.sh`, plus section checks in `scripts/run_pipeline.sh`.
+- Encode orchestration outcomes through `HandoffStatus` in `scripts/agents/schemas/handoff.py` and persist checkpoints/gates through `scripts/infra/checkpoint.py` and `scripts/infra/verification.py`.
 
 ## Cross-Cutting Concerns
 
-**Logging:** Use timestamped shell logging from `scripts/infra/common.sh` (`log_info`, `log_warn`, `log_error`) and Python-side structured payloads/checkpoints from `scripts/agents/` and `scripts/infra/`.
+**Logging:** Use timestamped shell logging from `scripts/infra/common.sh` (`log_info`, `log_warn`, `log_error`) and JSON-serializable handoff/checkpoint metadata from `scripts/agents/` and `scripts/infra/`.
 
-**Validation:** Validate config sections in `scripts/run_pipeline.sh`, config keys and files in each stage script, output quality in `scripts/agents/checker.py`, and runtime logs in `scripts/infra/monitor.py`.
+**Validation:** Validate config sections in `scripts/run_pipeline.sh`, config keys in `scripts/infra/config_loader.sh`, workspace/file existence in `scripts/infra/common.sh`, and human review gates in `scripts/infra/verification.py`.
 
-**Authentication:** Not applicable for application auth. Execution trust is environment-based: Conda activation in `scripts/setenv.sh`, filesystem-based workspace access, and cluster access through Slurm commands invoked from `scripts/infra/common.sh` and `scripts/infra/executor.py`.
+**Authentication:** Not applicable as application auth. Trust boundaries are environment and filesystem based: Conda activation in `scripts/setenv.sh`, local workspace access, and batch-system identity through Slurm commands invoked by `scripts/infra/common.sh`.
 
 ---
 
