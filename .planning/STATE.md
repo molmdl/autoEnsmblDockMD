@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 6 of 6 (5.1-critical-correctness-and-namespace-fixes) |
-| **Current Plan** | 2 of 6 in current phase |
-| **Last Activity** | 2026-04-19 - Completed 5.1-02-PLAN.md |
+| **Current Plan** | 3 of 6 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 5.1-04-PLAN.md |
 | **Progress** | ████████░░ 35/42 plans complete (83%) |
 | **Phase 5.1 Blocker** | None |
-| **Status** | In progress — 5.1-03 through 5.1-06 remaining |
+| **Status** | In progress — 5.1-03, 5.1-05, 5.1-06 remaining |
 
 ---
 
@@ -37,6 +37,8 @@
 | Use configured `water_model` in `gmx solvate` with `spc216` fallback | Maintain config-driven behavior with compatibility |
 | Resolve MM/PBSA receptor/ligand IDs from actual `index.ndx` and propagate via `mmpbsa_groups.dat` | Prevent silent wrong-group MM/PBSA calculations when index ordering differs |
 | Honor explicit non-default `[mmpbsa] receptor_group_id/ligand_group_id` overrides | Preserve escape hatch for manual system-specific recovery |
+| Map `com_ana` stage to `ligand` forwarding mode in `run_pipeline.sh` | Keep dispatcher/callee CLI contract consistent for per-ligand analysis targeting |
+| Compute advanced RMSD with superposition before displacement measurement | Remove translational/rotational drift inflation from RMSD timeseries |
 
 ### Known Pitfalls
 
@@ -48,8 +50,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:10 UTC
-Stopped at: Completed 5.1-02-PLAN.md
+Last session: 2026-04-19 10:09 UTC
+Stopped at: Completed 5.1-04-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -67,4 +69,4 @@ Execute `5.1-03-PLAN.md` (dock2com artifact contract + atom-order validation).
 
 *State updated: 2026-04-19*
 *Current phase: 5.1-critical-correctness-and-namespace-fixes (in progress)*
-*Last action: Completed 5.1-02-PLAN.md and created 5.1-02-SUMMARY.md*
+*Last action: Completed 5.1-04-PLAN.md and created 5.1-04-SUMMARY.md*
