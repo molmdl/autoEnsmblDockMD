@@ -5,10 +5,36 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
+CUSTOM_WORKDIR=""
+FILTERED_ARGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --workdir)
+      if [[ $# -lt 2 || "$2" == --* ]]; then
+        printf 'Error: --workdir requires a value\n' >&2
+        exit 1
+      fi
+      CUSTOM_WORKDIR="$2"
+      shift 2
+      ;;
+    *)
+      FILTERED_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [[ -n "$CUSTOM_WORKDIR" ]]; then
+  cd "$CUSTOM_WORKDIR" || {
+    printf 'Error: cannot cd to %s\n' "$CUSTOM_WORKDIR" >&2
+    exit 1
+  }
+fi
+
 ensure_env
 WORKSPACE_ROOT="$(find_workspace_root)"
 cd "${WORKSPACE_ROOT}"
-parse_flags "$@"
+parse_flags "${FILTERED_ARGS[@]}"
 
 status() {
   local config_file mode handoff_dir last_stage latest_success_ts
