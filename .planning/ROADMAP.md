@@ -281,8 +281,8 @@ Plans (original — completed or superseded):
 - [x] ~~05-07-PLAN.md~~ — Superseded by 05-10
 
 Plans (remediation):
-- [ ] 05-08-PLAN.md — Revert 05-03 commits, restore SKILL.md YAML frontmatter (Wave 5)
-- [ ] 05-09-PLAN.md — Review surviving docs for compatibility with restored skills (Wave 5)
+- [x] 05-08-PLAN.md — Revert 05-03 commits, restore SKILL.md YAML frontmatter (Wave 5)
+- [x] 05-09-PLAN.md — Review surviving docs for compatibility with restored skills (Wave 5)
 - [ ] 05-10-PLAN.md — End-to-end structural validation (Wave 6)
 
 **Success Criteria:**
