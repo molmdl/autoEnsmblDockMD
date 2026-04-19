@@ -61,10 +61,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### VII. Documentation (DOC)
 
-- [ ] **DOC-01**: README.md — clear usage instructions for humans (must-have, not feature)
-- [ ] **DOC-02**: Agent-optimized documentation — detailed, structured for agent loading
-- [ ] **DOC-03**: WORKFLOW.md — workflow steps and script usage (to be finalized)
-- [ ] **DOC-04**: AGENTS.md — agent guidelines (exists, update as needed)
+- [x] **DOC-01**: README.md — clear usage instructions for humans (must-have, not feature)
+- [x] **DOC-02**: Agent-optimized documentation — detailed, structured for agent loading
+- [x] **DOC-03**: WORKFLOW.md — workflow steps and script usage (to be finalized)
+- [x] **DOC-04**: AGENTS.md — agent guidelines (exists, update as needed)
 
 ## v2 Requirements
 
@@ -135,10 +135,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHECK-01 | Phase 1 | Complete |
 | CHECK-02 | Phase 1 | Complete |
 | CHECK-03 | Phase 1 | Complete |
-| DOC-01 | Phase 5 | Pending |
-| DOC-02 | Phase 4 | Pending |
-| DOC-03 | Phase 5 | Pending |
-| DOC-04 | Phase 5 | Pending |
+| DOC-01 | Phase 5 | Complete |
+| DOC-02 | Phase 4 | Complete |
+| DOC-03 | Phase 5 | Complete |
+| DOC-04 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total
