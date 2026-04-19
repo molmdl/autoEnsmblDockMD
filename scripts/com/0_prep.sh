@@ -238,30 +238,151 @@ discover_ligands() {
     done
 }
 
-resolve_single_match() {
-    local base_dir="$1"
-    local preferred="$2"
-    local pattern="$3"
+validate_ligand_itp() {
+    local itp_path="$1"
+    python - "$itp_path" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(errors="replace")
+lines = [ln.strip().lower() for ln in text.splitlines() if ln.strip() and not ln.strip().startswith(';')]
+has_moleculetype = any(ln == '[ moleculetype ]' for ln in lines)
+has_atoms = any(ln == '[ atoms ]' for ln in lines)
+if not has_moleculetype or not has_atoms:
+    raise SystemExit(1)
+PY
+}
+
+resolve_ligand_itp() {
+    local ligand_dir="$1"
+    local ligand_name="$2"
+    local preferred="$3"
+    local preferred_path
+    local -a candidates=()
+    local entry base
 
     if [[ -n "${preferred}" ]]; then
         if [[ -f "${preferred}" ]]; then
-            printf '%s\n' "$(realpath "${preferred}")"
-            return 0
+            preferred_path="$(realpath "${preferred}")"
+        elif [[ -f "${ligand_dir}/${preferred}" ]]; then
+            preferred_path="$(realpath "${ligand_dir}/${preferred}")"
+        else
+            log_error "Configured ligand_itp '${preferred}' not found for ${ligand_name}"
+            return 1
         fi
-        if [[ -f "${base_dir}/${preferred}" ]]; then
-            printf '%s\n' "$(realpath "${base_dir}/${preferred}")"
-            return 0
+        if ! validate_ligand_itp "${preferred_path}"; then
+            log_error "Configured ligand ITP is not a valid ligand topology: ${preferred_path}"
+            return 1
         fi
+        printf '%s\n' "${preferred_path}"
+        return 0
     fi
 
     shopt -s nullglob
-    local matches=("${base_dir}"/${pattern})
+    local all_itps=("${ligand_dir}"/*.itp)
     shopt -u nullglob
-    if [[ ${#matches[@]} -eq 0 ]]; then
+
+    for entry in "${all_itps[@]}"; do
+        base="$(basename "${entry}")"
+        case "${base}" in
+            posre*.itp|*posre*.itp|rec.itp|topol*.itp)
+                continue
+                ;;
+        esac
+        if validate_ligand_itp "${entry}"; then
+            candidates+=("$(realpath "${entry}")")
+        fi
+    done
+
+    if [[ ${#candidates[@]} -eq 0 ]]; then
         return 1
     fi
-    printf '%s\n' "$(realpath "${matches[0]}")"
-    return 0
+
+    local preferred_name="${ligand_dir}/${ligand_name}.itp"
+    local generic_name="${ligand_dir}/lig.itp"
+    if [[ -f "${preferred_name}" ]] && validate_ligand_itp "${preferred_name}"; then
+        printf '%s\n' "$(realpath "${preferred_name}")"
+        return 0
+    fi
+    if [[ -f "${generic_name}" ]] && validate_ligand_itp "${generic_name}"; then
+        printf '%s\n' "$(realpath "${generic_name}")"
+        return 0
+    fi
+
+    if [[ ${#candidates[@]} -gt 1 ]]; then
+        log_error "Ambiguous ligand ITP for ${ligand_name}. Set [complex] ligand_itp explicitly."
+        printf '%s\n' "Candidates:" >&2
+        printf '  - %s\n' "${candidates[@]}" >&2
+        return 1
+    fi
+
+    printf '%s\n' "${candidates[0]}"
+}
+
+resolve_ligand_gro() {
+    local ligand_dir="$1"
+    local ligand_name="$2"
+    local preferred="$3"
+    local preferred_path
+    local -a candidates=()
+    local entry base
+
+    if [[ -n "${preferred}" ]]; then
+        if [[ -f "${preferred}" ]]; then
+            preferred_path="$(realpath "${preferred}")"
+        elif [[ -f "${ligand_dir}/${preferred}" ]]; then
+            preferred_path="$(realpath "${ligand_dir}/${preferred}")"
+        else
+            log_error "Configured ligand_gro '${preferred}' not found for ${ligand_name}"
+            return 1
+        fi
+        printf '%s\n' "${preferred_path}"
+        return 0
+    fi
+
+    shopt -s nullglob
+    local all_gros=("${ligand_dir}"/*.gro)
+    shopt -u nullglob
+
+    for entry in "${all_gros[@]}"; do
+        base="$(basename "${entry}")"
+        case "${base}" in
+            com.gro|complex.gro|box.gro|solv.gro|ion.gro|em.gro|pr*.gro|prod*.gro|*.pdb_ali.gro)
+                continue
+                ;;
+        esac
+        candidates+=("$(realpath "${entry}")")
+    done
+
+    if [[ ${#candidates[@]} -eq 0 ]]; then
+        return 1
+    fi
+
+    local preferred_name="${ligand_dir}/${ligand_name}.gro"
+    local best_name="${ligand_dir}/best.gro"
+    local generic_name="${ligand_dir}/lig.gro"
+    if [[ -f "${preferred_name}" ]]; then
+        printf '%s\n' "$(realpath "${preferred_name}")"
+        return 0
+    fi
+    if [[ -f "${best_name}" ]]; then
+        printf '%s\n' "$(realpath "${best_name}")"
+        return 0
+    fi
+    if [[ -f "${generic_name}" ]]; then
+        printf '%s\n' "$(realpath "${generic_name}")"
+        return 0
+    fi
+
+    if [[ ${#candidates[@]} -gt 1 ]]; then
+        log_error "Ambiguous ligand GRO for ${ligand_name}. Set [complex] ligand_gro explicitly."
+        printf '%s\n' "Candidates:" >&2
+        printf '  - %s\n' "${candidates[@]}" >&2
+        return 1
+    fi
+
+    printf '%s\n' "${candidates[0]}"
 }
 
 build_sys_top() {
@@ -483,11 +604,11 @@ log_info "Preparing ${#TARGETS[@]} ligand complex(es) in mode=${MODE}"
 for lig_path in "${TARGETS[@]}"; do
     lig_name="$(basename "${lig_path}")"
 
-    lig_itp="$(resolve_single_match "${lig_path}" "${LIGAND_ITP_KEY}" "*.itp")" || {
+    lig_itp="$(resolve_ligand_itp "${lig_path}" "${lig_name}" "${LIGAND_ITP_KEY}")" || {
         log_error "No ligand ITP found for ${lig_name} in ${lig_path}"
         exit 1
     }
-    lig_gro="$(resolve_single_match "${lig_path}" "${LIGAND_GRO_KEY}" "*.gro")" || {
+    lig_gro="$(resolve_ligand_gro "${lig_path}" "${lig_name}" "${LIGAND_GRO_KEY}")" || {
         log_error "No ligand GRO found for ${lig_name} in ${lig_path}"
         exit 1
     }

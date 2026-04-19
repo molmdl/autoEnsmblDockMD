@@ -189,15 +189,31 @@ discover_ref_ligands() {
     done
 }
 
-find_first_match() {
+find_unique_match() {
     local pattern="$1"
+    local label="$2"
+    local -a hits=()
+    local hit
 
-    shopt -s nullglob
-    local hits=(${pattern})
-    shopt -u nullglob
+    while IFS= read -r hit; do
+        [[ -n "${hit}" ]] || continue
+        hits+=("${hit}")
+    done < <(python - "$pattern" <<'PY'
+import glob
+import sys
+
+for path in sorted(glob.glob(sys.argv[1])):
+    print(path)
+PY
+)
 
     if [[ ${#hits[@]} -eq 0 ]]; then
         return 1
+    fi
+    if [[ ${#hits[@]} -gt 1 ]]; then
+        log_error "Ambiguous ${label}. Multiple matches for pattern: ${pattern}"
+        printf '  - %s\n' "${hits[@]}" >&2
+        return 2
     fi
 
     printf '%s\n' "${hits[0]}"
@@ -316,7 +332,7 @@ for ligand_id in "${REF_LIGANDS[@]}"; do
     require_dir "${ligand_dir}" "Reference ligand docking directory not found: ${ligand_dir}"
 
     sdf_glob="${ligand_dir}/$(render_pattern "${SDF_PATTERN}" "${ligand_id}")"
-    if ! selected_sdf="$(find_first_match "${sdf_glob}")"; then
+    if ! selected_sdf="$(find_unique_match "${sdf_glob}" "reference docking SDF")"; then
         log_error "No docking SDF matches '${sdf_glob}' for reference ligand ${ligand_id}"
         exit 1
     fi
@@ -338,7 +354,7 @@ for ligand_id in "${REF_LIGANDS[@]}"; do
         template_path="${ligand_dir}/$(render_pattern "${LIG_TEMPLATE_PATTERN}" "${ligand_id}")"
     fi
     if [[ ! -f "${template_path}" ]]; then
-        if alt_template="$(find_first_match "${ligand_dir}/*.mol2")"; then
+        if alt_template="$(find_unique_match "${ligand_dir}/*.mol2" "reference ligand MOL2 template")"; then
             template_path="${alt_template}"
         fi
     fi
