@@ -45,11 +45,19 @@ def _convert_with_rdkit(sdf_path: Path, output_path: Path, pose_index: int) -> b
         return False
 
     supplier = Chem.SDMolSupplier(str(sdf_path), removeHs=False)
-    molecules = [m for m in supplier if m is not None]
-    if pose_index < 1 or pose_index > len(molecules):
-        raise IndexError(f"pose-index {pose_index} out of range (1..{len(molecules)})")
+    molecule = None
+    valid_pose_count = 0
+    for candidate in supplier:
+        if candidate is None:
+            continue
+        valid_pose_count += 1
+        if valid_pose_count == pose_index:
+            molecule = candidate
+            break
 
-    molecule = molecules[pose_index - 1]
+    if molecule is None:
+        raise IndexError(f"pose-index {pose_index} out of range (1..{valid_pose_count})")
+
     conf = molecule.GetConformer()
     coords: list[tuple[str, float, float, float]] = []
     for atom in molecule.GetAtoms():
