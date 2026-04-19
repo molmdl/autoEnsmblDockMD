@@ -22,6 +22,7 @@ import numpy as np
 
 try:
     import MDAnalysis as mda
+    from MDAnalysis.analysis import rms
 except Exception as exc:  # pragma: no cover - runtime dependency
     raise SystemExit(f"MDAnalysis is required: {exc}")
 
@@ -92,16 +93,16 @@ def compute_rmsd(universe: "mda.Universe", selection: str) -> Tuple[np.ndarray, 
     if len(atoms) == 0:
         raise ValueError(f"Selection yielded no atoms for RMSD: {selection}")
 
+    universe.trajectory[0]
     reference = atoms.positions.copy()
     frames: list[int] = []
     times: list[float] = []
     values: list[float] = []
     for ts in universe.trajectory:
-        diff = atoms.positions - reference
-        rmsd = float(np.sqrt(np.mean(np.sum(diff * diff, axis=1))))
+        rmsd_value = rms.rmsd(atoms.positions, reference, superposition=True)
         frames.append(int(ts.frame))
         times.append(float(ts.time))
-        values.append(rmsd)
+        values.append(float(rmsd_value))
     return np.array(frames), np.array(times), np.array(values)
 
 
