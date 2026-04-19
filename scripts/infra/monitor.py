@@ -7,12 +7,14 @@ to determine job status without manual inspection.
 """
 
 import argparse
+import configparser
 import os
 import re
 import sys
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 
 class JobStatus(Enum):
@@ -30,6 +32,15 @@ class JobStatus(Enum):
     FAILED = 'failed'
     WARNING = 'warning'
     UNKNOWN = 'unknown'
+
+
+@dataclass(frozen=True)
+class PatternRule:
+    """Pattern registry entry with category and severity metadata."""
+
+    kind: str
+    pattern: str
+    severity: str
 
 
 class LogMonitor:
@@ -54,66 +65,60 @@ class LogMonitor:
         ...     print(f"Found {len(errors)} errors")
     """
     
-    # Error patterns for GROMACS/gnina/gmx_MMPBSA (case-insensitive)
-    ERROR_PATTERNS = [
-        r'\bERROR\b',
-        r'Fatal error',
-        r'Segmentation fault',
-        r'SIGSEGV',
-        r'\bAborted\b',
-        r'CUDA ERROR',
-        r'GROMACS error',
-        r'GPU memory allocation failed',
-        r'Input validation failed',
-        r'Assertion.*failed',
-        r'\bFAILED\b',
-        r'Error:',
-        r'Program terminated',
-        r'Panic',
-        r'Invalid.*parameter',
-        r'Cannot open file',
-        r'File not found',
-        r'Memory allocation failed',
-        r'Out of memory',
-        r'Too many atoms',
-        r'Inconsistent state',
-    ]
-    
-    # Warning patterns
-    WARNING_PATTERNS = [
-        r'\bWARNING\b',
-        r'\bWARN\b',
-        r'\bNote:',
-        r'Step.*out of range',
-        r'Large.*value',
-        r'Maybe you forgot to',
-        r'This might indicate',
-        r'POTENTIAL ISSUE',
-        r'UNUSUAL',
-        r'Could not find',
-        r'Guessing',
-        r'Assuming',
-    ]
-    
-    # Completion markers (tool-specific success indicators)
-    COMPLETION_MARKERS = [
-        r'GROMACS.*finished',
-        r'gnina.*finished',
-        r'Performance:',  # GROMACS MD completion
-        r'Final.*energy',
-        r'Simulation complete',
-        r'MMPBSA.*complete',
-        r'Writing output',
-        r'Complete\.',
-        r'Done\.',
-        r'Program finished',
-        r'Total wall time',
-        r'Successfully completed',
-        r'Results written to',
-        r'Output written to',
-    ]
-    
-    def __init__(self, log_file: str):
+    DEFAULT_PATTERN_REGISTRY: Sequence[PatternRule] = (
+        PatternRule('error', r'\bERROR\b', 'high'),
+        PatternRule('error', r'Fatal error', 'high'),
+        PatternRule('error', r'Segmentation fault', 'high'),
+        PatternRule('error', r'SIGSEGV', 'high'),
+        PatternRule('error', r'\bAborted\b', 'high'),
+        PatternRule('error', r'CUDA ERROR', 'high'),
+        PatternRule('error', r'GROMACS error', 'high'),
+        PatternRule('error', r'GPU memory allocation failed', 'high'),
+        PatternRule('error', r'Input validation failed', 'high'),
+        PatternRule('error', r'Assertion.*failed', 'high'),
+        PatternRule('error', r'\bFAILED\b', 'high'),
+        PatternRule('error', r'Error:', 'high'),
+        PatternRule('error', r'Program terminated', 'high'),
+        PatternRule('error', r'Panic', 'high'),
+        PatternRule('error', r'Invalid.*parameter', 'medium'),
+        PatternRule('error', r'Cannot open file', 'medium'),
+        PatternRule('error', r'File not found', 'medium'),
+        PatternRule('error', r'Memory allocation failed', 'high'),
+        PatternRule('error', r'Out of memory', 'high'),
+        PatternRule('error', r'Too many atoms', 'high'),
+        PatternRule('error', r'Inconsistent state', 'high'),
+        PatternRule('warning', r'\bWARNING\b', 'medium'),
+        PatternRule('warning', r'\bWARN\b', 'medium'),
+        PatternRule('warning', r'\bNote:', 'low'),
+        PatternRule('warning', r'Step.*out of range', 'medium'),
+        PatternRule('warning', r'Large.*value', 'medium'),
+        PatternRule('warning', r'Maybe you forgot to', 'low'),
+        PatternRule('warning', r'This might indicate', 'low'),
+        PatternRule('warning', r'POTENTIAL ISSUE', 'medium'),
+        PatternRule('warning', r'UNUSUAL', 'medium'),
+        PatternRule('warning', r'Could not find', 'medium'),
+        PatternRule('warning', r'Guessing', 'low'),
+        PatternRule('warning', r'Assuming', 'low'),
+        PatternRule('completion', r'GROMACS.*finished', 'info'),
+        PatternRule('completion', r'gnina.*finished', 'info'),
+        PatternRule('completion', r'Performance:', 'info'),
+        PatternRule('completion', r'Final.*energy', 'info'),
+        PatternRule('completion', r'Simulation complete', 'info'),
+        PatternRule('completion', r'MMPBSA.*complete', 'info'),
+        PatternRule('completion', r'Writing output', 'info'),
+        PatternRule('completion', r'Complete\.', 'info'),
+        PatternRule('completion', r'Done\.', 'info'),
+        PatternRule('completion', r'Program finished', 'info'),
+        PatternRule('completion', r'Total wall time', 'info'),
+        PatternRule('completion', r'Successfully completed', 'info'),
+        PatternRule('completion', r'Results written to', 'info'),
+        PatternRule('completion', r'Output written to', 'info'),
+    )
+
+    DEFAULT_PATTERNS_CONFIG_SECTION = 'monitor_patterns'
+    DEFAULT_MAX_MATCHED_LINES = 0
+
+    def __init__(self, log_file: str, config_file: Optional[str] = None):
         """Initialize monitor with log file path.
         
         Args:
@@ -126,9 +131,72 @@ class LogMonitor:
             raise TypeError(f"log_file must be a string, got {type(log_file)}")
         
         self.log_file = Path(log_file)
-        self._compiled_error_patterns = [re.compile(p, re.IGNORECASE) for p in self.ERROR_PATTERNS]
-        self._compiled_warning_patterns = [re.compile(p, re.IGNORECASE) for p in self.WARNING_PATTERNS]
-        self._compiled_completion_patterns = [re.compile(p, re.IGNORECASE) for p in self.COMPLETION_MARKERS]
+        self._pattern_registry = self._load_pattern_registry(config_file)
+        self.max_matched_lines = self._load_max_matched_lines(config_file)
+        self._compiled_error_patterns = self._compile_patterns('error')
+        self._compiled_warning_patterns = self._compile_patterns('warning')
+        self._compiled_completion_patterns = self._compile_patterns('completion')
+
+    @staticmethod
+    def _sanitize_regex_list(raw_value: str) -> List[str]:
+        return [entry.strip() for entry in raw_value.split('||') if entry.strip()]
+
+    def _load_pattern_registry(self, config_file: Optional[str]) -> List[PatternRule]:
+        registry = list(self.DEFAULT_PATTERN_REGISTRY)
+        if not config_file:
+            return registry
+
+        parser = configparser.ConfigParser()
+        parser.read(config_file)
+        section = self.DEFAULT_PATTERNS_CONFIG_SECTION
+        if not parser.has_section(section):
+            return registry
+
+        config_section = parser[section]
+        mapping = {
+            'error_patterns': ('error', 'high'),
+            'warning_patterns': ('warning', 'medium'),
+            'completion_markers': ('completion', 'info'),
+        }
+
+        for key, (kind, severity) in mapping.items():
+            value = config_section.get(key, '').strip()
+            if not value:
+                continue
+            parsed = self._sanitize_regex_list(value)
+            if parsed:
+                registry = [rule for rule in registry if rule.kind != kind]
+                registry.extend(PatternRule(kind=kind, pattern=pattern, severity=severity) for pattern in parsed)
+        return registry
+
+    def _load_max_matched_lines(self, config_file: Optional[str]) -> int:
+        if not config_file:
+            return self.DEFAULT_MAX_MATCHED_LINES
+
+        parser = configparser.ConfigParser()
+        parser.read(config_file)
+        section = self.DEFAULT_PATTERNS_CONFIG_SECTION
+        if not parser.has_section(section):
+            return self.DEFAULT_MAX_MATCHED_LINES
+
+        raw_limit = parser[section].get('max_matched_lines', str(self.DEFAULT_MAX_MATCHED_LINES)).strip()
+        try:
+            value = int(raw_limit)
+        except ValueError:
+            return self.DEFAULT_MAX_MATCHED_LINES
+        return max(value, 0)
+
+    def _compile_patterns(self, kind: str) -> List[re.Pattern[str]]:
+        return [
+            re.compile(rule.pattern, re.IGNORECASE)
+            for rule in self._pattern_registry
+            if rule.kind == kind
+        ]
+
+    def _limit_matches(self, matches: List[str]) -> List[str]:
+        if self.max_matched_lines <= 0:
+            return matches
+        return matches[: self.max_matched_lines]
     
     def _file_exists(self) -> bool:
         """Check if log file exists.
@@ -176,7 +244,7 @@ class LogMonitor:
                     errors.append(line.rstrip('\n'))
                     break  # Don't count same line multiple times
         
-        return errors
+        return self._limit_matches(errors)
     
     def check_warnings(self) -> List[str]:
         """Scan log file for warning patterns.
@@ -202,7 +270,7 @@ class LogMonitor:
                     warnings.append(line.rstrip('\n'))
                     break  # Don't count same line multiple times
         
-        return warnings
+        return self._limit_matches(warnings)
     
     def check_completion(self) -> bool:
         """Check if job completed successfully.
@@ -404,28 +472,34 @@ Examples:
     # status subcommand
     status_parser = subparsers.add_parser('status', help='Get job status')
     status_parser.add_argument('--log', required=True, help='Path to log file')
+    status_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     # errors subcommand
     errors_parser = subparsers.add_parser('errors', help='List error lines')
     errors_parser.add_argument('--log', required=True, help='Path to log file')
+    errors_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     # warnings subcommand
     warnings_parser = subparsers.add_parser('warnings', help='List warning lines')
     warnings_parser.add_argument('--log', required=True, help='Path to log file')
+    warnings_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     # summary subcommand
     summary_parser = subparsers.add_parser('summary', help='Get full summary')
     summary_parser.add_argument('--log', required=True, help='Path to log file')
+    summary_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     # tail subcommand
     tail_parser = subparsers.add_parser('tail', help='Get last N lines')
     tail_parser.add_argument('--log', required=True, help='Path to log file')
     tail_parser.add_argument('--lines', type=int, default=50, help='Number of lines (default: 50)')
+    tail_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     # grep subcommand
     grep_parser = subparsers.add_parser('grep', help='Search for pattern')
     grep_parser.add_argument('--log', required=True, help='Path to log file')
     grep_parser.add_argument('--pattern', required=True, help='Regex pattern to search')
+    grep_parser.add_argument('--config', default=None, help='Optional config for monitor patterns')
     
     args = parser.parse_args()
     
@@ -434,7 +508,7 @@ Examples:
         sys.exit(1)
     
     try:
-        monitor = LogMonitor(args.log)
+        monitor = LogMonitor(args.log, config_file=args.config)
         
         if args.command == 'status':
             status = monitor.get_status()
