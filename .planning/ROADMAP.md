@@ -312,7 +312,7 @@ Plans (remediation):
 **Goal:** Address critical code correctness issues and establish project namespace for skills before production use.
 
 **Depends on:** Phase 5
-**Plans:** 6 plans in 2 waves
+**Plans:** 7 plans in 3 waves
 
 **Scope:**
 
@@ -351,6 +351,7 @@ Plans:
 - [ ] 5.1-04-PLAN.md — Fix run_pipeline.sh arg forwarding and RMSD alignment (Wave 1)
 - [ ] 5.1-05-PLAN.md — Rename all skills/commands to aedmd-* namespace (Wave 2)
 - [ ] 5.1-06-PLAN.md — Update docs with aedmd-* namespace and fix doc consistency (Wave 2)
+- [ ] 5.1-07-PLAN.md — Gap closure: fix config section mismatch and implement --workdir (Wave 3)
 
 ---
 
