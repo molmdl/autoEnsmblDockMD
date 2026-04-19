@@ -19,7 +19,16 @@ This guide is the human-facing deep reference for configuring and preparing `aut
     - [[analysis]](#analysis)
   - [Input File Preparation](#input-file-preparation)
   - [Workspace Setup](#workspace-setup)
-- [Part 2: Per-Stage Instructions (placeholder)](#part-2-per-stage-instructions-placeholder)
+- [Part 2: Stage-by-Stage Operating Guide](#part-2-stage-by-stage-operating-guide)
+  - [How to use this section with `WORKFLOW.md`](#how-to-use-this-section-with-workflowmd)
+  - [Stage 0: Input Preparation and Preflight](#stage-0-input-preparation-and-preflight)
+  - [Stage 1: Receptor Ensemble Generation](#stage-1-receptor-ensemble-generation)
+  - [Stage 2: Docking](#stage-2-docking)
+  - [Stage 3: Complex Setup](#stage-3-complex-setup)
+  - [Stage 4: MD Simulation](#stage-4-md-simulation)
+  - [Stage 5: MM/PBSA](#stage-5-mmpbsa)
+  - [Stage 6: Analysis](#stage-6-analysis)
+  - [Output Interpretation Quick Guide](#output-interpretation-quick-guide)
 
 ## Part 1: Before Running the Pipeline
 
@@ -384,8 +393,214 @@ bash scripts/commands/status.sh --workdir work/my_project
 
 If `status` or `--list-stages` reports missing config keys/paths, fix those first to avoid expensive failed jobs.
 
-## Part 2: Per-Stage Instructions (placeholder)
+## Part 2: Stage-by-Stage Operating Guide
 
-Detailed per-stage operating instructions, verification checkpoints, and troubleshooting will be added in Part 2.
+Use this section while running stages from `scripts/run_pipeline.sh`.
+For script paths, stage aliases, and full command inventory, always cross-check `WORKFLOW.md`.
 
-<!-- Part 2: Per-stage instructions will be added -->
+### How to use this section with `WORKFLOW.md`
+
+- This guide tells you **what to do and what to inspect** before moving to the next stage.
+- `WORKFLOW.md` tells you **exact script sequence and script locations** (`scripts/rec`, `scripts/dock`, `scripts/com`, `scripts/infra`).
+- Recommended execution pattern:
+  1. Run one stage.
+  2. Perform the verification checklist below.
+  3. Confirm expected outputs are present and sensible.
+  4. Proceed only when pass criteria are met.
+
+### Stage 0: Input Preparation and Preflight
+
+**What this stage does**
+- Validates `config.ini`, input file paths, and stage prerequisites before expensive compute jobs.
+- Ensures your workspace is consistent with what downstream scripts expect.
+
+**Key commands to run**
+- `source ./scripts/setenv.sh`
+- `bash scripts/run_pipeline.sh --config work/my_project/config.ini --list-stages`
+- Optional workspace readiness check: `bash scripts/commands/status.sh --workdir work/my_project`
+- See `WORKFLOW.md` Stage 0 for infra-level script references.
+
+**Check before proceeding**
+- Config sections are present (`[general]`, `[receptor]`, `[docking]`, `[complex]`, `[production]`, `[mmpbsa]`, `[analysis]`).
+- Paths resolve correctly (receptor PDB, MDP directories, ligand directories).
+- Mode-specific inputs are ready (Mode A reference ligand, Mode B blind docking assets).
+
+**Expected outputs and what they mean**
+- No missing-key/path errors in stage listing output.
+- Stage discovery output confirms pipeline entry points are reachable.
+- A clean preflight means failures in later stages are more likely scientific/runtime issues, not setup mistakes.
+
+**Common issues (stage-specific)**
+- Wrong `workdir` or stale relative paths in copied config.
+- Missing MDP files (`em.mdp`, `pr0.mdp`, `md.mdp`) causing early grompp failures.
+- Running without `source ./scripts/setenv.sh` and then hitting missing tool/module errors.
+
+### Stage 1: Receptor Ensemble Generation
+
+**What this stage does**
+- Prepares receptor system, samples receptor dynamics, then clusters representative conformations.
+- Optionally aligns representative structures to a reference frame for stable pocket comparison.
+
+**Key commands to run**
+- Run Stage 1 via pipeline stage selection or full pipeline execution.
+- Use stage-level status checks to confirm receptor trials completed.
+- Script sequence and exact paths are documented in `WORKFLOW.md` Stage 1.
+
+**Check before proceeding**
+- Receptor trajectories exist for each configured trial.
+- Clustering completed and produced representative `rec*` structures.
+- If alignment enabled, aligned outputs exist under configured alignment output directory.
+
+**Expected outputs and what they mean**
+- Receptor topology/coordinate artifacts indicate prep succeeded.
+- Cluster outputs represent conformational diversity used by docking.
+- Balanced cluster populations suggest reasonable ensemble quality; one giant cluster may indicate low diversity.
+
+**Common issues (stage-specific)**
+- Protonation/hydrogen assignment issues from incomplete receptor input.
+- Overly strict clustering cutoff producing too many tiny/noisy clusters.
+- Alignment reference mismatch causing unexpected orientation shifts.
+
+### Stage 2: Docking
+
+**What this stage does**
+- Converts/normalizes ligand and receptor docking inputs, runs gnina across receptor ensemble, and ranks/selects poses.
+- Produces scored poses used to seed complex setup.
+
+**Key commands to run**
+- Execute docking stage from the pipeline with your selected mode (`targeted/test` or `blind`).
+- Review generated docking report after gnina completes.
+- For script-level sequence (`0_gro2mol2`, `2_gnina`, `3_dock_report`, etc.), see `WORKFLOW.md` Stage 2.
+
+**Check before proceeding**
+- gnina completed for expected ligand/receptor combinations.
+- Docking report exists and contains ranked entries.
+- Selected output poses were exported for next-stage conversion.
+
+**Expected outputs and what they mean**
+- SDF outputs and logs contain pose-level scoring details.
+- Better (more favorable) CNN-based rankings generally indicate stronger candidate poses.
+- Pose geometry should be chemically plausible inside the target region (for targeted mode).
+
+**Common issues (stage-specific)**
+- Incorrect autobox reference/size causing unrealistic or empty docking region.
+- Input ligand format/atom typing inconsistencies reducing valid pose generation.
+- Blind docking search space too broad with insufficient exhaustiveness.
+
+### Stage 3: Complex Setup
+
+**What this stage does**
+- Converts selected docked poses into receptor-ligand complex systems ready for MD.
+- Builds topology, solvates, ions, and runs minimization/early restraint steps.
+
+**Key commands to run**
+- Run Stage 3 through pipeline stage orchestration after docking selection is complete.
+- Inspect generated per-ligand complex directories.
+- For branch-specific script chain (`dock2com*`, `scripts/com/0_prep.sh`, bypass helper), refer to `WORKFLOW.md` Stage 3.
+
+**Check before proceeding**
+- Each intended ligand has a complete complex folder with `com.gro`, `sys.top`, and index files.
+- Minimization/equilibration setup commands finished without fatal topology errors.
+- Force-field branch (`amber` vs `charmm`) is consistent with ligand parameter family.
+
+**Expected outputs and what they mean**
+- `sys.top` and related include files show topology assembly succeeded.
+- Minimized structures with reduced potential energy indicate physically saner starting coordinates.
+- Position-restraint artifacts indicate readiness for Stage 4 equilibration/production.
+
+**Common issues (stage-specific)**
+- Topology include ordering problems or missing ligand include files.
+- Force-field mismatch between protein and ligand assets.
+- Atom type/angle definitions needing bypass helper in AMBER-oriented branch.
+
+### Stage 4: MD Simulation
+
+**What this stage does**
+- Runs the complex equilibration chain and production trajectories for each ligand/trial.
+- Generates the dynamic trajectories used for MM/PBSA and structural analyses.
+
+**Key commands to run**
+- Execute production stage after verifying Stage 3 minimized/equilibration-ready artifacts.
+- Monitor per-ligand trial outputs and scheduler logs during runtime.
+- See `WORKFLOW.md` Stage 4 for production script path and required config keys.
+
+**Check before proceeding**
+- Expected number of trial trajectories (`prod_*.xtc`, `prod_*.tpr`) exists.
+- Jobs complete without LINCS/blow-up/fatal pressure/temperature instability errors.
+- Stability metrics (especially RMSD trend) are acceptable before using trajectories downstream.
+
+**Expected outputs and what they mean**
+- Stable RMSD trajectories (commonly targeting <3 Å plateau for core protein frame) suggest equilibration sufficiency.
+- Consistent temperature/pressure behavior indicates healthy integration settings.
+- Major monotonic drift or repeated spikes suggests unstable setup requiring correction.
+
+**Common issues (stage-specific)**
+- RMSD stays >3 Å with unstable trend (often needs longer equilibration or box/ion review).
+- Inadequate restraints or problematic starting poses causing early structural distortions.
+- Resource/request mismatch in Slurm leading to repeated failed runs.
+
+### Stage 5: MM/PBSA
+
+**What this stage does**
+- Preprocesses MD trajectories and computes chunked binding free-energy estimates.
+- Produces total and component energy terms to compare ligand binding behavior.
+
+**Key commands to run**
+- Run MM/PBSA orchestration scripts after confirming Stage 4 trajectories are complete.
+- Check chunk directories and summarized outputs per ligand.
+- Exact script order (`2_run_mmpbsa`, `2_trj4mmpbsa`, `2_sub_mmpbsa`, `2_mmpbsa`) is in `WORKFLOW.md` Stage 5.
+
+**Check before proceeding**
+- Processed trajectories and expected chunk folders were created.
+- Topology used by `gmx_MMPBSA` matches the force-field branch and generated structures.
+- Result files include total binding estimates and decomposition terms.
+
+**Expected outputs and what they mean**
+- More favorable (more negative) total binding energy generally indicates stronger predicted binding.
+- Per-residue or per-component decomposition helps identify interaction drivers.
+- Very noisy or inconsistent chunk-level estimates suggest insufficient sampling or input mismatch.
+
+**Common issues (stage-specific)**
+- Topology mismatch (`amber_topology_file`/`charmm_topology_file` wrong for actual system).
+- Group/index selection mismatch for receptor-ligand complex definitions.
+- Chunk jobs failing due to CPU/MPI resource settings incompatible with queue limits.
+
+### Stage 6: Analysis
+
+**What this stage does**
+- Generates interpretable trajectory metrics (RMSD, RMSF, contacts, hydrogen bonds, optional fingerprints).
+- Converts raw MD results into comparative evidence across ligands.
+
+**Key commands to run**
+- Run analysis stage after Stage 4 and (optionally) Stage 5 results are available.
+- Inspect per-ligand analysis output directories and generated figures/tables.
+- Full script list for standard + optional analysis tools is in `WORKFLOW.md` Stage 6.
+
+**Check before proceeding**
+- Required metrics enabled in `[analysis]` were actually produced.
+- Plot files and summary tables are present and non-empty.
+- Selection/group settings used in analysis are consistent across ligands for fair comparison.
+
+**Expected outputs and what they mean**
+- RMSD: global stability of structure over time.
+- RMSF: residue-level flexibility hotspots and rigid regions.
+- Contacts/H-bonds: persistence of receptor-ligand interactions.
+- Fingerprints/advanced metrics: comparative interaction patterns across candidates.
+
+**Common issues (stage-specific)**
+- Incorrect group IDs producing empty/invalid RMSD or H-bond outputs.
+- Selection definitions not matching topology atom naming.
+- Mixed analysis settings across ligands leading to non-comparable plots.
+
+### Output Interpretation Quick Guide
+
+Use this as a fast triage rubric before selecting lead compounds:
+
+| Output | Good sign | Warning sign | Action |
+| --- | --- | --- | --- |
+| Receptor clustering | Multiple representative clusters with interpretable populations | Single dominant cluster with poor diversity or highly fragmented noisy clusters | Revisit clustering cutoff and receptor sampling length |
+| Docking (gnina) | Favorable CNN rankings with plausible pocket poses | No valid poses or high-scoring but unrealistic orientations | Re-check docking mode, box definition, ligand preparation |
+| Complex minimization | Potential energy decreases and converges | Persistent minimization failures or topology errors | Fix topology/includes and retry setup |
+| Production MD | RMSD stabilizes (commonly near <3 Å for core frame) | Continuous drift/spikes suggesting instability | Extend equilibration, inspect restraints and box setup |
+| MM/PBSA | Consistent negative trend across chunks/trials | Highly inconsistent chunks or extreme outliers | Verify topology/group mapping, increase sampling |
+| Contacts/H-bonds | Persistent interaction network for top ligands | Transient/noisy contacts with no stable interaction pattern | Re-evaluate pose quality and replicate length |
