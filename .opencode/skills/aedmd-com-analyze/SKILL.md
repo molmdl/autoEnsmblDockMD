@@ -1,5 +1,5 @@
 ---
-name: com-analyze
+name: aedmd-com-analyze
 description: Use when analyzing complex MD trajectories to generate RMSD, RMSF, contact, and hydrogen-bond summaries for ligand comparison.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -26,7 +26,7 @@ This skill runs standard post-MD analysis workflows and optional advanced trajec
 - GROMACS and Python analysis dependencies are available.
 
 ## Usage
-Command: `scripts/commands/com-analyze.sh --config config.ini`
+Command: `scripts/commands/aedmd-com-analyze.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent analyzer --input handoff.json`
 
 ## Parameters

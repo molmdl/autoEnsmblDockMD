@@ -1,5 +1,5 @@
 ---
-name: checker-validate
+name: aedmd-checker-validate
 description: Use when validating outputs from any completed workflow stage, especially when quality or consistency concerns are reported.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -24,7 +24,7 @@ This skill runs on-demand quality checks by inspecting handoff records and gener
 - Stage output files are present in workspace directories.
 
 ## Usage
-Command: `scripts/commands/checker-validate.sh --config config.ini`
+Command: `scripts/commands/aedmd-checker-validate.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent checker --input handoff.json`
 
 ## Parameters

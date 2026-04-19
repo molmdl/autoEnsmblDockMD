@@ -1,5 +1,5 @@
 ---
-name: orchestrator-resume
+name: aedmd-orchestrator-resume
 description: Use when resuming an interrupted workflow session from saved checkpoints and handoff state.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -24,7 +24,7 @@ This skill restores session continuity by reading checkpoint/handoff state, iden
 - Workflow config is unchanged or intentionally versioned.
 
 ## Usage
-Command: `scripts/commands/orchestrator-resume.sh --config config.ini`
+Command: `scripts/commands/aedmd-orchestrator-resume.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent orchestrator --input handoff.json`
 
 ## Parameters
@@ -39,5 +39,5 @@ Agent dispatch: `python -m scripts.agents --agent orchestrator --input handoff.j
 - Updated checkpoint record for continued execution.
 
 ## Troubleshooting
-- No checkpoint state: run `status` to inspect workspace and start from earliest incomplete stage.
+- No checkpoint state: run `aedmd-status` to inspect workspace and start from earliest incomplete stage.
 - Conflicting state files: use newest successful handoff timestamp as source of truth.

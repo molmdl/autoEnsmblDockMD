@@ -1,5 +1,5 @@
 ---
-name: com-mmpbsa
+name: aedmd-com-mmpbsa
 description: Use when calculating binding free energies with MM/PBSA from completed complex MD trajectories.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -26,7 +26,7 @@ This skill prepares trajectories for MM/PBSA chunking and submits/runs binding f
 - `config.ini` contains a valid `[mmpbsa]` section.
 
 ## Usage
-Command: `scripts/commands/com-mmpbsa.sh --config config.ini`
+Command: `scripts/commands/aedmd-com-mmpbsa.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters

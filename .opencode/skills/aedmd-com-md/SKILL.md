@@ -1,5 +1,5 @@
 ---
-name: com-md
+name: aedmd-com-md
 description: Use when running equilibration and production molecular dynamics for prepared receptor-ligand complexes.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -26,7 +26,7 @@ This skill runs configured equilibration and production MD trials for each prepa
 - `config.ini` contains a valid `[production]` section.
 
 ## Usage
-Command: `scripts/commands/com-md.sh --config config.ini`
+Command: `scripts/commands/aedmd-com-md.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters

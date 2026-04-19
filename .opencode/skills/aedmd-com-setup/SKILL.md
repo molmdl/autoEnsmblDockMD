@@ -1,5 +1,5 @@
 ---
-name: com-setup
+name: aedmd-com-setup
 description: Use when preparing receptor-ligand complex systems after docking, including topology assembly, solvation, ionization, and minimization setup.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -18,7 +18,7 @@ This skill converts docked poses into simulation-ready receptor-ligand complexes
 - Docking poses are ready and you need MD-ready complex systems.
 - You need topology assembly for AMBER or CHARMM complex workflows.
 - You want automated solvent box and ion preparation for all ligands.
-- You are preparing inputs for the `com-md` stage.
+- You are preparing inputs for the `aedmd-com-md` stage.
 
 ## Prerequisites
 - Docking outputs exist for target ligands.
@@ -26,7 +26,7 @@ This skill converts docked poses into simulation-ready receptor-ligand complexes
 - `config.ini` contains `[complex]` (and relevant `dock2com*`) sections.
 
 ## Usage
-Command: `scripts/commands/com-setup.sh --config config.ini`
+Command: `scripts/commands/aedmd-com-setup.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters

@@ -1,5 +1,5 @@
 ---
-name: status
+name: aedmd-status
 description: Use when inspecting current workspace progress, detected workflow mode, completed stages, pending stages, and last handoff status.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -21,10 +21,10 @@ This skill summarizes workspace execution state without dispatching an agent, in
 
 ## Prerequisites
 - Workspace contains pipeline config and/or prior stage artifacts.
-- `scripts/commands/status.sh` is available.
+- `scripts/commands/aedmd-status.sh` is available.
 
 ## Usage
-Command: `scripts/commands/status.sh --config config.ini`
+Command: `scripts/commands/aedmd-status.sh --config config.ini`
 Agent dispatch: `N/A (no agent dispatch for this command)`
 
 ## Parameters

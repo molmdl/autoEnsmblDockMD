@@ -1,5 +1,5 @@
 ---
-name: dock-run
+name: aedmd-dock-run
 description: Use when running gnina ensemble docking in targeted or blind mode after receptor ensemble preparation and ligand setup.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -26,7 +26,7 @@ This skill executes ligand conversion/prep and gnina docking against receptor en
 - `config.ini` contains `[dock]` and `[docking]` sections.
 
 ## Usage
-Command: `scripts/commands/dock-run.sh --config config.ini`
+Command: `scripts/commands/aedmd-dock-run.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters

@@ -1,5 +1,5 @@
 ---
-name: debugger-diagnose
+name: aedmd-debugger-diagnose
 description: Use when a pipeline stage fails or outputs are unexpected and you need diagnosis with concrete remediation steps.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -24,7 +24,7 @@ This skill inspects stage logs and handoff errors to identify root causes, versi
 - Related handoff record exists in `.handoffs/`.
 
 ## Usage
-Command: `scripts/commands/debugger-diagnose.sh --config config.ini`
+Command: `scripts/commands/aedmd-debugger-diagnose.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent debugger --input handoff.json`
 
 ## Parameters

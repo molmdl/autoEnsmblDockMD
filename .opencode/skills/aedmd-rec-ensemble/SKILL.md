@@ -1,5 +1,5 @@
 ---
-name: rec-ensemble
+name: aedmd-rec-ensemble
 description: Use when preparing receptor ensembles from a receptor PDB through preparation, receptor MD sampling, clustering, and structure alignment for downstream docking.
 license: MIT
 compatibility: Requires gnina, gromacs 2022+, python 3.10+
@@ -18,7 +18,7 @@ This skill orchestrates receptor preparation, equilibration/production sampling,
 - You need to generate receptor conformers from a new receptor PDB.
 - You are starting a new docking campaign and `rec/aligned/` does not exist.
 - You want reproducible ensemble generation using configured Slurm/local settings.
-- You need aligned receptor structures before running `dock-run`.
+- You need aligned receptor structures before running `aedmd-dock-run`.
 
 ## Prerequisites
 - Receptor PDB input exists in the receptor workspace.
@@ -26,7 +26,7 @@ This skill orchestrates receptor preparation, equilibration/production sampling,
 - Environment is prepared with `source scripts/setenv.sh`.
 
 ## Usage
-Command: `scripts/commands/rec-ensemble.sh --config config.ini`
+Command: `scripts/commands/aedmd-rec-ensemble.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 
 ## Parameters
