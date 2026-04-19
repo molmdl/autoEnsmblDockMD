@@ -345,13 +345,13 @@ This urgent phase addresses critical findings from codebase analysis (`.planning
 - Better to fix now (Phase 5 polish context) than after 05-12 E2E testing reveals failures
 
 Plans:
-- [ ] 5.1-01-PLAN.md — Fix 0_prep.sh topology generation and water_model usage (Wave 1)
-- [ ] 5.1-02-PLAN.md — Fix MM/PBSA group-ID propagation (Wave 1)
-- [ ] 5.1-03-PLAN.md — Fix dock2com artifact contract and atom-order validation (Wave 1)
-- [ ] 5.1-04-PLAN.md — Fix run_pipeline.sh arg forwarding and RMSD alignment (Wave 1)
-- [ ] 5.1-05-PLAN.md — Rename all skills/commands to aedmd-* namespace (Wave 2)
-- [ ] 5.1-06-PLAN.md — Update docs with aedmd-* namespace and fix doc consistency (Wave 2)
-- [ ] 5.1-07-PLAN.md — Gap closure: fix config section mismatch and implement --workdir (Wave 3)
+- [x] 5.1-01-PLAN.md — Fix 0_prep.sh topology generation and water_model usage (Wave 1)
+- [x] 5.1-02-PLAN.md — Fix MM/PBSA group-ID propagation (Wave 1)
+- [x] 5.1-03-PLAN.md — Fix dock2com artifact contract and atom-order validation (Wave 1)
+- [x] 5.1-04-PLAN.md — Fix run_pipeline.sh arg forwarding and RMSD alignment (Wave 1)
+- [x] 5.1-05-PLAN.md — Rename all skills/commands to aedmd-* namespace (Wave 2)
+- [x] 5.1-06-PLAN.md — Update docs with aedmd-* namespace and fix doc consistency (Wave 2)
+- [x] 5.1-07-PLAN.md — Gap closure: fix config section mismatch and implement --workdir (Wave 3)
 
 ---
 
@@ -410,6 +410,7 @@ Plans:
 | 3 | Agent Infrastructure | Complete ✓ | 6 | None |
 | 4 | Integration | Complete ✓ | 7 | None |
 | 5 | Polish | Complete ✓ | 4 | None |
+| 5.1 | Critical Correctness and Namespace Fixes | Complete ✓ | 0 (inserted fix phase) | None |
 
 ---
 
