@@ -27,6 +27,13 @@ This skill summarizes workspace execution state without dispatching an agent, in
 Command: `scripts/commands/status.sh --config config.ini`
 Agent dispatch: `N/A (no agent dispatch for this command)`
 
+## Parameters
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Config file | `general.config` | `--config` | `config.ini` | Configuration file used to detect workflow mode and expected paths. |
+| Workspace root | `general.workdir` | `--workdir` | `./work/test` | Root workspace scanned for stage artifacts and completion markers. |
+| Verbose status | `status.verbose` | `--verbose` | `false` | Include detailed per-stage path checks in status output. |
+
 ## Expected Output
 - Human-readable summary of mode, completed stages, pending stages.
 - Last handoff status and path hints to relevant logs/artifacts.

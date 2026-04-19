@@ -27,6 +27,13 @@ This skill restores session continuity by reading checkpoint/handoff state, iden
 Command: `scripts/commands/orchestrator-resume.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent orchestrator --input handoff.json`
 
+## Parameters
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Config file | `general.config` | `--config` | `config.ini` | Workflow configuration used to resolve stage order and paths. |
+| Resume handoff | `orchestrator.handoff` | `--input` | `.handoffs/latest.json` | Most recent handoff record used to infer resume state. |
+| Checkpoint file | `orchestrator.checkpoint_file` | `--checkpoint` | `.checkpoint/state.json` | Persisted checkpoint state for locating last validated stage. |
+
 ## Expected Output
 - Resume decision (last completed stage, next stage, rationale).
 - Updated checkpoint record for continued execution.

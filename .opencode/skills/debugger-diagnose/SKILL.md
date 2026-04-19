@@ -27,6 +27,13 @@ This skill inspects stage logs and handoff errors to identify root causes, versi
 Command: `scripts/commands/debugger-diagnose.sh --config config.ini`
 Agent dispatch: `python -m scripts.agents --agent debugger --input handoff.json`
 
+## Parameters
+| Parameter | Config Key | CLI Flag | Default | Description |
+|-----------|------------|----------|---------|-------------|
+| Config file | `general.config` | `--config` | `config.ini` | Workflow configuration providing stage paths and runtime settings. |
+| Failed handoff | `debugger.handoff` | `--input` | `.handoffs/latest.json` | Handoff record from the failed stage to diagnose. |
+| Log root | `debugger.log_root` | `--log-root` | `.run_logs` | Directory containing stage logs inspected during diagnosis. |
+
 ## Expected Output
 - Diagnosis report with likely causes and confidence levels.
 - Suggested fixes and next command recommendations.
