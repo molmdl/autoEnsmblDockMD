@@ -284,6 +284,8 @@ Plans (remediation):
 - [x] 05-08-PLAN.md — Revert 05-03 commits, restore SKILL.md YAML frontmatter (Wave 5) ✓
 - [x] 05-09-PLAN.md — Review surviving docs for compatibility with restored skills (Wave 5) ✓
 - [x] 05-10-PLAN.md — End-to-end structural validation (Wave 6) ✓
+- [ ] 05-11-PLAN.md — Agent-targeted workflow document (DOC-02) (Wave 7)
+- [ ] 05-12-PLAN.md — E2E functional testing of slash commands + skills (Wave 8)
 
 **Success Criteria:**
 
