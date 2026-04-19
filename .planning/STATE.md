@@ -34,7 +34,7 @@
 | Decision | Rationale |
 |----------|-----------|
 | Include receptor topology body in generated `sys.top` | Prevent invalid topology assembly in complex prep |
-| Use configured `water_model` in `gmx solvate` with `spc216` fallback | Maintain config-driven behavior with compatibility |
+| ~~Use configured `water_model` in `gmx solvate` with `spc216` fallback~~ **(superseded)** | Superseded by subsequent fixes introducing explicit solvent coordinate controls (`[complex] solvent_coordinates`) and updated stage-specific solvation guidance |
 | Resolve MM/PBSA receptor/ligand IDs from actual `index.ndx` and propagate via `mmpbsa_groups.dat` | Prevent silent wrong-group MM/PBSA calculations when index ordering differs |
 | Honor explicit non-default `[mmpbsa] receptor_group_id/ligand_group_id` overrides | Preserve escape hatch for manual system-specific recovery |
 | Derive receptor GRO from docking SDF prefix and merge receptor+ligand coordinates in wrappers | Ensure wrappers generate `com.gro` before validation and maintain deterministic artifact contract |
@@ -44,6 +44,8 @@
 | Namespace all public skills and slash-command wrappers with `aedmd-*` | Prevent collisions with generic OpenCode command names and keep project command ownership explicit |
 | Keep AGENT-WORKFLOW status vocabulary and handoff persistence docs aligned with common.sh parser/output behavior | Prevent documentation drift in orchestrator expectations and handoff status interpretation |
 | Keep `aedmd-status` wrapper-local `--workdir` parsing while forwarding remaining args to `parse_flags` | Adds documented workdir targeting without regressing shared command flag behavior |
+
+Superseded decision notes are retained for traceability and should not be treated as current implementation guarantees.
 
 ### Known Pitfalls
 
