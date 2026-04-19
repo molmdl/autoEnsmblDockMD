@@ -29,6 +29,8 @@ This guide is the human-facing deep reference for configuring and preparing `aut
   - [Stage 5: MM/PBSA](#stage-5-mmpbsa)
   - [Stage 6: Analysis](#stage-6-analysis)
   - [Output Interpretation Quick Guide](#output-interpretation-quick-guide)
+  - [Troubleshooting](#troubleshooting)
+  - [Force Field Compatibility](#force-field-compatibility)
 
 ## Part 1: Before Running the Pipeline
 
@@ -604,3 +606,28 @@ Use this as a fast triage rubric before selecting lead compounds:
 | Production MD | RMSD stabilizes (commonly near <3 Å for core frame) | Continuous drift/spikes suggesting instability | Extend equilibration, inspect restraints and box setup |
 | MM/PBSA | Consistent negative trend across chunks/trials | Highly inconsistent chunks or extreme outliers | Verify topology/group mapping, increase sampling |
 | Contacts/H-bonds | Persistent interaction network for top ligands | Transient/noisy contacts with no stable interaction pattern | Re-evaluate pose quality and replicate length |
+
+## Troubleshooting
+
+Use the table below for common failure patterns and first-response fixes.
+
+| Symptom | Likely cause | How to diagnose quickly | Recommended fix |
+| --- | --- | --- | --- |
+| Topology build crashes after docking-to-complex conversion | Force-field family mismatch (e.g., AMBER protein + CGenFF ligand) | Inspect `[complex] ff`, `[dock2com] ff`, and ligand parameter source | Use matched FF families end-to-end (AMBER+GAFF2 or CHARMM36m+CGenFF) |
+| Docking or MD prep fails with atom/protonation errors | Missing/incorrect hydrogen atoms | Check receptor preprocessing logs and protonation outputs | Rebuild receptor protonation via `pdb2pqr` or `gmx pdb2gmx` |
+| `gmx_MMPBSA` errors on topology/structure consistency | MM/PBSA topology file does not match generated complex | Compare selected topology key and actual files in ligand folder | Set correct AMBER/CHARMM topology file and rerun trajectory preprocessing |
+| Production run unstable (RMSD persistently >3 Å, repeated spikes) | Inadequate equilibration, poor starting pose, or box settings | Review RMSD plot and runtime warnings (LINCS/pressure) | Extend equilibration, validate pose quality, and check box size |
+| Docking returns no valid poses | Wrong box center/size or unsuitable docking mode | Check gnina logs, autobox settings, and docking mode | Correct box center/size or retry in blind mode |
+| Slurm job fails silently or exits unexpectedly | Scheduler/module/runtime environment issue | Inspect `slurm*.err` and job stdout/stderr for missing modules | Verify module loading, partition/resources, and conda/tool initialization |
+
+## Force Field Compatibility
+
+Keep protein and ligand parameter families aligned.
+
+| Workflow mode | Protein force field | Ligand force field | Compatibility status | Notes |
+| --- | --- | --- | --- | --- |
+| Mode A (reference pocket, AMBER-oriented) | AMBER ff14SB (or compatible AMBER protein FF) | GAFF2 (or compatible AMBER ligand parameters) | ✅ Compatible | Typical targeted/test docking with AMBER-style downstream topology |
+| Mode B (blind docking, CHARMM-oriented) | CHARMM36m | CGenFF | ✅ Compatible | Typical blind docking with CHARMM/CGenFF topology branch |
+| Any mode (invalid mix) | AMBER protein force field | CGenFF ligand parameters | ❌ Do not mix | Common cause of topology/runtime crashes |
+
+**Rule of thumb:** choose one force-field family at Stage 1/3 and keep it consistent through Stage 5.
