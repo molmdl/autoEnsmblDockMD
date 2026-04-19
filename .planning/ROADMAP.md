@@ -269,6 +269,14 @@ Plans:
 - ⚠️ **WORKFLOW.md finalized** — Need workflow steps to document
 - ⚠️ **End-to-end test artifacts** — Need full pipeline run output for validation
 
+**Plans:** 4 plans in 2 waves
+
+Plans:
+- [ ] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1)
+- [ ] 05-02-PLAN.md — Restructure AGENTS.md + audit agent skill metadata (Wave 1)
+- [ ] 05-03-PLAN.md — Write comprehensive README.md (Wave 2)
+- [ ] 05-04-PLAN.md — End-to-end structural validation + human review (Wave 2)
+
 **Success Criteria:**
 
 1. **README Provides Clear Human Usage**
