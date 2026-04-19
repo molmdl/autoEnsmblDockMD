@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 5 - Polish |
-| **Current Plan** | 3 of 7 (05-03 completed) |
-| **Last Activity** | 2026-04-19 - Completed 05-03-PLAN.md |
-| **Progress** | █████████████░░░ 26/31 plans complete (84%) |
+| **Current Plan** | 3 of 7 (05-01, 05-02, 05-03 completed) |
+| **Last Activity** | 2026-04-19 - Completed 05-01-PLAN.md |
+| **Progress** | ██████████████░░ 27/31 plans complete (87%) |
 | **Phase 5 Blocker** | End-to-end test artifacts pending |
 | **Status** | In progress |
 
@@ -27,7 +27,7 @@
 | 2 | Complete | ✓ Delivered |
 | 3 | Complete | ✓ Delivered |
 | 4 | Complete | ✓ Delivered |
-| 5 | WORKFLOW.md, End-to-end test | Finalize workflow, run full pipeline |
+| 5 | End-to-end test artifacts | Run full pipeline validation and collect outputs |
 
 ---
 
@@ -57,6 +57,8 @@
 | Keep AGENTS.md overview-only with links to skill/WORKFLOW/PROJECT docs | Avoids duplication and keeps implementation specifics in authoritative files | 5 |
 | Enforce one SKILL.md metadata template across all 10 skills | Ensures deterministic parsing and consistent runtime documentation shape | 5 |
 | Align skill parameter tables to `scripts/config.ini.template` keys | Keeps skill guidance synchronized with config-driven execution | 5 |
+| Use implemented script inventory as WORKFLOW.md source of truth | Removes legacy command drift and keeps workflow docs aligned with runnable scripts | 5 |
+| Put Mode A/Mode B differences inside each stage section | Keeps mode-specific operator guidance next to execution steps | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -76,8 +78,8 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:34 +0800
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-19 10:35 +0800
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -95,6 +97,7 @@ Resume file: None
 - 2026-04-19: Phase 4 plan 01 executed (command bridge scripts)
 - 2026-04-19: Phase 4 plan 02 executed (Agent Skills files)
 - 2026-04-19: Phase 4 plan 03 executed (integration smoke test + experimental docs)
+- 2026-04-19: Phase 5 plan 01 executed (WORKFLOW.md definitive reference rewrite)
 - 2026-04-19: Phase 5 plan 02 executed (AGENTS.md role-based restructure)
 - 2026-04-19: Phase 5 plan 03 executed (SKILL.md metadata standardization)
 
@@ -130,4 +133,4 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-03-PLAN.md and created 05-03-SUMMARY.md*
+*Last action: Completed 05-01-PLAN.md and created 05-01-SUMMARY.md*
