@@ -269,7 +269,7 @@ Plans:
 - ⚠️ **WORKFLOW.md finalized** — Need workflow steps to document
 - ⚠️ **End-to-end test artifacts** — Need full pipeline run output for validation
 
-**Plans:** 10 plans in 6 waves
+**Plans:** 12 plans in 8 waves
 
 Plans (original — completed or superseded):
 - [x] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1) ✓
