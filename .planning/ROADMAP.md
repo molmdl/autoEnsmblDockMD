@@ -307,6 +307,51 @@ Plans (remediation):
    - Results match expected outputs from manual workflow
 
 ---
+### Phase 5.1: Critical Correctness and Namespace Fixes (INSERTED)
+
+**Goal:** Address critical code correctness issues and establish project namespace for skills before production use.
+
+**Depends on:** Phase 5
+**Plans:** 0 plans (to be planned)
+
+**Scope:**
+
+This urgent phase addresses critical findings from codebase analysis (`.planning/code_analysis/2026-04-19-*.md`):
+
+**A. Code Correctness (HIGH priority - affects scientific validity):**
+1. Fix `scripts/com/0_prep.sh` topology generation (missing receptor content in sys.top)
+2. Fix `scripts/com/2_mmpbsa.sh` / `2_trj4mmpbsa.sh` MM/PBSA group-ID propagation
+3. Fix `scripts/dock/4_dock2com*.sh` artifact contract (com.gro creation)
+4. Fix `scripts/run_pipeline.sh` argument forwarding mismatch (--target vs --ligand for com_ana)
+5. Add ligand GRO↔ITP atom-order validation before position restraint generation
+6. Reference working implementations in `expected/chm/BRD4/scripts`, `expected/amb/scripts`, `expected/chm/L99A/scripts`, `expected/chm/L99A_M102Q/scripts`
+
+**B. Namespace Standardization (HIGH priority - prevents collision):**
+1. Rename all skills from generic names to `aedmd-*` prefix (e.g., `/status` → `/aedmd-status`)
+2. Update `.opencode/skills/*/SKILL.md` frontmatter and folder names
+3. Update `AGENTS.md`, `README.md`, `docs/GUIDE.md`, `docs/EXPERIMENTAL.md`, `.opencode/docs/AGENT-WORKFLOW.md`
+4. Update `scripts/commands/*.sh` wrapper scripts
+
+**C. Documentation Consistency (MEDIUM priority):**
+1. Reconcile handoff persistence contract between docs and `scripts/commands/common.sh`
+2. Fix config section references (status reads `[workflow] mode` but template has `[docking] mode`)
+3. Align agent role ownership for com-analyze (runner vs analyzer)
+4. Remove or implement documented but unsupported `--workdir` flag for status
+
+**Rationale for insertion:**
+- Topology and MM/PBSA bugs affect reproducibility and validity of scientific results
+- `/status` skill conflicts with standard OpenCode commands
+- These are not cosmetic issues; they can silently produce wrong science or namespace collisions
+- Better to fix now (Phase 5 polish context) than after 05-12 E2E testing reveals failures
+
+Plans:
+- [ ] TBD (run `/gsd-plan-phase 5.1` to break down)
+
+**Details:**
+[To be added during planning]
+
+---
+
 
 ## Coverage Map
 

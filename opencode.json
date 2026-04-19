@@ -8,7 +8,7 @@
     "gsd-roadmapper": { "model": "github-copilot/claude-sonnet-4.5" },
     "gsd-project-researcher": { "model": "github-copilot/claude-sonnet-4.5" },
     "gsd-research-synthesizer": { "model": "github-copilot/claude-sonnet-4.5" },
-    "gsd-codebase-mapper": { "model": "github-copilot/claude-sonnet-4.5" },
+    "gsd-codebase-mapper": { "model": "github-copilot/gpt-5.4" },
     "gsd-executor": { "model": "github-copilot/gpt-5.3-codex" },
     "gsd-debugger": { "model": "github-copilot/gpt-5.3-codex" },
     "gsd-verifier": { "model": "github-copilot/claude-sonnet-4.5" },

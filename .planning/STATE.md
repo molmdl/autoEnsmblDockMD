@@ -151,3 +151,13 @@ Resume file: None
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
 *Last action: Completed 05-10-PLAN.md and created 05-10-SUMMARY.md*
+
+---
+
+## Roadmap Evolution
+
+- **Phase 5.1 inserted after Phase 5:** Critical correctness and namespace fixes (URGENT)
+  - **Date:** 2026-04-19
+  - **Trigger:** Codebase analysis revealed critical code correctness issues affecting scientific validity and skill naming conflicts with OpenCode internals
+  - **Scope:** Fix topology generation, MM/PBSA group propagation, dock-to-complex artifacts, and rename all skills to `aedmd-*` namespace
+  - **Rationale:** Scientific correctness risks must be addressed before production use; namespace conflicts must be resolved before agent layer stabilizes
