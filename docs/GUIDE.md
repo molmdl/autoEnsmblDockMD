@@ -400,6 +400,11 @@ If `status` or `--list-stages` reports missing config keys/paths, fix those firs
 Use this section while running stages from `scripts/run_pipeline.sh`.
 For script paths, stage aliases, and full command inventory, always cross-check `WORKFLOW.md`.
 
+### Agent skill reference format (for slash-command users)
+
+If you use agent/slash-command workflows, skill references point to `.opencode/skills/{name}/SKILL.md`.
+These skill files use YAML frontmatter with `name`, `description`, `license`, `compatibility`, and `metadata`, followed by operational sections such as **When to use this skill**, **Prerequisites**, **Usage**, **Parameters**, and troubleshooting guidance.
+
 ### How to use this section with `WORKFLOW.md`
 
 - This guide tells you **what to do and what to inspect** before moving to the next stage.
