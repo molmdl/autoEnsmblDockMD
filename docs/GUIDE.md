@@ -262,12 +262,130 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 
 ## Input File Preparation
 
-_To be completed in Task 2._
+Prepare all required inputs before running `scripts/run_pipeline.sh`.
+
+### 1) Receptor PDB (`[receptor] input_pdb`)
+
+- File format: standard `.pdb` with valid ATOM/HETATM records and coordinates.
+- Chain naming: keep chain IDs consistent and non-empty for stable downstream selections.
+- Hydrogen handling: avoid double-protonating manually if you use scripted protonation (`pdb2pqr`/`pdb2gmx`) in Stage 1.
+- Clean structure: remove irrelevant crystallization artifacts unless intentionally required.
+- Ensure residue naming matches chosen force field family (AMBER or CHARMM conventions).
+
+### 2) Reference ligand (Mode A targeted/test docking)
+
+Purpose: defines the pocket/autobox region for targeted docking.
+
+- Coordinates: provide a reference ligand coordinate file (`.pdb` and/or `.gro`) placed under workspace dock/ref paths.
+- Topology: provide matching ligand topology (`.itp`; plus related params if used by your FF workflow).
+- Consistency rule: coordinate atom names/order must align with topology definitions.
+- Configure in `config.ini` via `[docking] reference_ligand` and related dock2com settings.
+
+### 3) Test/new ligands for docking and complex setup
+
+For each ligand (commonly named with `lig*` pattern):
+
+- Coordinate file: `.gro` (or converted `.mol2`/`.sdf` intermediates as required by stage scripts).
+- Topology file: ligand `.itp` (and any associated includes required by your force field toolchain).
+- Naming convention: keep base names synchronized across files (for example `lig1.gro`, `lig1.itp`, `lig1.mol2`).
+- Pattern compatibility: defaults use `lig*`; if you use different names, set `ligand_pattern` or `ligand_list` explicitly.
+
+### 4) Force field files and compatibility
+
+You must provide/resolve FF assets referenced by receptor and complex setup:
+
+- Protein FF: chosen in `[receptor] ff` and `[complex] ff`.
+- Include path: `[complex] ff_include` must point to the correct `forcefield.itp` include.
+- Ligand parameters: ensure ligand topology was generated for the same FF family as the protein setup branch.
+
+FF family guidance:
+
+- **AMBER branch (Mode A often used):** use AMBER-compatible protein + ligand topology stack.
+- **CHARMM36m/CGenFF branch (Mode B common):** use CHARMM-compatible protein + CGenFF-style ligand topology stack.
+
+> Known pitfall: mixing AMBER protein setup with CGenFF ligand parameters commonly causes topology/runtime crashes. Keep FF families matched end-to-end.
+
+### 5) MDP files (`[receptor] mdp_dir`, `[complex] mdp_dir`)
+
+Required baseline files:
+
+- `em.mdp` — energy minimization
+- `nvt.mdp` — constant volume equilibration (if your protocol uses explicit NVT stage)
+- `npt.mdp` — constant pressure equilibration (if your protocol uses explicit NPT stage)
+- `md.mdp` — production MD
+
+Also commonly referenced in this codebase:
+
+- `pr0.mdp`, `pr.mdp` / `pr_pos.mdp` for staged equilibration naming used by scripts.
+
+Template/source locations:
+
+- Receptor-side MDPs under your receptor MDP folder (default `./mdp/rec`).
+- Complex-side MDPs under your complex MDP folder (default `./mdp/com`).
+- Start from project templates/examples already used by your team and adjust timestep, thermostat, barostat, and output intervals consistently.
 
 ## Workspace Setup
 
-_To be completed in Task 2._
+Create a dedicated run workspace and place inputs in predictable locations.
+
+### 1) Recommended directory layout
+
+```text
+work/{project}/
+├── config.ini
+├── rec/                  # receptor-stage outputs
+├── dock/                 # docking inputs/outputs
+├── com/                  # complex prep + MD + MMPBSA per ligand
+├── ref/                  # reference ligand assets (Mode A)
+└── mdp/
+    ├── rec/              # receptor-stage mdp files
+    └── com/              # complex/prod mdp files
+```
+
+### 2) Create workspace skeleton
+
+```bash
+mkdir -p work/my_project/{rec,dock,com,ref,mdp/rec,mdp/com}
+cp scripts/config.ini.template work/my_project/config.ini
+```
+
+### 3) Copy inputs into expected locations
+
+- Receptor PDB → path referenced by `[receptor] input_pdb` (often inside workspace root).
+- Docking ligands + ligand topologies → `[dock] ligand_dir` / `[docking] ligands_dir`.
+- Reference ligand assets (if Mode A) → workspace `ref/` and path in `[docking] reference_ligand`.
+- MDP files → `[receptor] mdp_dir` and `[complex] mdp_dir` targets.
+
+### 4) Configure `config.ini` from template
+
+At minimum, verify and edit these fields:
+
+- `[general] workdir`
+- `[receptor] input_pdb`, `ff`, `mdp_dir`
+- `[docking] mode`, `ligands_dir`, `receptor_dir`, `reference_ligand` (Mode A)
+- `[complex] mode`, `ff`, `ff_include`, `mdp_dir`
+- `[production] n_trials`, `production_mdp`
+- `[mmpbsa] n_chunks`, topology keys (`amber_topology_file` / `charmm_topology_file`)
+
+### 5) Verify setup before launching heavy stages
+
+Quick checks:
+
+```bash
+source ./scripts/setenv.sh
+bash scripts/run_pipeline.sh --config work/my_project/config.ini --list-stages
+```
+
+Then inspect workspace status via the project status command wrapper:
+
+```bash
+bash scripts/commands/status.sh --workdir work/my_project
+```
+
+If `status` or `--list-stages` reports missing config keys/paths, fix those first to avoid expensive failed jobs.
 
 ## Part 2: Per-Stage Instructions (placeholder)
 
 Detailed per-stage operating instructions, verification checkpoints, and troubleshooting will be added in Part 2.
+
+<!-- Part 2: Per-stage instructions will be added -->
