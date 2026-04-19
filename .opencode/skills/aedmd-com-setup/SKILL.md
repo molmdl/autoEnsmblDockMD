@@ -37,6 +37,7 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 | Ligand selector | `complex.ligand_pattern` | `--ligand-pattern` | `lig*` | Ligand folders to process for setup. |
 | Receptor GRO | `complex.receptor_gro` | `--receptor-gro` | `${general:workdir}/rec/prot.gro` | Receptor coordinates for assembly. |
 | Receptor TOP | `complex.receptor_top` | `--receptor-top` | `${general:workdir}/rec/topol.top` | Receptor topology for merge operations. |
+| Solvent coordinates | `complex.solvent_coordinates` | `--solvent-coordinates` | `spc216.gro` | Coordinate source used by `gmx solvate -cs`. |
 | Box distance | `complex.box_distance` | `--box-distance` | `1.0` | Solvation box distance in nm. |
 
 ## Expected Output

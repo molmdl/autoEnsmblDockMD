@@ -36,6 +36,7 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 | Chunk count | `mmpbsa.n_chunks` | `--n-chunks` | `4` | Number of trajectory chunks per trial for parallel jobs. |
 | Receptor group | `mmpbsa.receptor_group` | `--receptor-group` | `Protein` | Group name used in index splitting. |
 | Ligand group | `mmpbsa.ligand_group` | `--ligand-group` | `Other` | Group name representing ligand atoms. |
+| Group IDs file | `mmpbsa.group_ids_file` | `--group-ids-file` | `mmpbsa_groups.dat` | Persisted receptor/ligand/complex group-ID mapping file. |
 | MPI ranks | `mmpbsa.mpi_ranks` | `--mpi-ranks` | `16` | MPI ranks used in MM/PBSA chunk execution. |
 | Topology mode | `mmpbsa.ff` | `--ff` | `${complex:ff}` | Force-field mode controlling topology choice logic. |
 
@@ -43,6 +44,11 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 - MM/PBSA chunk directories (e.g., `mmpbsa_*/`) with energy outputs.
 - Per-ligand MM/PBSA result files and logs.
 - Handoff record at `.handoffs/complex_mmpbsa.json`.
+
+Execution model note:
+
+- MM/PBSA chunk submissions are asynchronous in Slurm-backed runs.
+- Confirm all chunk jobs are complete before interpreting summary energies.
 
 ## Troubleshooting
 - Topology mismatch errors: ensure selected topology file matches trajectory system.

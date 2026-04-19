@@ -24,11 +24,17 @@ Project slash commands are namespaced with `aedmd-` (for example `/aedmd-status`
 
 - Agents require OpenCode or a compatible agent runtime.
 - Handoff schema and command/agent integration details may evolve.
-- Skill documents currently follow agentskills.io v1 conventions, which may be revised.
+- Skill documents currently use this repository's YAML-frontmatter contract (`name`, `description`, `license`, `compatibility`, `metadata`), which may evolve with wrapper/agent contract changes.
 
 ## Use the project without agents
 
 You can run the pipeline directly through script entrypoints and configuration files:
+
+```bash
+conda env create -f scripts/env.yml
+conda activate autoEnsmblDockMD
+source ./scripts/setenv.sh
+```
 
 - Use `scripts/run_pipeline.sh` for staged orchestration.
 - Or run stage scripts directly under `scripts/rec/`, `scripts/dock/`, and `scripts/com/`.

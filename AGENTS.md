@@ -37,7 +37,8 @@ Owns global workflow state, routes stage work to specialist agents, and pauses/r
 
 Executes stage scripts through slash command wrappers and returns structured outputs/artifacts.
 
-- Resolves stage intent to script entry points in `scripts/commands/*.sh`.
+- Wrappers dispatch canonical `WorkflowStage` tokens (for example `receptor_prep`, `docking_run`, `complex_prep`, `complex_md`, `complex_mmpbsa`, `complex_analysis`) aligned with `scripts/agents/schemas/state.py`.
+- Wrapper handoff payloads for runner/analyzer include explicit `script` resolved from `scripts/commands/common.sh` stage→script mapping.
 - Passes validated parameters/config to script layer.
 - Produces deterministic stage outputs and run metadata.
 - Skills:
@@ -89,6 +90,18 @@ Agents exchange state through files, not long in-memory threads.
 
 This pattern supports resumable execution and minimizes context overflow risk.
 
+### Handoff status and wrapper exit behavior
+
+`scripts/commands/common.sh` interprets handoff status values and exits consistently:
+
+| Handoff status | Wrapper behavior | Exit code |
+|---|---|---|
+| `success` | Continue/complete normally | `0` |
+| `needs_review` | Print warnings and request review | `2` |
+| `failure` | Print errors/recommendations and fail | `1` |
+| `blocked` | Print blocker details and fail | `1` |
+| Unknown/missing handoff | Treat as failure | `1` |
+
 ---
 
 ## Skill File Contract
@@ -137,7 +150,7 @@ Skill files referenced in this document are stored at `.opencode/skills/{skill-n
 
 ## Prerequisites
 
-- Install and activate Conda environment from `env.yml`.
+- Install and activate Conda environment from `scripts/env.yml`.
 - Ensure required tools are available: **GROMACS > 2022**, **gnina**, **gmx_MMPBSA**.
 - Source environment before script execution: `source ./scripts/setenv.sh`.
 - Provide stage inputs in `./work/input` (copy to a new workspace run directory as needed).

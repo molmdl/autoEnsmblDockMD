@@ -31,8 +31,7 @@ Agent dispatch: `python -m scripts.agents --agent checker --input handoff.json`
 | Parameter | Config Key | CLI Flag | Default | Description |
 |-----------|------------|----------|---------|-------------|
 | Config file | `general.config` | `--config` | `config.ini` | Path to workflow configuration used for validation context. |
-| Handoff file | `checker.handoff` | `--input` | `.handoffs/latest.json` | Handoff record to validate when invoking checker directly. |
-| Output report | `checker.report_output` | `--report-output` | `validation_report.md` | Destination file for summarized pass/warn/fail findings. |
+| Extra params passthrough | `checker.*` | `--<key> <value>` | *(none)* | Additional flags are passed through wrapper `parse_flags` into agent params JSON. |
 
 ## Expected Output
 - Validation report summarizing pass/warn/fail findings.

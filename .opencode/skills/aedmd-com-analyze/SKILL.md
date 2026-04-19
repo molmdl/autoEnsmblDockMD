@@ -38,10 +38,11 @@ Agent dispatch: `python -m scripts.agents --agent analyzer --input handoff.json`
 | Run H-bond | `analysis.run_hbond` | `--run-hbond` | `true` | Enable hydrogen-bond analysis between groups. |
 | Run advanced | `analysis.run_advanced` | `--run-advanced` | `true` | Enable MDAnalysis-based advanced analytics. |
 | Contact cutoff | `analysis.contact_cutoff` | `--contact-cutoff` | `4.5` | Distance cutoff (Å) for contact analysis. |
+| Distance reference | `analysis.distance_reference` | `--distance-reference` | `protein_backbone` | Reference selection key used by advanced distance metrics. |
 
 ## Expected Output
 - Per-ligand plots/data under `com*/LIGAND_ID/analysis/`.
-- Comparative analysis artifacts in `com_ana/` when enabled by workflow.
+- Comparative interpretation is performed from per-ligand outputs under `<ligand>/${analysis.output_subdir}/`.
 - Handoff record at `.handoffs/complex_analysis.json`.
 
 ## Troubleshooting

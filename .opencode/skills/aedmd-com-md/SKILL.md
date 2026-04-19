@@ -44,6 +44,11 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 - Completed MD run directories under `com/LIGAND_ID/`.
 - Handoff record at `.handoffs/complex_md.json`.
 
+Execution model note:
+
+- On Slurm-backed runs this stage often submits jobs and returns immediately.
+- Treat command return as submission success; verify completion with scheduler queries and output checks.
+
 ## Troubleshooting
 - `grompp` failure: validate ligand/receptor topology includes and index groups.
 - Jobs pending/failing on Slurm: verify `partition`, GPU, and CPU resource settings.

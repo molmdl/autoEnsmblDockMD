@@ -7,7 +7,7 @@ metadata:
   author: autoEnsmblDockMD
   version: "1.0"
   agent: runner
-  stage: receptor_cluster
+  stage: receptor_prep
 ---
 
 # Receptor Ensemble Generation
@@ -42,7 +42,7 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 ## Expected Output
 - Receptor trajectories and clustering products under `rec/`.
 - Aligned ensemble PDBs under `rec/aligned/`.
-- Handoff record at `.handoffs/receptor_cluster.json`.
+- Handoff record at `.handoffs/receptor_prep.json`.
 
 ## Troubleshooting
 - Missing receptor file: confirm `receptor.input_pdb` exists in `receptor.workdir`.

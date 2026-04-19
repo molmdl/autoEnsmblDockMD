@@ -31,8 +31,7 @@ Agent dispatch: `python -m scripts.agents --agent debugger --input handoff.json`
 | Parameter | Config Key | CLI Flag | Default | Description |
 |-----------|------------|----------|---------|-------------|
 | Config file | `general.config` | `--config` | `config.ini` | Workflow configuration providing stage paths and runtime settings. |
-| Failed handoff | `debugger.handoff` | `--input` | `.handoffs/latest.json` | Handoff record from the failed stage to diagnose. |
-| Log root | `debugger.log_root` | `--log-root` | `.run_logs` | Directory containing stage logs inspected during diagnosis. |
+| Extra params passthrough | `debugger.*` | `--<key> <value>` | *(none)* | Additional flags are passed through wrapper `parse_flags` into agent params JSON. |
 
 ## Expected Output
 - Diagnosis report with likely causes and confidence levels.

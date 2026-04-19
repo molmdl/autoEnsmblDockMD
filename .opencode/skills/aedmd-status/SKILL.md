@@ -32,7 +32,7 @@ Agent dispatch: `N/A (no agent dispatch for this command)`
 |-----------|------------|----------|---------|-------------|
 | Config file | `general.config` | `--config` | `config.ini` | Configuration file used to detect workflow mode and expected paths. |
 | Workspace root | `general.workdir` | `--workdir` | `./work/test` | Root workspace scanned for stage artifacts and completion markers. |
-| Verbose status | `status.verbose` | `--verbose` | `false` | Include detailed per-stage path checks in status output. |
+| Verbose passthrough | `status.verbose` | `--verbose` | `false` | Generic wrapper verbose flag; status output remains concise. |
 
 ## Expected Output
 - Human-readable summary of mode, completed stages, pending stages.

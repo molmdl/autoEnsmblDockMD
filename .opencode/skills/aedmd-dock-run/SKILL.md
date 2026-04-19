@@ -44,6 +44,11 @@ Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
 - Ranked docking report such as `${docking.report_output}`.
 - Handoff record at `.handoffs/docking_run.json`.
 
+Wrapper note:
+
+- `scripts/commands/aedmd-dock-run.sh` dispatches canonical stage token `docking_run`.
+- `scripts/commands/common.sh` may also expose compatibility alias handoff names for older tooling.
+
 ## Troubleshooting
 - `gnina` not found: source `scripts/setenv.sh` and verify CLI availability.
 - No receptors discovered: validate `docking.receptor_dir` and receptor prefix.
