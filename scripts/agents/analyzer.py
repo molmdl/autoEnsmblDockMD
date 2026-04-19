@@ -27,8 +27,30 @@ class AnalyzerAgent(BaseAgent):
         stage = str(input_data.get("stage", "unknown"))
         analysis_type = str(input_data.get("analysis_type", "standard"))
         data = input_data.get("data", {}) or {}
+        
+        # Check for explicit script field from wrapper (new contract)
+        explicit_script = input_data.get("script")
+        
+        if explicit_script:
+            # Use script from input (wrapper-provided)
+            scripts = [explicit_script]
+        else:
+            # Fallback to stage-based mapping (legacy compatibility)
+            scripts = self.STAGE_ANALYSIS_MAP.get(stage, [])
+        
+        # Fail closed if no scripts resolved
+        if not scripts:
+            error_msg = f"No analysis scripts defined for stage '{stage}' and no explicit script provided"
+            return self.create_handoff(
+                to_agent=input_data.get("next_agent", "orchestrator"),
+                stage=stage,
+                status=HandoffStatus.FAILURE,
+                data={},
+                warnings=[],
+                errors=[error_msg],
+                recommendations=["Add stage to STAGE_ANALYSIS_MAP or provide explicit 'script' in input"],
+            )
 
-        scripts = self.STAGE_ANALYSIS_MAP.get(stage, [])
         analysis_outputs: Dict[str, Dict[str, Any]] = {}
         warnings: List[str] = []
         errors: List[str] = []
@@ -84,6 +106,7 @@ class AnalyzerAgent(BaseAgent):
             if errors
             else [],
         )
+
 
     def _run_analysis(self, script: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a standard analysis script and return execution metadata."""
