@@ -1,50 +1,51 @@
----
-name: rec-ensemble
-description: Use when preparing receptor ensembles from a receptor PDB through preparation, receptor MD sampling, clustering, and structure alignment for downstream docking.
-license: MIT
-compatibility: Requires gnina, gromacs 2022+, python 3.10+
-metadata:
-  author: autoEnsmblDockMD
-  version: "1.0"
-  agent: runner
-  stage: receptor_cluster
----
+# Skill: rec-ensemble
+**Stage:** receptor_cluster
+**Agent:** runner
 
-# Receptor Ensemble Generation
-
-This skill orchestrates receptor preparation, equilibration/production sampling, clustering, and alignment to produce a structurally diverse aligned receptor ensemble for docking.
-
-## When to use this skill
-- You need to generate receptor conformers from a new receptor PDB.
-- You are starting a new docking campaign and `rec/aligned/` does not exist.
-- You want reproducible ensemble generation using configured Slurm/local settings.
-- You need aligned receptor structures before running `dock-run`.
-
-## Prerequisites
-- Receptor PDB input exists in the receptor workspace.
-- `config.ini` contains a valid `[receptor]` section.
-- Environment is prepared with `source scripts/setenv.sh`.
-
-## Usage
-Command: `scripts/commands/rec-ensemble.sh --config config.ini`
-Agent dispatch: `python -m scripts.agents --agent runner --input handoff.json`
+## Capability
+Prepare a receptor ensemble from a receptor PDB through setup, MD sampling, clustering, and structural alignment. Use this to produce reproducible aligned receptor conformers for downstream docking.
 
 ## Parameters
-| Parameter | Config Key | CLI Flag | Default | Description |
-|-----------|------------|----------|---------|-------------|
-| Workspace root | `general.workdir` | `--workdir` | `./work/test` | Root workspace containing `rec/`, `dock/`, and related stage folders. |
-| Receptor PDB | `receptor.input_pdb` | `--input-pdb` | `receptor.pdb` | Input receptor structure used for preparation. |
-| Force field | `receptor.ff` | `--ff` | `charmm36` | Protein force field passed to receptor setup. |
-| Trials | `receptor.n_trials` | `--n-trials` | `4` | Number of receptor production trials for ensemble sampling. |
-| Ensemble size | `receptor.ensemble_size` | `--ensemble-size` | `10` | Number of clustered conformers to export. |
-| Align reference | `receptor.align_reference` | `--align-reference` | `${general:workdir}/dock/ref.pdb` | Reference structure for alignment. |
+| Parameter | Config Key | Required | Description |
+|-----------|------------|----------|-------------|
+| Workspace root | `general.workdir` | Yes | Root workspace containing receptor, docking, and downstream stage directories. |
+| Receptor workdir | `receptor.workdir` | Yes | Receptor-stage working directory where preparation and MD artifacts are generated. |
+| Receptor PDB | `receptor.input_pdb` | Yes | Input receptor structure used for protonation, solvation, and setup. |
+| Force field | `receptor.ff` | Yes | Protein force field passed to receptor preparation (`pdb2gmx`) steps. |
+| Water model | `receptor.water_model` | Yes | Water model used during receptor system preparation. |
+| Number of trials | `receptor.n_trials` | Yes | Number of receptor production trials for ensemble sampling. |
+| Ensemble size | `receptor.ensemble_size` | Yes | Number of clustered conformers expected/exported for docking. |
+| Alignment inputs | `receptor.align_structures` | Yes | Structure list/pattern used by alignment utility. |
+| Alignment reference | `receptor.align_reference` | Yes | Reference structure used to align receptor conformers. |
+| Alignment output dir | `receptor.align_output_dir` | Yes | Destination directory for aligned ensemble structures. |
 
-## Expected Output
-- Receptor trajectories and clustering products under `rec/`.
-- Aligned ensemble PDBs under `rec/aligned/`.
-- Handoff record at `.handoffs/receptor_cluster.json`.
+## Scripts
+| Script | Purpose |
+|--------|---------|
+| `scripts/commands/rec-ensemble.sh` | Command entrypoint that dispatches receptor ensemble workflow. |
+| `scripts/run_pipeline.sh --stage rec_prep` | Receptor preparation, solvation, and equilibration setup. |
+| `scripts/run_pipeline.sh --stage rec_md` | Receptor production MD sampling runs. |
+| `scripts/run_pipeline.sh --stage rec_cluster` | Cluster sampled receptor trajectories into ensemble conformers. |
+| `scripts/rec/5_align.py` | Align receptor conformers to a common reference frame. |
 
-## Troubleshooting
+## Success Criteria
+- Aligned receptor ensemble structures are generated under `receptor.align_output_dir`.
+- Stage handoff `.handoffs/receptor_cluster.json` reports successful completion with expected outputs.
+
+## Usage Example
+Slash command: `/rec-ensemble --config config.ini`
+
+Agent invocation: `python -m scripts.agents --agent runner --input handoff.json`
+
+## Workflow
+1. Validate prerequisites: receptor input exists, environment is sourced, and `[receptor]` config keys are present.
+2. Run receptor preparation and equilibration setup from configured `receptor.workdir`.
+3. Launch receptor MD sampling using configured `receptor.n_trials` and compute settings.
+4. Merge/analyze trajectories and cluster conformations to target `receptor.ensemble_size`.
+5. Align exported receptor structures to `receptor.align_reference` into `receptor.align_output_dir`.
+6. Write handoff metadata for downstream docking consumption.
+
+Troubleshooting:
 - Missing receptor file: confirm `receptor.input_pdb` exists in `receptor.workdir`.
 - Clustering fails: verify trajectory files were produced by receptor MD trials.
-- Alignment errors: check `receptor.align_reference` path and atom selection compatibility.
+- Alignment errors: check `receptor.align_reference` path and atom-selection compatibility.
