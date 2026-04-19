@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 5 - Polish |
-| **Current Plan** | 2 of 7 (05-02 completed) |
-| **Last Activity** | 2026-04-19 - Completed 05-02-PLAN.md |
-| **Progress** | █████████████░░░ 25/31 plans complete (81%) |
+| **Current Plan** | 3 of 7 (05-03 completed) |
+| **Last Activity** | 2026-04-19 - Completed 05-03-PLAN.md |
+| **Progress** | █████████████░░░ 26/31 plans complete (84%) |
 | **Phase 5 Blocker** | End-to-end test artifacts pending |
 | **Status** | In progress |
 
@@ -55,6 +55,8 @@
 |----------|-----------|----------------|
 | Restructure AGENTS.md by agent role instead of requirement category | Improves agent discoverability and keeps AGENTS.md readable at load time | 5 |
 | Keep AGENTS.md overview-only with links to skill/WORKFLOW/PROJECT docs | Avoids duplication and keeps implementation specifics in authoritative files | 5 |
+| Enforce one SKILL.md metadata template across all 10 skills | Ensures deterministic parsing and consistent runtime documentation shape | 5 |
+| Align skill parameter tables to `scripts/config.ini.template` keys | Keeps skill guidance synchronized with config-driven execution | 5 |
 
 ### Research Flags (Areas for Planning)
 
@@ -74,15 +76,15 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 10:32 +0800
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-04-19 10:34 +0800
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
 
 ### Next Action
 
 **Phase 5 is in progress.**
 
-**Recommend:** Continue with 05-03-PLAN.md.
+**Recommend:** Continue with 05-04-PLAN.md.
 
 ### Recent Milestones
 
@@ -94,6 +96,7 @@ Resume file: None
 - 2026-04-19: Phase 4 plan 02 executed (Agent Skills files)
 - 2026-04-19: Phase 4 plan 03 executed (integration smoke test + experimental docs)
 - 2026-04-19: Phase 5 plan 02 executed (AGENTS.md role-based restructure)
+- 2026-04-19: Phase 5 plan 03 executed (SKILL.md metadata standardization)
 
 ### Planning Status
 
@@ -127,4 +130,4 @@ Resume file: None
 
 *State updated: 2026-04-19*
 *Current phase: 05-polish (in progress)*
-*Last action: Completed 05-02-PLAN.md and created 05-02-SUMMARY.md*
+*Last action: Completed 05-03-PLAN.md and created 05-03-SUMMARY.md*
