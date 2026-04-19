@@ -151,6 +151,18 @@ class SlurmExecutor:
         'NODE_FAIL',
         'OUT_OF_MEMORY'
     }
+
+    FAILURE_STATES = {
+        'FAILED',
+        'CANCELLED',
+        'TIMEOUT',
+        'NODE_FAIL',
+        'OUT_OF_MEMORY',
+        'BOOT_FAIL',
+        'PREEMPTED',
+        'DEADLINE',
+        'REVOKED',
+    }
     
     def __init__(self, account: str = None, default_time: str = '02:00:00',
                  default_cpus: int = 1, default_mem: str = '4G'):
@@ -298,6 +310,41 @@ class SlurmExecutor:
         except subprocess.CalledProcessError as e:
             # Job not found or squeue failed
             return 'UNKNOWN'
+
+    def get_job_terminal_state(self, job_id: str) -> str:
+        """Resolve final Slurm terminal state using sacct.
+
+        Returns:
+            Canonical terminal state (e.g., COMPLETED/FAILED/...) or UNKNOWN.
+        """
+        try:
+            result = subprocess.run(
+                ['sacct', '-n', '-P', '-j', job_id, '-o', 'JobIDRaw,State'],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+        except subprocess.CalledProcessError:
+            return 'UNKNOWN'
+
+        terminal = 'UNKNOWN'
+        for raw in result.stdout.splitlines():
+            line = raw.strip()
+            if not line:
+                continue
+            parts = line.split('|')
+            if len(parts) < 2:
+                continue
+            row_job_id = parts[0].strip()
+            row_state = parts[1].strip().upper()
+            # Keep only root job record, ignore step records (e.g. 12345.batch)
+            if row_job_id != str(job_id):
+                continue
+            state_base = row_state.split()[0].split('+')[0]
+            terminal = state_base or 'UNKNOWN'
+            break
+
+        return terminal
     
     def wait_for_job(self, job_id: str, poll_interval: int = 30,
                      timeout: int = None) -> Tuple[str, str]:
@@ -347,22 +394,16 @@ class SlurmExecutor:
             if status in self.TERMINAL_STATES:
                 return (status, output_file)
             
-            # Check if job completed (not in queue)
+            # Check if job is no longer visible in squeue
             if status == 'UNKNOWN':
-                # Job may have finished very quickly
-                # Try to find output file
-                if output_file and Path(output_file).exists():
-                    # Check if output contains error indicators
-                    try:
-                        with open(output_file, 'r') as f:
-                            content = f.read()
-                            # Heuristic: check for common error patterns
-                            if 'error' in content.lower() or 'failed' in content.lower():
-                                return ('FAILED', output_file)
-                    except IOError:
-                        pass
-                
-                return ('COMPLETED', output_file)
+                terminal_state = self.get_job_terminal_state(job_id)
+                if terminal_state == 'COMPLETED':
+                    return ('COMPLETED', output_file)
+                if terminal_state in self.FAILURE_STATES or terminal_state in self.TERMINAL_STATES:
+                    return (terminal_state, output_file)
+
+                # Do not assume success when scheduler state is indeterminate.
+                return ('FAILED', output_file)
             
             # Wait before next check
             time.sleep(poll_interval)
