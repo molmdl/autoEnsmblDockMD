@@ -134,6 +134,8 @@ test_receptor = ${docking:receptor_dir}/${docking:receptor_prefix}0.pdb
 ; gnina run controls
 exhaustiveness = 100
 num_modes = 32
+; Maximum receptor-conformer jobs to run in parallel per ligand
+ensemble_parallelism = 1
 autobox_add = 4
 ; autobox_ligand = receptor OR path-to-reference-ligand
 autobox_ligand = receptor
@@ -276,6 +278,8 @@ mmpbsa_input = scripts/com/mmpbsa.in
 trj_script = scripts/com/2_trj4mmpbsa.sh
 submit_script = scripts/com/2_sub_mmpbsa.sh
 mmpbsa_script = scripts/com/2_mmpbsa.sh
+; Persisted receptor/ligand/complex group IDs written by trajectory-prep step
+group_ids_file = mmpbsa_groups.dat
 ; Slurm CPU settings for MM/PBSA arrays
 partition = cpu
 cpus_per_task = 16
@@ -304,6 +308,8 @@ plot_format = png
 plot_dpi = 300
 ; Contact cutoff for advanced MDAnalysis contacts (angstrom)
 contact_cutoff = 4.5
+; Advanced distance reference selection key
+distance_reference = protein_backbone
 ; Optional explicit atom selections (comma/newline separated)
 selections =
 ; GROMACS group IDs
@@ -314,3 +320,54 @@ gmx_hbond_group_a = 1
 gmx_hbond_group_b = 13
 ; Optional target ligand list for analysis stage
 ligand_list =
+
+[fingerprint]
+; Optional fingerprint utility stage defaults
+workdir = ${complex:workdir}
+ligand_dir = ${fingerprint:workdir}
+ligand_pattern = ${complex:ligand_pattern}
+ligand_list =
+trajectory = com_traj.xtc
+topology = com.tpr
+output_dir = fp
+output_prefix = fingerprint
+ligand_selection = resname MOL and not name H*
+receptor_selection = protein and not name H*
+cutoff = 4.5
+summary_csv = ${fingerprint:workdir}/fingerprint_summary.csv
+fp_script = scripts/com/4_fp.py
+
+[archive]
+; Optional archive-selection utility stage defaults
+workdir = ${complex:workdir}
+ligand_dir = ${archive:workdir}
+ligand_pattern = ${complex:ligand_pattern}
+ligand_list =
+archive_dir = ${archive:workdir}/archive
+include_patterns = *.gro,*.xtc,*.xvg,mmpbsa_*/FINAL_RESULTS_MMPBSA.dat,mmpbsa_*/FINAL_RESULTS_MMPBSA.csv
+dry_run = false
+compress_level = 6
+
+[rerun]
+; Optional rerun-selection utility stage defaults
+workdir = ${complex:workdir}
+ligand_dir = ${rerun:workdir}
+ligand_pattern = ${complex:ligand_pattern}
+ligand_list =
+stage = prod
+expected_prep = pr_pos.gro,sys.top,index.ndx
+expected_prod = prod_0.xtc,prod_0.tpr
+expected_mmpbsa = mmpbsa_0/FINAL_RESULTS_MMPBSA.dat
+prep_script = scripts/com/0_prep.sh
+prod_script = scripts/com/1_pr_prod.sh
+mmpbsa_script = scripts/com/2_sub_mmpbsa.sh
+partition = ${slurm:partition}
+cpus_per_task = 4
+
+[monitor_patterns]
+; Optional log-monitor override patterns (separate multiple regexes with ||)
+error_patterns =
+warning_patterns =
+completion_markers =
+; 0 = no limit
+max_matched_lines = 0

@@ -17,6 +17,10 @@ This guide is the human-facing deep reference for configuring and preparing `aut
     - [[production] (MD)](#production-md)
     - [[mmpbsa]](#mmpbsa)
     - [[analysis]](#analysis)
+    - [[fingerprint]](#fingerprint)
+    - [[archive]](#archive)
+    - [[rerun]](#rerun)
+    - [[monitor_patterns]](#monitor_patterns)
   - [Input File Preparation](#input-file-preparation)
   - [Workspace Setup](#workspace-setup)
 - [Part 2: Stage-by-Stage Operating Guide](#part-2-stage-by-stage-operating-guide)
@@ -140,6 +144,7 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `addH` | enum | `off` | Stage 2 gnina | Hydrogen add behavior for docking input. |
 | `stripH` | enum | `off` | Stage 2 gnina | Hydrogen stripping behavior. |
 | `cpu` | int | `8` | Stage 2 gnina | CPU threads for gnina. |
+| `ensemble_parallelism` | int | `1` | Stage 2 gnina | Max receptor-conformer jobs run in parallel per ligand. |
 | `min_rmsd_filter` | float/int | `3` | Stage 2 post-process | Pose redundancy filter threshold. |
 | `report_output` | path | `${docking:dock_dir}/dock_report.csv` | Stage 2 report | Docking ranking report path. |
 | `report_format` | enum | `csv` | Stage 2 report | Docking report output format. |
@@ -190,6 +195,7 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `ff` | string | `charmm36` | Stage 3/5 | FF tag used for script defaults and MMPBSA topology choice. |
 | `ff_include` | path | `charmm36.ff/forcefield.itp` | Stage 3 | `#include` line written into `sys.top`. |
 | `water_model` | string | `tip3p` | Stage 3 | Water model for complex setup. |
+| `solvent_coordinates` | string/path | `spc216.gro` | Stage 3 | Coordinate source passed to `gmx solvate -cs` (file/path, not water-model label). |
 | `box_distance` | float | `1.0` | Stage 3 | Solvation box margin (nm). |
 | `ion_conc` | float | `0.15` | Stage 3 | Ion concentration (M). |
 | `mdp_dir` | path | `./mdp/com` | Stage 3/4 | MDP directory for complex prep and production. |
@@ -246,6 +252,7 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `mpi_ranks` | int | `16` | Stage 5 | MPI ranks per MM/PBSA chunk job. |
 | `receptor_group_id` | int | `1` | Stage 5 | Optional fixed receptor group ID. |
 | `ligand_group_id` | int | `12` | Stage 5 | Optional fixed ligand group ID. |
+| `group_ids_file` | string | `mmpbsa_groups.dat` | Stage 5 | Persisted receptor/ligand/complex group ID mapping per ligand directory. |
 | `ff` | string | `${complex:ff}` | Stage 5 | FF selector for topology choice (AMBER vs CHARMM). |
 | `topology_file` | path | *(empty)* | Stage 5 | Optional explicit topology override. |
 | `amber_topology_file` | string | `bypass_sys.top` | Stage 5 | Topology filename for AMBER branch (Mode A typical). |
@@ -263,6 +270,7 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `plot_format` | string | `png` | Stage 6 | Plot file format. |
 | `plot_dpi` | int | `300` | Stage 6 | Plot DPI. |
 | `contact_cutoff` | float | `4.5` | Stage 6 | Contact cutoff (angstrom). |
+| `distance_reference` | enum | `protein_backbone` | Stage 6 advanced | Reference selection key used in advanced distance calculations. |
 | `selections` | list/string | *(empty)* | Stage 6 | Optional explicit atom selections. |
 | `gmx_rmsd_ref_group` | int | `4` | Stage 6 | Group ID for RMSD reference. |
 | `gmx_rmsd_mobile_group` | int | `4` | Stage 6 | Group ID for RMSD mobile group. |
@@ -270,6 +278,64 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `gmx_hbond_group_a` | int | `1` | Stage 6 | H-bond group A ID. |
 | `gmx_hbond_group_b` | int | `13` | Stage 6 | H-bond group B ID. |
 | `ligand_list` | list | *(empty)* | Stage 6 | Optional explicit ligand subset for analysis. |
+
+#### [fingerprint]
+
+| Key | Type | Default | Used by stage(s) | Description / mode notes |
+| --- | --- | --- | --- | --- |
+| `workdir` | path | `${complex:workdir}` | Optional utility | Workspace root for fingerprint discovery. |
+| `ligand_dir` | path | `${fingerprint:workdir}` | Optional utility | Ligand directory scanned by fingerprint stage. |
+| `ligand_pattern` | pattern | `${complex:ligand_pattern}` | Optional utility | Ligand directory discovery pattern. |
+| `ligand_list` | list | *(empty)* | Optional utility | Explicit ligand list override. |
+| `trajectory` | string | `com_traj.xtc` | Optional utility | Trajectory filename used for per-ligand fingerprint analysis. |
+| `topology` | string | `com.tpr` | Optional utility | Topology filename used for per-ligand fingerprint analysis. |
+| `output_dir` | string | `fp` | Optional utility | Per-ligand output subdirectory. |
+| `output_prefix` | string | `fingerprint` | Optional utility | Prefix for generated fingerprint artifacts. |
+| `ligand_selection` | string | `resname MOL and not name H*` | Optional utility | MDAnalysis atom selection for ligand atoms. |
+| `receptor_selection` | string | `protein and not name H*` | Optional utility | MDAnalysis atom selection for receptor atoms. |
+| `cutoff` | float | `4.5` | Optional utility | Contact distance cutoff (Å). |
+| `summary_csv` | path | `${fingerprint:workdir}/fingerprint_summary.csv` | Optional utility | Aggregated fingerprint summary CSV path. |
+| `fp_script` | path | `scripts/com/4_fp.py` | Optional utility | Fingerprint analysis Python entrypoint override. |
+
+#### [archive]
+
+| Key | Type | Default | Used by stage(s) | Description / mode notes |
+| --- | --- | --- | --- | --- |
+| `workdir` | path | `${complex:workdir}` | Optional utility | Workspace root for archive selection. |
+| `ligand_dir` | path | `${archive:workdir}` | Optional utility | Ligand directory scanned for archival. |
+| `ligand_pattern` | pattern | `${complex:ligand_pattern}` | Optional utility | Ligand discovery pattern. |
+| `ligand_list` | list | *(empty)* | Optional utility | Explicit ligand list override. |
+| `archive_dir` | path | `${archive:workdir}/archive` | Optional utility | Output directory for per-ligand archive tarballs. |
+| `include_patterns` | list/pattern | `*.gro,*.xtc,*.xvg,mmpbsa_*/FINAL_RESULTS_MMPBSA.dat,mmpbsa_*/FINAL_RESULTS_MMPBSA.csv` | Optional utility | Comma-separated glob patterns included in each archive. |
+| `dry_run` | bool | `false` | Optional utility | Preview archive membership without writing tarballs. |
+| `compress_level` | int | `6` | Optional utility | Gzip compression level passed to `tar`. |
+
+#### [rerun]
+
+| Key | Type | Default | Used by stage(s) | Description / mode notes |
+| --- | --- | --- | --- | --- |
+| `workdir` | path | `${complex:workdir}` | Optional utility | Workspace root for rerun selection. |
+| `ligand_dir` | path | `${rerun:workdir}` | Optional utility | Ligand directory scanned for completeness checks. |
+| `ligand_pattern` | pattern | `${complex:ligand_pattern}` | Optional utility | Ligand discovery pattern. |
+| `ligand_list` | list | *(empty)* | Optional utility | Explicit ligand list override. |
+| `stage` | enum | `prod` | Optional utility | Stage to validate/rerun (`prep|prod|mmpbsa`). |
+| `expected_prep` | list/pattern | `pr_pos.gro,sys.top,index.ndx` | Optional utility | Required files/patterns indicating prep completion. |
+| `expected_prod` | list/pattern | `prod_0.xtc,prod_0.tpr` | Optional utility | Required files/patterns indicating production completion. |
+| `expected_mmpbsa` | list/pattern | `mmpbsa_0/FINAL_RESULTS_MMPBSA.dat` | Optional utility | Required files/patterns indicating MM/PBSA completion. |
+| `prep_script` | path | `scripts/com/0_prep.sh` | Optional utility | Script invoked when rerunning prep stage. |
+| `prod_script` | path | `scripts/com/1_pr_prod.sh` | Optional utility | Script invoked when rerunning production stage. |
+| `mmpbsa_script` | path | `scripts/com/2_sub_mmpbsa.sh` | Optional utility | Script invoked when rerunning MM/PBSA stage. |
+| `partition` | string | `${slurm:partition}` | Optional utility | Slurm partition used for rerun submissions. |
+| `cpus_per_task` | int | `4` | Optional utility | CPU count used for rerun submissions. |
+
+#### [monitor_patterns]
+
+| Key | Type | Default | Used by stage(s) | Description / mode notes |
+| --- | --- | --- | --- | --- |
+| `error_patterns` | list/regex | built-in defaults | Monitoring/validation | Custom error regex patterns, separated by `||`; overrides default error registry when set. |
+| `warning_patterns` | list/regex | built-in defaults | Monitoring/validation | Custom warning regex patterns, separated by `||`; overrides default warning registry when set. |
+| `completion_markers` | list/regex | built-in defaults | Monitoring/validation | Custom completion regex markers, separated by `||`; overrides default completion registry when set. |
+| `max_matched_lines` | int | `0` | Monitoring/validation | Max matched lines returned per class (`0` = no limit). |
 
 ## Input File Preparation
 
@@ -515,6 +581,10 @@ These skill files use YAML frontmatter with `name`, `description`, `license`, `c
 - Minimized structures with reduced potential energy indicate physically saner starting coordinates.
 - Position-restraint artifacts indicate readiness for Stage 4 equilibration/production.
 
+**Scheduler note**
+- `scripts/com/0_prep.sh` may submit jobs and return before all ligand folders are fully ready.
+- Confirm completion (`squeue`/`sacct`) and expected files (`pr_pos.gro`, `sys.top`, `index.ndx`) before Stage 4.
+
 **Common issues (stage-specific)**
 - Topology include ordering problems or missing ligand include files.
 - Force-field mismatch between protein and ligand assets.
@@ -541,6 +611,11 @@ These skill files use YAML frontmatter with `name`, `description`, `license`, `c
 - Consistent temperature/pressure behavior indicates healthy integration settings.
 - Major monotonic drift or repeated spikes suggests unstable setup requiring correction.
 
+**Scheduler note**
+- `scripts/com/1_pr_prod.sh` is typically a submission stage in Slurm environments.
+- Treat command return as job submission success, not production completion.
+- Wait for `COMPLETED` job state and verify `prod_*.xtc`/`prod_*.tpr` before Stage 5.
+
 **Common issues (stage-specific)**
 - RMSD stays >3 Å with unstable trend (often needs longer equilibration or box/ion review).
 - Inadequate restraints or problematic starting poses causing early structural distortions.
@@ -566,6 +641,10 @@ These skill files use YAML frontmatter with `name`, `description`, `license`, `c
 - More favorable (more negative) total binding energy generally indicates stronger predicted binding.
 - Per-residue or per-component decomposition helps identify interaction drivers.
 - Very noisy or inconsistent chunk-level estimates suggest insufficient sampling or input mismatch.
+
+**Scheduler note**
+- `scripts/com/2_sub_mmpbsa.sh` submits chunk jobs asynchronously.
+- Track job IDs in scheduler output and verify all chunks complete before interpreting results.
 
 **Common issues (stage-specific)**
 - Topology mismatch (`amber_topology_file`/`charmm_topology_file` wrong for actual system).
@@ -613,6 +692,8 @@ Use this as a fast triage rubric before selecting lead compounds:
 | Contacts/H-bonds | Persistent interaction network for top ligands | Transient/noisy contacts with no stable interaction pattern | Re-evaluate pose quality and replicate length |
 
 ## Troubleshooting
+
+For scheduler-focused troubleshooting and async stage completion checks, see [docs/TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
 
 Use the table below for common failure patterns and first-response fixes.
 
