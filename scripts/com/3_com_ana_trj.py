@@ -136,21 +136,29 @@ def compute_contact_frequency(
     if len(receptor) == 0 or len(ligand) == 0:
         raise ValueError("Selections yielded empty atoms for contact analysis")
 
-    residues = receptor.residues
-    counts = {int(r.resid): 0 for r in residues}
+    receptor_resids = receptor.resids.astype(int, copy=False)
+    residue_ids = np.unique(receptor_resids)
+    counts = np.zeros(len(residue_ids), dtype=int)
     total_frames = 0
 
     for _ in universe.trajectory:
         total_frames += 1
-        for residue in residues:
-            if len(residue.atoms) == 0:
-                continue
-            d = mda.lib.distances.distance_array(residue.atoms.positions, ligand.positions)
-            if np.any(d <= cutoff):
-                counts[int(residue.resid)] += 1
+        contacts = mda.lib.distances.capped_distance(
+            receptor.positions,
+            ligand.positions,
+            max_cutoff=cutoff,
+            box=universe.dimensions,
+            return_distances=False,
+        )
+        if contacts.size == 0:
+            continue
 
-    residue_ids = np.array(sorted(counts.keys()), dtype=int)
-    frequencies = np.array([counts[r] / max(total_frames, 1) for r in residue_ids], dtype=float)
+        contact_atom_indices = np.unique(contacts[:, 0])
+        contacting_resids = np.unique(receptor_resids[contact_atom_indices])
+        residue_indices = np.searchsorted(residue_ids, contacting_resids)
+        counts[residue_indices] += 1
+
+    frequencies = counts.astype(float) / max(total_frames, 1)
     return residue_ids, frequencies
 
 
