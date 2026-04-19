@@ -44,6 +44,7 @@ Config keys used:
   [docking] addH = off|on
   [docking] stripH = off|on
   [docking] cpu
+  [docking] ensemble_parallelism
   [docking] min_rmsd_filter
   [slurm] partition
   [slurm] gpus
@@ -155,6 +156,7 @@ ADDH="$(get_config docking addH "off")"
 STRIPH="$(get_config docking stripH "off")"
 CPU="$(get_config docking cpu "8")"
 MIN_RMSD_FILTER="$(get_config docking min_rmsd_filter "3")"
+ENSEMBLE_PARALLELISM="$(get_config docking ensemble_parallelism "1")"
 
 SLURM_PARTITION="$(get_config slurm partition "workq")"
 SLURM_GPUS="$(get_config slurm gpus "1")"
@@ -274,9 +276,14 @@ require_uint "${EXHAUSTIVENESS}" "docking exhaustiveness"
 require_uint "${NUM_MODES}" "docking num_modes"
 require_uint "${AUTOBOX_ADD}" "docking autobox_add"
 require_uint "${CPU}" "docking cpu"
+require_uint "${ENSEMBLE_PARALLELISM}" "docking ensemble_parallelism"
 require_uint "${SLURM_GPUS}" "slurm gpus"
 require_uint "${SLURM_CPUS}" "slurm cpus_per_task"
 require_safe_partition "${SLURM_PARTITION}"
+if [[ "${ENSEMBLE_PARALLELISM}" -le 0 ]]; then
+    log_error "Invalid docking ensemble_parallelism='${ENSEMBLE_PARALLELISM}'. Must be > 0"
+    exit 1
+fi
 
 if [[ "${SCORING,,}" != "cnn" && "${SCORING,,}" != "ad4_scoring" ]]; then
     log_error "Invalid docking scoring='${SCORING}'. Expected cnn or ad4_scoring"
@@ -341,6 +348,7 @@ submit_ligand_job() {
     local q_mode q_ligand_name q_test_receptor q_reference_ligand q_receptor_rel q_receptor_prefix
     local q_ensemble_size q_autobox_add q_exhaustiveness q_num_modes q_addh q_striph q_cpu
     local q_scoring q_min_rmsd_filter q_autobox_ligand_setting q_ref_rel q_lig_workdir
+    local q_ensemble_parallelism
 
     require_safe_id "${lig_name}" "ligand id"
 
@@ -397,6 +405,7 @@ PY
     printf -v q_autobox_ligand_setting '%q' "${AUTOBOX_LIGAND_SETTING}"
     printf -v q_ref_rel '%q' "${ref_rel}"
     printf -v q_lig_workdir '%q' "${lig_workdir}"
+    printf -v q_ensemble_parallelism '%q' "${ENSEMBLE_PARALLELISM}"
 
     job_script="${lig_workdir}/run_gnina_${lig_name}.sbatch"
     cat > "${job_script}" <<EOF
@@ -428,6 +437,7 @@ readonly SCORING=${q_scoring}
 readonly MIN_RMSD_FILTER=${q_min_rmsd_filter}
 readonly AUTOBOX_LIGAND_SETTING=${q_autobox_ligand_setting}
 readonly REF_REL=${q_ref_rel}
+readonly ENSEMBLE_PARALLELISM=${q_ensemble_parallelism}
 
 if [[ "\${MODE}" == "test" ]]; then
   cmd=(
@@ -448,11 +458,14 @@ if [[ "\${MODE}" == "test" ]]; then
   cmd+=(-o "rec-\${LIGAND_NAME}.sdf" --log "rec-\${LIGAND_NAME}.log")
   "\${cmd[@]}"
 else
-  for (( i = 0; i < \${ENSEMBLE_SIZE}; i++ )); do
+  run_gnina_for_receptor() {
+    local i="\$1"
+    local receptor_file autobox_token
+
     receptor_file="\${RECEPTOR_REL}/\${RECEPTOR_PREFIX}\${i}.pdb"
     if [[ ! -f "\${receptor_file}" ]]; then
       echo "Missing receptor: \${receptor_file}" >&2
-      exit 1
+      return 1
     fi
 
     if [[ "\${AUTOBOX_LIGAND_SETTING}" == "receptor" ]]; then
@@ -483,7 +496,31 @@ else
     fi
     cmd+=(-o "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.sdf" --log "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.log")
     "\${cmd[@]}"
+  }
+
+  max_parallel="\${ENSEMBLE_PARALLELISM}"
+  if [[ "\${max_parallel}" -gt "\${ENSEMBLE_SIZE}" ]]; then
+    max_parallel="\${ENSEMBLE_SIZE}"
+  fi
+
+  declare -a pids=()
+  for (( i = 0; i < \${ENSEMBLE_SIZE}; i++ )); do
+    run_gnina_for_receptor "\${i}" &
+    pids+=("\$!")
+
+    if [[ "\${#pids[@]}" -ge "\${max_parallel}" ]]; then
+      for pid in "\${pids[@]}"; do
+        wait "\${pid}"
+      done
+      pids=()
+    fi
   done
+
+  if [[ "\${#pids[@]}" -gt 0 ]]; then
+    for pid in "\${pids[@]}"; do
+      wait "\${pid}"
+    done
+  fi
 fi
 EOF
 
