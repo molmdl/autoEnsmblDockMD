@@ -25,7 +25,7 @@ cd autoEnsmblDockMD
 ### 2) Create and activate Conda environment
 
 ```bash
-conda env create -f env.yml
+conda env create -f scripts/env.yml
 conda activate autoEnsmblDockMD
 ```
 
@@ -136,15 +136,19 @@ Both modes share the same stage structure; differences are encoded through confi
 ### Prerequisites
 
 - **Conda** (recommended environment manager)
-- **GROMACS ≥ 2022**
-- **gnina**
-- **gmx_MMPBSA**
+  - [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install/overview)) 
+- **GROMACS ≥ 2022** (note: the Amber FF provided in the example is for gromacs < 2025, tested with 2023.5)
+  - [GROMACS official website](https://www.gromacs.org/)
+- **gnina** (tested with v1.1, since our hardware CUDA does not support newer version)
+  - [Gnina github](https://github.com/gnina/gnina)
+- **gmx_MMPBSA** (automatically installed if you create the conda environment using env.yml)
+  - [gmx_MMPBSA Documentation](https://valdes-tresanco-ms.github.io/gmx_MMPBSA/dev/)
 - Optional utilities depending on stage usage (for example Open Babel for specific conversion helpers)
 
 ### Environment setup
 
 ```bash
-conda env create -f env.yml && conda activate autoEnsmblDockMD
+conda env create -f scripts/env.yml && conda activate autoEnsmblDockMD
 source scripts/setenv.sh
 ```
 
