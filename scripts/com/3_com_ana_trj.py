@@ -111,13 +111,23 @@ def compute_rmsf(universe: "mda.Universe", selection: str) -> Tuple[np.ndarray, 
     if len(atoms) == 0:
         raise ValueError(f"Selection yielded no atoms for RMSF: {selection}")
 
-    coords = []
+    n_frames = 0
+    mean_xyz = np.zeros((len(atoms), 3), dtype=float)
+    m2_xyz = np.zeros((len(atoms), 3), dtype=float)
+
     for _ in universe.trajectory:
-        coords.append(atoms.positions.copy())
-    xyz = np.stack(coords, axis=0)
-    mean_xyz = xyz.mean(axis=0)
-    fluctuations = xyz - mean_xyz
-    per_atom_rmsf = np.sqrt(np.mean(np.sum(fluctuations * fluctuations, axis=2), axis=0))
+        n_frames += 1
+        xyz = atoms.positions.astype(float, copy=True)
+        delta = xyz - mean_xyz
+        mean_xyz += delta / n_frames
+        delta2 = xyz - mean_xyz
+        m2_xyz += delta * delta2
+
+    if n_frames == 0:
+        raise ValueError("Trajectory contains no frames for RMSF analysis")
+
+    per_atom_var = m2_xyz / n_frames
+    per_atom_rmsf = np.sqrt(np.sum(per_atom_var, axis=1))
 
     residue_to_values: Dict[int, list[float]] = {}
     for atom, value in zip(atoms, per_atom_rmsf):
