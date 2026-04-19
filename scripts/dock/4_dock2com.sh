@@ -149,6 +149,35 @@ render_pattern() {
     printf '%s\n' "${pattern//\{ligand\}/${ligand}}"
 }
 
+trim_token() {
+    local value="$1"
+    value="${value#${value%%[![:space:]]*}}"
+    value="${value%${value##*[![:space:]]}}"
+    printf '%s\n' "${value}"
+}
+
+split_csv_tokens() {
+    local csv="$1"
+    local -n out_ref="$2"
+    local raw token
+
+    out_ref=()
+    IFS=',' read -r -a raw <<< "${csv}"
+    for token in "${raw[@]}"; do
+        token="$(trim_token "${token}")"
+        [[ -n "${token}" ]] || continue
+        out_ref+=("${token}")
+    done
+}
+
+require_safe_ligand_id() {
+    local ligand_id="$1"
+    if [[ ! "${ligand_id}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        log_error "Invalid ligand ID '${ligand_id}'. Allowed characters: A-Z a-z 0-9 . _ -"
+        exit 1
+    fi
+}
+
 discover_ligands() {
     local explicit="$1"
     local -n out_ref="$2"
@@ -157,8 +186,10 @@ discover_ligands() {
     out_ref=()
 
     if [[ -n "${explicit}" ]]; then
-        explicit="${explicit//,/ }"
-        for token in ${explicit}; do
+        local explicit_tokens=()
+        split_csv_tokens "${explicit}" explicit_tokens
+        for token in "${explicit_tokens[@]}"; do
+            require_safe_ligand_id "${token}"
             out_ref+=("${token}")
         done
         return
@@ -173,6 +204,7 @@ discover_ligands() {
     for path in "${candidates[@]}"; do
         [[ -d "${path}" ]] || continue
         base="$(basename "${path}")"
+        require_safe_ligand_id "${base}"
         out_ref+=("${base}")
     done
 }
