@@ -80,7 +80,7 @@ STAGE_LIGAND_MODE[com_mmpbsa]="ligand"
 STAGE_DESC[com_ana]="Run complex trajectory analysis"
 STAGE_CMD[com_ana]="${SCRIPT_DIR}/com/3_ana.sh"
 STAGE_SECTIONS[com_ana]="general,complex,analysis"
-STAGE_LIGAND_MODE[com_ana]="target"
+STAGE_LIGAND_MODE[com_ana]="ligand"
 
 STAGE_DESC[com_fp]="Run fingerprint analysis (optional utility)"
 STAGE_CMD[com_fp]="${SCRIPT_DIR}/com/4_cal_fp.sh"
