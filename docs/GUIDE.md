@@ -717,3 +717,13 @@ Keep protein and ligand parameter families aligned.
 | Any mode (invalid mix) | AMBER protein force field | CGenFF ligand parameters | ❌ Do not mix | Common cause of topology/runtime crashes |
 
 **Rule of thumb:** choose one force-field family at Stage 1/3 and keep it consistent through Stage 5.
+
+## Citations
+
+If you use `autoEnsmblDockMD` for your research, please cite the underlying computational tools. Full citation details are available in [README.md](../README.md#citations).
+
+**Key tools:**
+- **GROMACS** (Abraham et al. 2015; Berendsen et al. 1995) — molecular dynamics engine
+- **gnina** (McNutt et al. 2025, 2021) — deep learning-enhanced molecular docking
+- **gmx_MMPBSA** (Valdés-Tresanco et al. 2021) — binding free energy calculation
+- **MDAnalysis** (Michaud-Agrawal et al. 2011; Gowers et al. 2016) — trajectory analysis toolkit

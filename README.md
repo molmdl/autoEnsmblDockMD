@@ -226,3 +226,22 @@ Please preserve configuration-driven behavior and backward-compatible script int
 ## License
 
 This project is licensed under **GNU GPL v3.0**. See [LICENSE](./LICENSE).
+
+## Citations
+
+If you use `autoEnsmblDockMD` in your research, please cite the relevant tools and methods:
+
+### GROMACS
+- Abraham, M. J., Murtola, T., Schulz, R., Páll, S., Smith, J. C., Hess, B., & Lindahl, E. (2015). GROMACS: High performance molecular simulations through multi-level parallelism from laptops to supercomputers. *SoftwareX*, 1-2, 19-25. https://doi.org/10.1016/j.softx.2015.06.001
+- Berendsen, H. J. C., van der Spoel, D., & van Drunen, R. (1995). GROMACS: A message-passing parallel molecular dynamics implementation. *Computer Physics Communications*, 91(1-3), 43-56. https://doi.org/10.1016/0010-4655(95)00042-E
+
+### gnina
+- McNutt, A. T., Li, Y., Meli, R., Aggarwal, R., & Koes, D. R. (2025). GNINA 1.3: the next increment in molecular docking with deep learning. *Journal of Cheminformatics*, 17, 28. https://doi.org/10.1186/s13321-025-00973-x
+- McNutt, A. T., Francoeur, P., Aggarwal, R., Masuda, T., Meli, R., Ragoza, M., Sunseri, J., & Koes, D. R. (2021). GNINA 1.0: Molecular docking with deep learning. *Journal of Cheminformatics*, 13, 43. https://doi.org/10.1186/s13321-021-00522-2
+
+### gmx_MMPBSA
+- Valdés-Tresanco, M. S., Valdés-Tresanco, M. E., Valiente, P. A., & Moreno, E. (2021). gmx_MMPBSA: A new tool to perform end-state free energy calculations with GROMACS. *Journal of Chemical Theory and Computation*, 17(10), 6281-6291. https://doi.org/10.1021/acs.jctc.1c00645
+
+### MDAnalysis
+- Michaud-Agrawal, N., Denning, E. J., Woolf, T. B., & Beckstein, O. (2011). MDAnalysis: A toolkit for the analysis of molecular dynamics simulations. *Journal of Computational Chemistry*, 32(10), 2319-2327. https://doi.org/10.1002/jcc.21787
+- Gowers, R. J., Linke, M., Barnoud, J., Reddy, T. J. E., Melo, M. N., Seyler, S. L., Domański, J., Dotson, D. L., Buchoux, S., Kenney, I. M., & Beckstein, O. (2016). MDAnalysis: A Python package for the rapid analysis of molecular dynamics simulations. *Proceedings of the 15th Python in Science Conference*, 98-105. https://doi.org/10.25080/Majora-629e541a-00e
