@@ -338,6 +338,32 @@ output_top.write_text("\n".join(content))
 PY
 }
 
+require_safe_id() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        log_error "Invalid ${label} '${value}'. Allowed characters: A-Z a-z 0-9 . _ -"
+        exit 1
+    fi
+}
+
+require_uint() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid ${label}='${value}'. Expected non-negative integer."
+        exit 1
+    fi
+}
+
+require_safe_partition() {
+    local value="$1"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._,-]+$ ]]; then
+        log_error "Invalid slurm partition='${value}'."
+        exit 1
+    fi
+}
+
 submit_prepare_job() {
     local ligand_name="$1"
     local ligand_dir="$2"
@@ -346,6 +372,20 @@ submit_prepare_job() {
 
     local prep_dir="${COMPLEX_WORKDIR}/${ligand_name}"
     local local_lig_itp local_lig_gro ligand_molname job_script job_id solvate_cs
+    local q_prep_dir q_box_distance q_solvate_cs q_ion_conc q_ntomp
+
+    require_safe_id "${ligand_name}" "ligand id"
+    require_uint "${NTOMP}" "slurm ntomp"
+    require_uint "${SLURM_GPUS}" "slurm gpus"
+    require_safe_partition "${SLURM_PARTITION}"
+    if [[ ! "${BOX_DISTANCE}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+        log_error "Invalid complex box_distance='${BOX_DISTANCE}'. Expected numeric value."
+        exit 1
+    fi
+    if [[ ! "${ION_CONC}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+        log_error "Invalid complex ion_conc='${ION_CONC}'. Expected numeric value."
+        exit 1
+    fi
 
     ensure_dir "${prep_dir}"
 
@@ -374,6 +414,12 @@ submit_prepare_job() {
     write_combined_gro "${RECEPTOR_GRO}" "${local_lig_gro}" "${prep_dir}/com.gro"
     build_sys_top "${prep_dir}/sys.top" "$(basename "${local_lig_itp}")" "${ligand_molname}"
 
+    printf -v q_prep_dir '%q' "${prep_dir}"
+    printf -v q_box_distance '%q' "${BOX_DISTANCE}"
+    printf -v q_solvate_cs '%q' "${solvate_cs}"
+    printf -v q_ion_conc '%q' "${ION_CONC}"
+    printf -v q_ntomp '%q' "${NTOMP}"
+
     job_script="${prep_dir}/prep_complex.sbatch"
     cat > "${job_script}" <<EOF
 #!/usr/bin/env bash
@@ -384,17 +430,22 @@ submit_prepare_job() {
 #SBATCH --gres=gpu:${SLURM_GPUS}
 
 set -euo pipefail
-cd "${prep_dir}"
+cd ${q_prep_dir}
 
-gmx editconf -f com.gro -o box.gro -d ${BOX_DISTANCE} -bt dodecahedron -c
-gmx solvate -p sys.top -cp box.gro -cs ${solvate_cs} -o solv.gro
+readonly BOX_DISTANCE=${q_box_distance}
+readonly SOLVATE_CS=${q_solvate_cs}
+readonly ION_CONC=${q_ion_conc}
+readonly NTOMP=${q_ntomp}
+
+gmx editconf -f com.gro -o box.gro -d "\${BOX_DISTANCE}" -bt dodecahedron -c
+gmx solvate -p sys.top -cp box.gro -cs "\${SOLVATE_CS}" -o solv.gro
 gmx grompp -f em.mdp -c solv.gro -p sys.top -o ion.tpr -maxwarn 2
-echo SOL | gmx genion -s ion.tpr -p sys.top -neutral -nname CL -pname NA -conc ${ION_CONC} -o ion.gro
+echo SOL | gmx genion -s ion.tpr -p sys.top -neutral -nname CL -pname NA -conc "\${ION_CONC}" -o ion.gro
 gmx grompp -f em.mdp -c ion.gro -p sys.top -o em.tpr -maxwarn 2
 echo -e '"Protein" | "Other"\\nq' | gmx make_ndx -f em.tpr
-gmx mdrun -deffnm em -ntmpi 1 -ntomp ${NTOMP}
+gmx mdrun -deffnm em -ntmpi 1 -ntomp "\${NTOMP}"
 gmx grompp -f pr_pos.mdp -c em.gro -p sys.top -r em.gro -o pr_pos.tpr -maxwarn 2 -n index.ndx
-gmx mdrun -deffnm pr_pos -ntmpi 1 -ntomp ${NTOMP} -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
+gmx mdrun -deffnm pr_pos -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
 EOF
 
     chmod +x "${job_script}"

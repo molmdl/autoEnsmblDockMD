@@ -177,6 +177,32 @@ resolve_path() {
     fi
 }
 
+require_safe_id() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        log_error "Invalid ${label} '${value}'. Allowed characters: A-Z a-z 0-9 . _ -"
+        exit 1
+    fi
+}
+
+require_uint() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid ${label}='${value}'. Expected non-negative integer."
+        exit 1
+    fi
+}
+
+require_safe_partition() {
+    local value="$1"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._,-]+$ ]]; then
+        log_error "Invalid slurm partition='${value}'."
+        exit 1
+    fi
+}
+
 discover_ligands() {
     local explicit="$1"
     local -n _names_ref="$2"
@@ -239,6 +265,32 @@ discover_ligands() {
     fi
 }
 
+require_uint "${ENSEMBLE_SIZE}" "receptor ensemble_size"
+if [[ "${ENSEMBLE_SIZE}" -le 0 ]]; then
+    log_error "Invalid receptor ensemble_size='${ENSEMBLE_SIZE}'. Must be > 0"
+    exit 1
+fi
+require_uint "${EXHAUSTIVENESS}" "docking exhaustiveness"
+require_uint "${NUM_MODES}" "docking num_modes"
+require_uint "${AUTOBOX_ADD}" "docking autobox_add"
+require_uint "${CPU}" "docking cpu"
+require_uint "${SLURM_GPUS}" "slurm gpus"
+require_uint "${SLURM_CPUS}" "slurm cpus_per_task"
+require_safe_partition "${SLURM_PARTITION}"
+
+if [[ "${SCORING,,}" != "cnn" && "${SCORING,,}" != "ad4_scoring" ]]; then
+    log_error "Invalid docking scoring='${SCORING}'. Expected cnn or ad4_scoring"
+    exit 1
+fi
+if [[ "${ADDH,,}" != "on" && "${ADDH,,}" != "off" ]]; then
+    log_error "Invalid docking addH='${ADDH}'. Expected on or off"
+    exit 1
+fi
+if [[ "${STRIPH,,}" != "on" && "${STRIPH,,}" != "off" ]]; then
+    log_error "Invalid docking stripH='${STRIPH}'. Expected on or off"
+    exit 1
+fi
+
 ligand_list_cfg="$(get_config docking ligand_list "")"
 if [[ -n "${LIGAND_LIST_OVERRIDE}" ]]; then
     ligand_list_cfg="${LIGAND_LIST_OVERRIDE}"
@@ -283,9 +335,14 @@ submit_ligand_job() {
     local lig_name="$1"
     local lig_file="$2"
     local lig_dir="$3"
-    local lig_workdir receptor_rel ref_rel autobox_token scoring_flag min_rmsd_flag
+    local lig_workdir receptor_rel ref_rel
     local job_name="gnina_${MODE}_${lig_name}"
-    local job_id
+    local job_id job_script
+    local q_mode q_ligand_name q_test_receptor q_reference_ligand q_receptor_rel q_receptor_prefix
+    local q_ensemble_size q_autobox_add q_exhaustiveness q_num_modes q_addh q_striph q_cpu
+    local q_scoring q_min_rmsd_filter q_autobox_ligand_setting q_ref_rel q_lig_workdir
+
+    require_safe_id "${lig_name}" "ligand id"
 
     if [[ -d "${lig_dir}" ]]; then
         lig_workdir="${lig_dir}"
@@ -298,33 +355,51 @@ submit_ligand_job() {
         cp -f "${lig_file}" "${lig_workdir}/${lig_name}.mol2"
     fi
 
-    receptor_rel="$(python - <<PY
+    receptor_rel="$(python - "${RECEPTOR_DIR}" "${lig_workdir}" <<'PY'
 import os
-print(os.path.relpath('${RECEPTOR_DIR}', '${lig_workdir}'))
+import sys
+print(os.path.relpath(sys.argv[1], sys.argv[2]))
 PY
 )"
 
     ref_rel=""
     if [[ -f "${REFERENCE_LIGAND}" ]]; then
-        ref_rel="$(python - <<PY
+        ref_rel="$(python - "${REFERENCE_LIGAND}" "${lig_workdir}" <<'PY'
 import os
-print(os.path.relpath('${REFERENCE_LIGAND}', '${lig_workdir}'))
+import sys
+print(os.path.relpath(sys.argv[1], sys.argv[2]))
 PY
 )"
     fi
 
-    scoring_flag=""
-    if [[ "${SCORING,,}" != "cnn" ]]; then
-        scoring_flag="--scoring ${SCORING}"
+    if [[ -n "${MIN_RMSD_FILTER}" ]]; then
+        if [[ ! "${MIN_RMSD_FILTER}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+            log_error "Invalid docking min_rmsd_filter='${MIN_RMSD_FILTER}'. Expected numeric value."
+            exit 1
+        fi
     fi
 
-    min_rmsd_flag=""
-    if [[ -n "${MIN_RMSD_FILTER}" && "${MODE}" != "test" ]]; then
-        min_rmsd_flag="--min_rmsd_filter ${MIN_RMSD_FILTER}"
-    fi
+    printf -v q_mode '%q' "${MODE}"
+    printf -v q_ligand_name '%q' "${lig_name}"
+    printf -v q_test_receptor '%q' "${TEST_RECEPTOR}"
+    printf -v q_reference_ligand '%q' "${REFERENCE_LIGAND}"
+    printf -v q_receptor_rel '%q' "${receptor_rel}"
+    printf -v q_receptor_prefix '%q' "${RECEPTOR_PREFIX}"
+    printf -v q_ensemble_size '%q' "${ENSEMBLE_SIZE}"
+    printf -v q_autobox_add '%q' "${AUTOBOX_ADD}"
+    printf -v q_exhaustiveness '%q' "${EXHAUSTIVENESS}"
+    printf -v q_num_modes '%q' "${NUM_MODES}"
+    printf -v q_addh '%q' "${ADDH}"
+    printf -v q_striph '%q' "${STRIPH}"
+    printf -v q_cpu '%q' "${CPU}"
+    printf -v q_scoring '%q' "${SCORING}"
+    printf -v q_min_rmsd_filter '%q' "${MIN_RMSD_FILTER}"
+    printf -v q_autobox_ligand_setting '%q' "${AUTOBOX_LIGAND_SETTING}"
+    printf -v q_ref_rel '%q' "${ref_rel}"
+    printf -v q_lig_workdir '%q' "${lig_workdir}"
 
-    job_id="$({
-        sbatch --parsable <<EOF
+    job_script="${lig_workdir}/run_gnina_${lig_name}.sbatch"
+    cat > "${job_script}" <<EOF
 #!/usr/bin/env bash
 #SBATCH -J ${job_name}
 #SBATCH --gres=gpu:${SLURM_GPUS}
@@ -334,52 +409,86 @@ PY
 
 set -euo pipefail
 
-cd "${lig_workdir}"
+cd ${q_lig_workdir}
 
-if [[ "${MODE}" == "test" ]]; then
-  gnina -r "${TEST_RECEPTOR}" -l "${lig_name}.mol2" \
-    --autobox_ligand "${REFERENCE_LIGAND}" \
-    --autobox_add ${AUTOBOX_ADD} \
-    --exhaustiveness ${EXHAUSTIVENESS} \
-    --num_modes ${NUM_MODES} \
-    --addH ${ADDH} --stripH ${STRIPH} \
-    --cpu ${CPU} \
-    ${scoring_flag} \
-    -o "rec-${lig_name}.sdf" \
-    --log "rec-${lig_name}.log"
+readonly MODE=${q_mode}
+readonly LIGAND_NAME=${q_ligand_name}
+readonly TEST_RECEPTOR=${q_test_receptor}
+readonly REFERENCE_LIGAND=${q_reference_ligand}
+readonly RECEPTOR_REL=${q_receptor_rel}
+readonly RECEPTOR_PREFIX=${q_receptor_prefix}
+readonly ENSEMBLE_SIZE=${q_ensemble_size}
+readonly AUTOBOX_ADD=${q_autobox_add}
+readonly EXHAUSTIVENESS=${q_exhaustiveness}
+readonly NUM_MODES=${q_num_modes}
+readonly ADDH=${q_addh}
+readonly STRIPH=${q_striph}
+readonly CPU=${q_cpu}
+readonly SCORING=${q_scoring}
+readonly MIN_RMSD_FILTER=${q_min_rmsd_filter}
+readonly AUTOBOX_LIGAND_SETTING=${q_autobox_ligand_setting}
+readonly REF_REL=${q_ref_rel}
+
+if [[ "\${MODE}" == "test" ]]; then
+  cmd=(
+    gnina
+    -r "\${TEST_RECEPTOR}"
+    -l "\${LIGAND_NAME}.mol2"
+    --autobox_ligand "\${REFERENCE_LIGAND}"
+    --autobox_add "\${AUTOBOX_ADD}"
+    --exhaustiveness "\${EXHAUSTIVENESS}"
+    --num_modes "\${NUM_MODES}"
+    --addH "\${ADDH}"
+    --stripH "\${STRIPH}"
+    --cpu "\${CPU}"
+  )
+  if [[ "\${SCORING,,}" != "cnn" ]]; then
+    cmd+=(--scoring "\${SCORING}")
+  fi
+  cmd+=(-o "rec-\${LIGAND_NAME}.sdf" --log "rec-\${LIGAND_NAME}.log")
+  "\${cmd[@]}"
 else
-  for i in \
-$(seq 0 $((ENSEMBLE_SIZE - 1))); do
-    receptor_file="${receptor_rel}/${RECEPTOR_PREFIX}\
-\${i}.pdb"
+  for (( i = 0; i < \${ENSEMBLE_SIZE}; i++ )); do
+    receptor_file="\${RECEPTOR_REL}/\${RECEPTOR_PREFIX}\${i}.pdb"
     if [[ ! -f "\${receptor_file}" ]]; then
       echo "Missing receptor: \${receptor_file}" >&2
       exit 1
     fi
 
-    if [[ "${AUTOBOX_LIGAND_SETTING}" == "receptor" ]]; then
+    if [[ "\${AUTOBOX_LIGAND_SETTING}" == "receptor" ]]; then
       autobox_token="\${receptor_file}"
-    elif [[ -n "${ref_rel}" ]]; then
-      autobox_token="${ref_rel}"
+    elif [[ -n "\${REF_REL}" ]]; then
+      autobox_token="\${REF_REL}"
     else
-      autobox_token="${AUTOBOX_LIGAND_SETTING}"
+      autobox_token="\${AUTOBOX_LIGAND_SETTING}"
     fi
 
-    gnina -r "\${receptor_file}" -l "${lig_name}.mol2" \
-      --autobox_ligand "\${autobox_token}" \
-      --autobox_add ${AUTOBOX_ADD} \
-      --exhaustiveness ${EXHAUSTIVENESS} \
-      --num_modes ${NUM_MODES} \
-      --addH ${ADDH} --stripH ${STRIPH} \
-      --cpu ${CPU} \
-      ${min_rmsd_flag} \
-      ${scoring_flag} \
-      -o "${RECEPTOR_PREFIX}\${i}-${lig_name}.sdf" \
-      --log "${RECEPTOR_PREFIX}\${i}-${lig_name}.log"
+    cmd=(
+      gnina
+      -r "\${receptor_file}"
+      -l "\${LIGAND_NAME}.mol2"
+      --autobox_ligand "\${autobox_token}"
+      --autobox_add "\${AUTOBOX_ADD}"
+      --exhaustiveness "\${EXHAUSTIVENESS}"
+      --num_modes "\${NUM_MODES}"
+      --addH "\${ADDH}"
+      --stripH "\${STRIPH}"
+      --cpu "\${CPU}"
+    )
+    if [[ -n "\${MIN_RMSD_FILTER}" ]]; then
+      cmd+=(--min_rmsd_filter "\${MIN_RMSD_FILTER}")
+    fi
+    if [[ "\${SCORING,,}" != "cnn" ]]; then
+      cmd+=(--scoring "\${SCORING}")
+    fi
+    cmd+=(-o "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.sdf" --log "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.log")
+    "\${cmd[@]}"
   done
 fi
 EOF
-    } | tr -d '[:space:]')"
+
+    chmod +x "${job_script}"
+    job_id="$(sbatch --parsable "${job_script}" | tr -d '[:space:]')"
 
     if [[ -z "${job_id}" ]]; then
         log_error "Failed to parse sbatch job id for ligand ${lig_name}"

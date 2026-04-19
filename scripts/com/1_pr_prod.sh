@@ -174,30 +174,67 @@ resolve_equil_mdp() {
     return 1
 }
 
+require_safe_id() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        log_error "Invalid ${label} '${value}'. Allowed characters: A-Z a-z 0-9 . _ -"
+        exit 1
+    fi
+}
+
+require_uint() {
+    local value="$1"
+    local label="$2"
+    if [[ ! "${value}" =~ ^[0-9]+$ ]]; then
+        log_error "Invalid ${label}='${value}'. Expected non-negative integer."
+        exit 1
+    fi
+}
+
+require_safe_partition() {
+    local value="$1"
+    if [[ ! "${value}" =~ ^[A-Za-z0-9._,-]+$ ]]; then
+        log_error "Invalid slurm partition='${value}'."
+        exit 1
+    fi
+}
+
 submit_chain_for_trial() {
     local lig_name="$1"
     local lig_dir="$2"
     local trial_idx="$3"
     local eq_job_script prod_job_script
     local eq_job_id prod_job_id
-    local ff_gpu_flags stage stage_mdp stage_lines last_eq_name
+    local stage stage_mdp last_eq_name
+    local -a stage_mdps=()
+    local q_lig_dir q_eq_input_gro q_index_file q_pr0_mdp q_ntomp q_mdp_dir
+    local q_last_eq_name q_production_mdp q_stage_mdp
 
     eq_job_script="${lig_dir}/pr_equil_${trial_idx}.sbatch"
     prod_job_script="${lig_dir}/prod_${trial_idx}.sbatch"
 
-    ff_gpu_flags="-bonded gpu -nb gpu -update gpu -pme gpu"
-    if [[ "${FF_NAME,,}" == *amber* ]]; then
-        ff_gpu_flags="-bonded gpu -nb gpu -update gpu -pme gpu"
-    fi
+    require_safe_id "${lig_name}" "ligand id"
+    require_uint "${trial_idx}" "trial index"
+    require_uint "${NTOMP}" "production ntomp"
+    require_uint "${SLURM_GPUS}" "production gpus"
+    require_safe_partition "${SLURM_PARTITION}"
 
-    stage_lines=""
     last_eq_name="pr_${trial_idx}"
     for stage in $(seq 1 "${N_EQ_STAGES}"); do
         stage_mdp="$(resolve_equil_mdp "${stage}")"
-        stage_lines+=$'gmx grompp -f "'"${stage_mdp}"$'" -c "'"${last_eq_name}"$'.gro" -p sys.top -n "'"${INDEX_FILE}"$'" -o "pr'"${stage}"$'_'"${trial_idx}"$'.tpr" -maxwarn 2\n'
-        stage_lines+=$'gmx mdrun -deffnm "pr'"${stage}"$'_'"${trial_idx}"$'" -ntmpi 1 -ntomp '"${NTOMP}"$' '"${ff_gpu_flags}"$' -cpt 5\n'
+        stage_mdps+=("${stage_mdp}")
         last_eq_name="pr${stage}_${trial_idx}"
     done
+
+    printf -v q_lig_dir '%q' "${lig_dir}"
+    printf -v q_eq_input_gro '%q' "${EQ_INPUT_GRO}"
+    printf -v q_index_file '%q' "${INDEX_FILE}"
+    printf -v q_pr0_mdp '%q' "${PR0_MDP}"
+    printf -v q_ntomp '%q' "${NTOMP}"
+    printf -v q_mdp_dir '%q' "${MDP_DIR}"
+    printf -v q_last_eq_name '%q' "${last_eq_name}"
+    printf -v q_production_mdp '%q' "${PRODUCTION_MDP}"
 
     cat > "${eq_job_script}" <<EOF
 #!/usr/bin/env bash
@@ -208,15 +245,29 @@ submit_chain_for_trial() {
 #SBATCH --gres=gpu:${SLURM_GPUS}
 
 set -euo pipefail
-cd "${lig_dir}"
+cd ${q_lig_dir}
 
-START_GRO="${EQ_INPUT_GRO}"
+readonly START_GRO=${q_eq_input_gro}
+readonly INDEX_FILE=${q_index_file}
+readonly PR0_MDP=${q_pr0_mdp}
+readonly NTOMP=${q_ntomp}
+readonly MDP_DIR=${q_mdp_dir}
 
-gmx grompp -f "${MDP_DIR}/${PR0_MDP}" -c "\${START_GRO}" -p sys.top -n "${INDEX_FILE}" -o "pr_${trial_idx}.tpr" -maxwarn 2
-gmx mdrun -deffnm "pr_${trial_idx}" -ntmpi 1 -ntomp ${NTOMP} ${ff_gpu_flags} -cpt 5
+gmx grompp -f "\${MDP_DIR}/\${PR0_MDP}" -c "\${START_GRO}" -p sys.top -n "\${INDEX_FILE}" -o "pr_${trial_idx}.tpr" -maxwarn 2
+gmx mdrun -deffnm "pr_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
 
-${stage_lines}
+last_eq_name="pr_${trial_idx}"
 EOF
+
+    for stage in $(seq 1 "${N_EQ_STAGES}"); do
+        stage_mdp="${stage_mdps[$((stage - 1))]}"
+        printf -v q_stage_mdp '%q' "${stage_mdp}"
+        cat >> "${eq_job_script}" <<EOF
+gmx grompp -f ${q_stage_mdp} -c "\${last_eq_name}.gro" -p sys.top -n "\${INDEX_FILE}" -o "pr${stage}_${trial_idx}.tpr" -maxwarn 2
+gmx mdrun -deffnm "pr${stage}_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
+last_eq_name="pr${stage}_${trial_idx}"
+EOF
+    done
 
     chmod +x "${eq_job_script}"
     eq_job_id="$(sbatch --parsable "${eq_job_script}" | tr -d '[:space:]')"
@@ -234,12 +285,16 @@ EOF
 #SBATCH --gres=gpu:${SLURM_GPUS}
 
 set -euo pipefail
-cd "${lig_dir}"
+cd ${q_lig_dir}
 
-LAST_EQ_GRO="${last_eq_name}.gro"
+readonly LAST_EQ_GRO=${q_last_eq_name}.gro
+readonly INDEX_FILE=${q_index_file}
+readonly PRODUCTION_MDP=${q_production_mdp}
+readonly NTOMP=${q_ntomp}
+readonly MDP_DIR=${q_mdp_dir}
 
-gmx grompp -f "${MDP_DIR}/${PRODUCTION_MDP}" -c "\${LAST_EQ_GRO}" -p sys.top -n "${INDEX_FILE}" -o "prod_${trial_idx}.tpr" -maxwarn 2
-gmx mdrun -deffnm "prod_${trial_idx}" -ntmpi 1 -ntomp ${NTOMP} ${ff_gpu_flags} -cpt 5
+gmx grompp -f "\${MDP_DIR}/\${PRODUCTION_MDP}" -c "\${LAST_EQ_GRO}" -p sys.top -n "\${INDEX_FILE}" -o "prod_${trial_idx}.tpr" -maxwarn 2
+gmx mdrun -deffnm "prod_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
 EOF
 
     chmod +x "${prod_job_script}"
