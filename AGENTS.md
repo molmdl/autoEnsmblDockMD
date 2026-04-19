@@ -1,81 +1,134 @@
-# AGENTS.md - Guidelines for Building an Agentic Workflow in autoEnsmblDockMD
-This project aim to create a set of scripts, with an experimental but SAFE AND EFFICIENT agentic workflow to perform ensemble docking using GROMACS and gnina, with a suite of bash and python scriprs, slash commands, and agent skills, compatible with opencode and ideally also other coding agents. 
+# AGENTS.md — Agent Overview for autoEnsmblDockMD
+
+Agent roles and execution boundaries for the docking→MD→MM/PBSA workflow toolkit.
+
+> [!WARNING]
+> **EXPERIMENTAL AGENT SUPPORT**
+> Agent-based operation is experimental. The stable baseline remains a script-driven, human-validated workflow.
 
 ---
 
-## Detailed requirements
-Success of this project depends on the elements I, II, III, IV, V, and VI.
+## Overview
 
-### I. Workflow
-1. The full workflow should be automated via calling of slash commands or agent skills. 
-2. Slash commands and agent skill use the scripts to do the work. 
-3. Agents orchestrate the workflow, execute commands or call scripts, preoare input files, inspect results and make decisions based on results.
-4. checkpoints should be provided for human verification and starting new session to avoid overflow of context window of LLM.
-5. When scripts can be used, prepare scripts for the protocol instead of letting the agent generate new commands every time.
+autoEnsmblDockMD uses agents to orchestrate and validate workflow stages, while scripts remain the source of truth for execution.
 
-### II. Agent(s)
-Agents are aware of how and when to use related commands and skills, and where to obtain relevant documentations. 
-1. orchestrator manage all agents, knows the workflow, knows when to spawn which agent, knows the agent-targeted documentation.
-2. runner run specific steps of the workflow, loads the workflow of a stage or a slash command, and knows how to use the scripts.
-3. analyzer run standard analysis and create custom analysis scripts if necessary, following a consistent coding style and i/o format
-4. checker investigate results to evaluate/judge/warn/suggest/comment on it
-5. debugger follow the gsd-debugger workflow to fix major issues awaring of the manual of the versions of gromacs, gnina, gmx_MMPBSA, and other python libraries.
-
-
-### III. Slash command: 
-For the user to run specific major stage in the workflow.
-
-### IV. Agent skill
-Formated, to be loaded by agents, minimal but sufficient. 
-
-### V. Scripts
-- Python and bash scripts of the current manual workflow is provided in the (sub-)directory in `./expected/scripts`, usage and execution order under the `## Workflow` session. 
-- Identify missing scripts (gaps) in the protocol. Ask the user to provide first, otherwise generate one.
-- Success criteria of this element is that a generalized version of related script is provided in the `./scripts` directory under repo root, which can be used vua command lines; and 'gaps' scripts generated, with options input via cli flag or input conf file.
-- All the scripts should be revised, refactored for consistency and generalizability.
-
-### VI. Documentation
-1. Minimal, sufficient, professional, clear and concise documentation in README.md for human
-2. Detailed documentation in a format optimized for agents to check whenever necessary (to avoid loading too much context every time)
+- Agents **call scripts** and stage wrappers; they do not replace protocol scripts.
+- Slash commands are thin entry points under `scripts/commands/`.
+- Stage logic, options, and reproducibility live in `./scripts/` and config files.
+- Human checkpoints are first-class for verification and session continuation.
+- File-based handoffs reduce context-window pressure and preserve resumability.
 
 ---
 
-## Prerequisite
-For other users
-- **Environment setup**: Conda environment in `env.yml` should be installed and activated.
-- **Software installation**: Gromacs version > 2022, gnina, gmx_MMPBSA (already in conda environment via pip)
-- **files to be provided by user**: see work/input for the files of each stage. copy them to new workspace to start
+## Agent Types
 
-For the CURRENT user (developer) or agents on this cluster (hostname=mgpu)
-- **Loading the environment**: `source ./scripts/setenv.sh`
-- **Input files for testing**: see ./work/input for the files of each stage, copy them to new workspace to start. this directory has the same structure as expected output.
-- **Expected output (selected) from a manual trial by human**: Selected output from a manual trial by human will be provided in the ./expected directory, which has the same structure as the work/input directory, and the new workspace created by agent for testing in work/ should also have the same structure.
-- **Other examples**: Other examples files for reference, e.g. the gmxMMPBSA source code, are provided in .reference/ directory
+### 1) Orchestrator
+
+Owns global workflow state, routes stage work to specialist agents, and pauses/resumes at checkpoints.
+
+- Tracks current phase/stage and execution status.
+- Spawns runner/checker/debugger pathways based on handoff data.
+- Handles resume logic and state recovery from prior sessions.
+- Skills:
+  - `.opencode/skills/orchestrator-resume/SKILL.md`
+  - `.opencode/skills/status/SKILL.md`
+
+### 2) Runner
+
+Executes stage scripts through slash command wrappers and returns structured outputs/artifacts.
+
+- Resolves stage intent to script entry points in `scripts/commands/*.sh`.
+- Passes validated parameters/config to script layer.
+- Produces deterministic stage outputs and run metadata.
+- Skills:
+  - `.opencode/skills/rec-ensemble/SKILL.md`
+  - `.opencode/skills/dock-run/SKILL.md`
+  - `.opencode/skills/com-setup/SKILL.md`
+  - `.opencode/skills/com-md/SKILL.md`
+  - `.opencode/skills/com-mmpbsa/SKILL.md`
+  - `.opencode/skills/com-analyze/SKILL.md`
+
+### 3) Checker
+
+Validates results against protocol expectations and quality thresholds before downstream progression.
+
+- Reviews generated outputs and key metrics.
+- Flags warnings/failures and recommends acceptance criteria decisions.
+- Supports human verification checkpoints with concise evidence.
+- Skill:
+  - `.opencode/skills/checker-validate/SKILL.md`
+
+### 4) Debugger
+
+Diagnoses failed stages, traces root causes, and proposes fixes with tool/version awareness.
+
+- Investigates script, config, and environment-level failures.
+- Uses version-aware reasoning for GROMACS/gnina/gmx_MMPBSA issues.
+- Produces remediation actions that preserve workflow compatibility.
+- Skill:
+  - `.opencode/skills/debugger-diagnose/SKILL.md`
 
 ---
 
-## Workflow
+## File-Based Handoff Pattern
 
-Workflow will be provided in the `WORKFLOW.md` file to reduce the filesize of this AGENTS.md.
+Agents exchange state through files, not long in-memory threads.
 
-## Future
-- Automate the ligand preparation procedures and ffnonbond.itp edits
+- **HandoffRecord JSON:** structured payload describing stage, status, inputs/outputs, and next action.
+- **Checkpoint files:** persisted pause/resume markers for human verification and continuation.
+- **Workspace artifacts:** generated outputs in stage directories (`rec/`, `dock/`, `com_md/`, `mmpbsa/`) serve as execution evidence.
+- **Planning state artifacts:** `.planning/STATE.md`, phase summaries, and related metadata preserve cross-session continuity.
 
+This pattern supports resumable execution and minimizes context overflow risk.
 
-## Notes for Agents
-- **No rm command except in the test directory**: the `rm` command is prohibited except in the test directory of the workspace created for the test, for handling temporary test files. In any case you use the rm command, report it in a file. and seek explicit approval
-- **Never require sudo permission**
-- **Environment sourcing**: Source `./scripts/setenv.sh` before using the script and commands in this project.
-- **Professional tone**: Be clear, concise, and professional in responses. Check output for errors.
-- **Conda environment only**: Do not modify system-wide Python installations
-- **work/test directory of the protocol/agent**: Primary location for validation and testing. User-provided inputs are in `./work/input`.
-- **Maintain backward compatibility**: When modifying core workflows
-- **Configuration-driven approach**: Preferred over hardcoded values
-- **Multi-job manager support**: Must be preserved in shell scripts
-- **Consistency**: Ensure input/output file formats and code style consistency across different conversations of this project
-- **Report summary of the tasks done and to-be-done**: After planning, the plan should write to a md file before proceed. After executing tasks, the working being done should be summarized abd append into a md file, and the to-do tasks summarized in another md file
+---
 
-## Other Constraints
-- always use the question tool for interactions, for approval, for uncertainties
-- show me your understanding and report how you will do the edit, before making any chagnes
-- dont read many files at once to avoid context overload. split into smaller tasks..
+## Slash Commands → Script Wrappers
+
+| Slash Command | Script Wrapper | Primary Skill Reference |
+|---|---|---|
+| `/rec-ensemble` | `scripts/commands/rec-ensemble.sh` | `.opencode/skills/rec-ensemble/SKILL.md` |
+| `/dock-run` | `scripts/commands/dock-run.sh` | `.opencode/skills/dock-run/SKILL.md` |
+| `/com-setup` | `scripts/commands/com-setup.sh` | `.opencode/skills/com-setup/SKILL.md` |
+| `/com-md` | `scripts/commands/com-md.sh` | `.opencode/skills/com-md/SKILL.md` |
+| `/com-mmpbsa` | `scripts/commands/com-mmpbsa.sh` | `.opencode/skills/com-mmpbsa/SKILL.md` |
+| `/com-analyze` | `scripts/commands/com-analyze.sh` | `.opencode/skills/com-analyze/SKILL.md` |
+| `/checker-validate` | `scripts/commands/checker-validate.sh` | `.opencode/skills/checker-validate/SKILL.md` |
+| `/debugger-diagnose` | `scripts/commands/debugger-diagnose.sh` | `.opencode/skills/debugger-diagnose/SKILL.md` |
+| `/orchestrator-resume` | `scripts/commands/orchestrator-resume.sh` | `.opencode/skills/orchestrator-resume/SKILL.md` |
+| `/status` | `scripts/commands/status.sh` | `.opencode/skills/status/SKILL.md` |
+
+---
+
+## Constraints (Safety + Operating Rules)
+
+- **No `rm` except in workspace test directories** for temporary test artifacts. Any `rm` use must be reported and explicitly approved.
+- **Never require `sudo`.**
+- **Environment sourcing required:** `source ./scripts/setenv.sh` before project scripts/commands.
+- **Conda environment only:** do not modify system-wide Python installations.
+- **Validation workspace:** prefer `work/test`; user-provided inputs are under `./work/input`.
+- **Maintain backward compatibility** when editing core workflow behavior.
+- **Configuration-driven implementation** over hardcoded values.
+- **Preserve multi-job manager support** in shell scripts.
+- **Keep I/O and coding style consistent** across scripts and stages.
+- **Professional tone:** clear, concise outputs with error checks.
+- **Interaction policy:** use question-style interactions for approvals/uncertainties.
+- **Session reporting:** summarize completed work and remaining to-do items in planning artifacts.
+
+---
+
+## Prerequisites
+
+- Install and activate Conda environment from `env.yml`.
+- Ensure required tools are available: **GROMACS > 2022**, **gnina**, **gmx_MMPBSA**.
+- Source environment before script execution: `source ./scripts/setenv.sh`.
+- Provide stage inputs in `./work/input` (copy to a new workspace run directory as needed).
+- Reference manual-trial outputs in `./expected/` and supporting examples in `.reference/`.
+
+---
+
+## Scope Notes
+
+- Workflow step-by-step execution order is documented in `WORKFLOW.md`.
+- Project-level requirements and deliverable tracking are maintained in `.planning/PROJECT.md`.
+- Future work (outside current scope): ligand preparation automation and `ffnonbond.itp` edit automation.
