@@ -11,11 +11,11 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 6 of 6 (5.1-critical-correctness-and-namespace-fixes) |
-| **Current Plan** | 5 of 6 in current phase |
-| **Last Activity** | 2026-04-19 - Completed 5.1-05-PLAN.md |
-| **Progress** | █████████░░ 37/42 plans complete (88%) |
+| **Current Plan** | 6 of 6 in current phase |
+| **Last Activity** | 2026-04-19 - Completed 5.1-06-PLAN.md |
+| **Progress** | ██████████░ 38/42 plans complete (90%) |
 | **Phase 5.1 Blocker** | None |
-| **Status** | In progress — 5.1-06 remaining |
+| **Status** | Phase complete |
 
 ---
 
@@ -42,6 +42,7 @@
 | Map `com_ana` stage to `ligand` forwarding mode in `run_pipeline.sh` | Keep dispatcher/callee CLI contract consistent for per-ligand analysis targeting |
 | Compute advanced RMSD with superposition before displacement measurement | Remove translational/rotational drift inflation from RMSD timeseries |
 | Namespace all public skills and slash-command wrappers with `aedmd-*` | Prevent collisions with generic OpenCode command names and keep project command ownership explicit |
+| Keep AGENT-WORKFLOW status vocabulary and handoff persistence docs aligned with common.sh parser/output behavior | Prevent documentation drift in orchestrator expectations and handoff status interpretation |
 
 ### Known Pitfalls
 
@@ -53,13 +54,13 @@
 
 ## Session Continuity
 
-Last session: 2026-04-19 11:32 UTC
-Stopped at: Completed 5.1-05-PLAN.md
+Last session: 2026-04-19 11:34 UTC
+Stopped at: Completed 5.1-06-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Execute `5.1-06-PLAN.md` (docs namespace and consistency updates).
+Phase 5.1 complete. Proceed to next roadmap phase selection.
 
 ---
 
@@ -72,4 +73,4 @@ Execute `5.1-06-PLAN.md` (docs namespace and consistency updates).
 
 *State updated: 2026-04-19*
 *Current phase: 5.1-critical-correctness-and-namespace-fixes (in progress)*
-*Last action: Completed 5.1-05-PLAN.md and created 5.1-05-SUMMARY.md*
+*Last action: Completed 5.1-06-PLAN.md and created 5.1-06-SUMMARY.md*
