@@ -269,16 +269,21 @@ Plans:
 - ⚠️ **WORKFLOW.md finalized** — Need workflow steps to document
 - ⚠️ **End-to-end test artifacts** — Need full pipeline run output for validation
 
-**Plans:** 7 plans in 4 waves
+**Plans:** 10 plans in 6 waves
 
-Plans:
-- [x] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1)
-- [x] 05-02-PLAN.md — Restructure AGENTS.md by agent type with skill cross-references (Wave 1)
-- [x] 05-03-PLAN.md — Audit and standardize all 10 SKILL.md metadata (Wave 1)
-- [x] 05-04-PLAN.md — Write comprehensive README.md (Wave 2)
-- [ ] 05-05-PLAN.md — Create docs/GUIDE.md Part 1: config reference + input prep + workspace setup (Wave 2)
-- [ ] 05-06-PLAN.md — Complete docs/GUIDE.md Part 2: per-stage instructions + troubleshooting (Wave 3)
-- [ ] 05-07-PLAN.md — End-to-end structural validation + human review (Wave 4)
+Plans (original — completed or superseded):
+- [x] 05-01-PLAN.md — Finalize WORKFLOW.md with complete script reference (Wave 1) ✓
+- [x] 05-02-PLAN.md — Restructure AGENTS.md by agent type with skill cross-references (Wave 1) ✓
+- [x] ~~05-03-PLAN.md~~ — ⚠️ REVERTED: broke SKILL.md YAML frontmatter format (superseded by 05-08)
+- [x] 05-04-PLAN.md — Write comprehensive README.md (Wave 2) ✓
+- [x] 05-05-PLAN.md — Create docs/GUIDE.md Part 1 (Wave 2) ✓
+- [x] 05-06-PLAN.md — Complete docs/GUIDE.md Part 2 (Wave 3) ✓
+- [x] ~~05-07-PLAN.md~~ — Superseded by 05-10
+
+Plans (remediation):
+- [ ] 05-08-PLAN.md — Revert 05-03 commits, restore SKILL.md YAML frontmatter (Wave 5)
+- [ ] 05-09-PLAN.md — Review surviving docs for compatibility with restored skills (Wave 5)
+- [ ] 05-10-PLAN.md — End-to-end structural validation (Wave 6)
 
 **Success Criteria:**
 
