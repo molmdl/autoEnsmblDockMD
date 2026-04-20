@@ -140,7 +140,9 @@ Type conventions used below: `path`, `string`, `int`, `float`, `bool`, `enum`, `
 | `num_modes` | int | `32` | Stage 2 gnina | Maximum generated poses per ligand. |
 | `autobox_add` | float/int | `4` | Stage 2 gnina | Autobox padding around reference region. |
 | `autobox_ligand` | enum/path | `receptor` | Stage 2 gnina | `receptor` or explicit ligand path for autobox definition. |
-| `scoring` | enum | `cnn` | Stage 2 gnina | Scoring type (`cnn` or `ad4_scoring`). |
+| `scoring` | enum | *(empty)* | Stage 2 gnina | Base scoring function (`ad4_scoring`, `default`, `dkoes_fast`, `dkoes_scoring`, `dkoes_scoring_old`, `vina`, `vinardo`); leave empty to use gnina default (vina). |
+| `cnn_scoring` | enum | `rescore` | Stage 2 gnina | CNN scoring/reranking mode (`none`, `rescore`, `refinement`, `metrorescore`, `metrorefine`, `all`). Controls how the CNN model re-ranks docking poses. |
+| `pose_sort_order` | enum | `CNNscore` | Stage 2 gnina | Final pose sort order (`CNNscore`, `CNNaffinity`, `Energy`). |
 | `addH` | enum | `off` | Stage 2 gnina | Hydrogen add behavior for docking input. |
 | `stripH` | enum | `off` | Stage 2 gnina | Hydrogen stripping behavior. |
 | `cpu` | int | `8` | Stage 2 gnina | CPU threads for gnina. |
