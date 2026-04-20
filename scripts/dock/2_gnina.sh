@@ -40,7 +40,9 @@ Config keys used:
   [docking] num_modes
   [docking] autobox_add
   [docking] autobox_ligand = receptor|ref.pdb|/path/to/file
-  [docking] scoring = cnn|ad4_scoring
+  [docking] scoring = ad4_scoring|default|dkoes_fast|dkoes_scoring|dkoes_scoring_old|vina|vinardo (empty = gnina default)
+  [docking] cnn_scoring = none|rescore|refinement|metrorescore|metrorefine|all (empty = gnina default)
+  [docking] pose_sort_order = CNNscore|CNNaffinity|Energy (empty = gnina default)
   [docking] addH = off|on
   [docking] stripH = off|on
   [docking] cpu
@@ -151,7 +153,9 @@ EXHAUSTIVENESS="$(get_config docking exhaustiveness "${DEFAULT_EXHAUSTIVENESS}")
 NUM_MODES="$(get_config docking num_modes "${DEFAULT_NUM_MODES}")"
 AUTOBOX_ADD="$(get_config docking autobox_add "${DEFAULT_AUTOBOX_ADD}")"
 AUTOBOX_LIGAND_SETTING="$(get_config docking autobox_ligand "")"
-SCORING="$(get_config docking scoring "cnn")"
+SCORING="$(get_config docking scoring "")"
+CNN_SCORING="$(get_config docking cnn_scoring "")"
+POSE_SORT_ORDER="$(get_config docking pose_sort_order "")"
 ADDH="$(get_config docking addH "off")"
 STRIPH="$(get_config docking stripH "off")"
 CPU="$(get_config docking cpu "8")"
@@ -285,9 +289,38 @@ if [[ "${ENSEMBLE_PARALLELISM}" -le 0 ]]; then
     exit 1
 fi
 
-if [[ "${SCORING,,}" != "cnn" && "${SCORING,,}" != "ad4_scoring" ]]; then
-    log_error "Invalid docking scoring='${SCORING}'. Expected cnn or ad4_scoring"
-    exit 1
+if [[ -n "${SCORING}" ]]; then
+    valid_scoring="ad4_scoring default dkoes_fast dkoes_scoring dkoes_scoring_old vina vinardo"
+    valid=0
+    for v in ${valid_scoring}; do
+        [[ "${SCORING,,}" == "${v}" ]] && valid=1 && break
+    done
+    if [[ "${valid}" -eq 0 ]]; then
+        log_error "Invalid docking scoring='${SCORING}'. Valid values: ${valid_scoring}"
+        exit 1
+    fi
+fi
+if [[ -n "${CNN_SCORING}" ]]; then
+    valid_cnn="none rescore refinement metrorescore metrorefine all"
+    valid=0
+    for v in ${valid_cnn}; do
+        [[ "${CNN_SCORING,,}" == "${v}" ]] && valid=1 && break
+    done
+    if [[ "${valid}" -eq 0 ]]; then
+        log_error "Invalid docking cnn_scoring='${CNN_SCORING}'. Valid values: ${valid_cnn}"
+        exit 1
+    fi
+fi
+if [[ -n "${POSE_SORT_ORDER}" ]]; then
+    valid_pso="cnnscore cnnaffinity energy"
+    valid=0
+    for v in ${valid_pso}; do
+        [[ "${POSE_SORT_ORDER,,}" == "${v}" ]] && valid=1 && break
+    done
+    if [[ "${valid}" -eq 0 ]]; then
+        log_error "Invalid docking pose_sort_order='${POSE_SORT_ORDER}'. Valid values: CNNscore CNNaffinity Energy"
+        exit 1
+    fi
 fi
 if [[ "${ADDH,,}" != "on" && "${ADDH,,}" != "off" ]]; then
     log_error "Invalid docking addH='${ADDH}'. Expected on or off"
@@ -347,7 +380,7 @@ submit_ligand_job() {
     local job_id job_script
     local q_mode q_ligand_name q_test_receptor q_reference_ligand q_receptor_rel q_receptor_prefix
     local q_ensemble_size q_autobox_add q_exhaustiveness q_num_modes q_addh q_striph q_cpu
-    local q_scoring q_min_rmsd_filter q_autobox_ligand_setting q_ref_rel q_lig_workdir
+    local q_scoring q_cnn_scoring q_pose_sort_order q_min_rmsd_filter q_autobox_ligand_setting q_ref_rel q_lig_workdir
     local q_ensemble_parallelism
 
     require_safe_id "${lig_name}" "ligand id"
@@ -401,6 +434,8 @@ PY
     printf -v q_striph '%q' "${STRIPH}"
     printf -v q_cpu '%q' "${CPU}"
     printf -v q_scoring '%q' "${SCORING}"
+    printf -v q_cnn_scoring '%q' "${CNN_SCORING}"
+    printf -v q_pose_sort_order '%q' "${POSE_SORT_ORDER}"
     printf -v q_min_rmsd_filter '%q' "${MIN_RMSD_FILTER}"
     printf -v q_autobox_ligand_setting '%q' "${AUTOBOX_LIGAND_SETTING}"
     printf -v q_ref_rel '%q' "${ref_rel}"
@@ -434,6 +469,8 @@ readonly ADDH=${q_addh}
 readonly STRIPH=${q_striph}
 readonly CPU=${q_cpu}
 readonly SCORING=${q_scoring}
+readonly CNN_SCORING=${q_cnn_scoring}
+readonly POSE_SORT_ORDER=${q_pose_sort_order}
 readonly MIN_RMSD_FILTER=${q_min_rmsd_filter}
 readonly AUTOBOX_LIGAND_SETTING=${q_autobox_ligand_setting}
 readonly REF_REL=${q_ref_rel}
@@ -452,8 +489,14 @@ if [[ "\${MODE}" == "test" ]]; then
     --stripH "\${STRIPH}"
     --cpu "\${CPU}"
   )
-  if [[ "\${SCORING,,}" != "cnn" ]]; then
+  if [[ -n "\${SCORING}" ]]; then
     cmd+=(--scoring "\${SCORING}")
+  fi
+  if [[ -n "\${CNN_SCORING}" ]]; then
+    cmd+=(--cnn_scoring "\${CNN_SCORING}")
+  fi
+  if [[ -n "\${POSE_SORT_ORDER}" ]]; then
+    cmd+=(--pose_sort_order "\${POSE_SORT_ORDER}")
   fi
   cmd+=(-o "rec-\${LIGAND_NAME}.sdf" --log "rec-\${LIGAND_NAME}.log")
   "\${cmd[@]}"
@@ -491,8 +534,14 @@ else
     if [[ -n "\${MIN_RMSD_FILTER}" ]]; then
       cmd+=(--min_rmsd_filter "\${MIN_RMSD_FILTER}")
     fi
-    if [[ "\${SCORING,,}" != "cnn" ]]; then
+    if [[ -n "\${SCORING}" ]]; then
       cmd+=(--scoring "\${SCORING}")
+    fi
+    if [[ -n "\${CNN_SCORING}" ]]; then
+      cmd+=(--cnn_scoring "\${CNN_SCORING}")
+    fi
+    if [[ -n "\${POSE_SORT_ORDER}" ]]; then
+      cmd+=(--pose_sort_order "\${POSE_SORT_ORDER}")
     fi
     cmd+=(-o "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.sdf" --log "\${RECEPTOR_PREFIX}\${i}-\${LIGAND_NAME}.log")
     "\${cmd[@]}"
