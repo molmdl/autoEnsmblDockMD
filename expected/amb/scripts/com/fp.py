@@ -151,12 +151,12 @@ def validate_output_file_path(output_path, description):
     raw = str(output_path)
     if '..' in raw:
         raise ValueError(f"Directory traversal not allowed in {description}: {output_path}")
+    if Path(output_path).is_symlink():
+        raise ValueError(f"Symlinks not allowed for output path: {output_path}")
     try:
         path = Path(output_path).resolve(strict=False)
     except Exception as e:
         raise ValueError(f"Invalid {description} path '{output_path}': {e}")
-    if path.exists() and path.is_symlink():
-        raise ValueError(f"Symlinks not allowed for output path: {path}")
     if path.exists() and path.is_dir():
         raise ValueError(f"{description} is a directory: {path}")
     parent_dir = path.parent
@@ -462,8 +462,6 @@ def _build_sparse_similarity_chunk(intersect, sumA, sumB, similarity, threshold,
         elif similarity == 'jaccard':
             sims = inter_vals / (sumA_arr[i] + sumB_arr[js] - inter_vals + 1e-10)
         else:  # cosine
-            if normB_arr is None:
-                raise ValueError("normB must be provided for cosine similarity computation")
             sims = inter_vals / ((np.sqrt(sumA_arr[i] + 1e-10) * normB_arr[js]) + 1e-10)
 
         mask = sims >= threshold
@@ -1351,7 +1349,7 @@ def calculate_sasa_internal(universe, ligand_selections, receptor_selection=None
     logging.info(f"  NOTE: Fast approximation for relative comparisons (10-20% accuracy vs. probe methods)")
     
     # Helper function to calculate SASA using VDW+Gaussian method
-    def calculate_group_sasa_fast(atom_group, all_coords, all_elements, tree=None):
+    def calculate_group_sasa_fast(atom_group, all_coords, all_elements, tree=None, group_indices_in_all=None):
         """Calculate per-atom SASA using fast VDW+Gaussian approximation.
         
         Args:
@@ -1370,12 +1368,6 @@ def calculate_sasa_internal(universe, ligand_selections, receptor_selection=None
             for elem in group_elements
         ])
         
-        # Get radii for all atoms (for neighbor occlusion)
-        all_radii = np.array([
-            vdw_radii_ang.get(elem, default_radius) + probe_radius
-            for elem in all_elements
-        ])
-        
         # Build KDTree for all atoms (complex) if not provided
         if tree is None:
             tree = cKDTree(all_coords)
@@ -1391,16 +1383,26 @@ def calculate_sasa_internal(universe, ligand_selections, receptor_selection=None
             atom_sasa_array[:] = 4 * np.pi * (group_radii ** 2)
             return atom_sasa_array / 100.0
 
+        if group_indices_in_all is None:
+            group_indices_in_all = np.arange(n_atoms, dtype=np.intp)
+        else:
+            group_indices_in_all = np.asarray(group_indices_in_all, dtype=np.intp)
+            if len(group_indices_in_all) != n_atoms:
+                raise ValueError(
+                    f"group_indices_in_all length mismatch: expected {n_atoms}, got {len(group_indices_in_all)}"
+                )
+
         neighbor_sum = np.zeros(n_atoms, dtype=np.float32)
-        n_query = min(n_atoms, len(neighbors_list))
-        for i in range(n_query):
-            neighbor_indices = neighbors_list[i]
+        for local_i, global_i in enumerate(group_indices_in_all):
+            if global_i < 0 or global_i >= len(neighbors_list):
+                continue
+            neighbor_indices = neighbors_list[global_i]
             if len(neighbor_indices) <= 1:
                 continue
             neighbor_indices = np.asarray(neighbor_indices, dtype=np.intp)
-            dists = np.linalg.norm(all_coords[neighbor_indices] - all_coords[i], axis=1)
+            dists = np.linalg.norm(all_coords[neighbor_indices] - all_coords[global_i], axis=1)
             weights = np.exp(-(dists ** 2) / (2 * gaussian_sigma ** 2))
-            neighbor_sum[i] = np.sum(weights[dists > 0])
+            neighbor_sum[local_i] = np.sum(weights[dists > 0])
 
         # Exposure and SASA per atom
         exposure = np.exp(-gaussian_lambda * neighbor_sum)
@@ -1421,18 +1423,20 @@ def calculate_sasa_internal(universe, ligand_selections, receptor_selection=None
     else:
         receptor_sel = receptor_selection
     
+    # Build complex with receptor + all ligands once (topology is static)
+    all_ligands = receptor_sel.universe.atoms[:0]
+    for lig in ligand_selections:
+        all_ligands = all_ligands + lig
+    complex_all = receptor_sel + all_ligands
+    complex_indices = complex_all.indices
+    index_map = {atom_index: pos for pos, atom_index in enumerate(complex_indices)}
+
     # Calculate per-atom SASA once per frame, then sum by ligand atoms.
     # Precompute ligand atom indices in complex for fast per-frame summation
     ligand_indices_global = [lg.indices for lg in ligand_selections]
 
     for ts in universe.trajectory:
         frame = ts.frame
-        
-        # Build complex with receptor + ALL ligands (done once per frame)
-        all_ligands = receptor_sel.universe.atoms[:0]
-        for lig in ligand_selections:
-            all_ligands = all_ligands + lig
-        complex_all = receptor_sel + all_ligands
         
         # 1. Calculate per-atom SASA for entire complex (ONCE per frame)
         complex_all_coords = complex_all.positions
@@ -1441,8 +1445,6 @@ def calculate_sasa_internal(universe, ligand_selections, receptor_selection=None
         per_atom_sasa = calculate_group_sasa_fast(complex_all, complex_all_coords, complex_all_elements, tree=tree)
         
         # 2. For each ligand: sum SASA for atoms belonging to this ligand
-        complex_indices = complex_all.indices
-        index_map = {atom_index: pos for pos, atom_index in enumerate(complex_indices)}
         for lig_id, lig_indices in enumerate(ligand_indices_global):
             missing_atoms = [i for i in lig_indices if i not in index_map]
             if missing_atoms:
@@ -1823,13 +1825,13 @@ def align_structures(ref_coords, mob_coords, ref_resids, mob_resids, ref_resname
     # Compute optimal rotation using Kabsch algorithm
     H = mob_centered.T @ ref_centered
     U, S, Vt = np.linalg.svd(H)
-    d = (np.linalg.det(Vt.T @ U.T) < 0) * -1
+    d = -1 if (np.linalg.det(Vt.T @ U.T) < 0) else 1
     D = np.diag([1, 1, d])
     rotation = Vt.T @ D @ U.T
 
     # Apply rotation and translation to full mobile structure
-    mob_mean = np.mean(mob_coords, axis=0)
-    ref_mean = np.mean(ref_coords, axis=0)
+    mob_mean = np.mean(mob_common, axis=0)
+    ref_mean = np.mean(ref_common, axis=0)
     mob_aligned = (mob_coords - mob_mean) @ rotation
     translation = ref_mean - np.mean(mob_aligned, axis=0)
     mob_aligned += translation
