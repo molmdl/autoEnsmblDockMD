@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-03 complete (4/8 plans in Phase 6; 06-04 also complete) |
-| **Last Activity** | 2026-04-28 - Completed 06-03-PLAN.md (handoff inspector) |
-| **Progress** | ██████████░░ 44/51 plans complete (86%) |
+| **Current Plan** | 06-05 complete (5/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-05-PLAN.md (OpenCode TypeScript plugins) |
+| **Progress** | ███████████░ 45/51 plans complete (88%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -70,6 +70,9 @@ Superseded decision notes are retained for traceability and should not be treate
 | Keep conversion cache isolated per-workspace under `.cache/` with mtime staleness detection | Prevents cross-workspace contamination while skipping redundant deterministic conversions |
 | Normalize inspected handoff stage status into uppercase summary labels (`SUCCESS/FAILED/NEEDS_REVIEW/BLOCKED`) | Gives orchestrator-facing status summaries without changing canonical handoff enum values |
 | Select latest handoff by file `st_mtime` and generate status-specific `next_action` guidance | Minimizes repeated JSON parsing and provides immediate operator direction |
+| Use `definePlugin` JS wrappers as OpenCode-native layer over Python plugins | Completes dual-format architecture while keeping Python as source of core logic |
+| Normalize JS plugin outputs to `{ success, data, warnings, errors }` | Gives orchestrator and hooks a stable machine-readable contract |
+| Bridge conversion cache via Python inline driver loading `conversion_cache.py` module path | Supports class-based get/put/clear operations without requiring a standalone Python CLI entrypoint |
 
 ### Known Pitfalls
 
@@ -89,13 +92,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 14:28 UTC
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-04-28 14:45 UTC
+Stopped at: Completed 06-05-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed with 06-05-PLAN.md (OpenCode TypeScript plugins).
+Proceed with 06-06-PLAN.md (dual-format Markdown skills).
 
 ---
 
@@ -108,7 +111,7 @@ Proceed with 06-05-PLAN.md (OpenCode TypeScript plugins).
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-03 handoff inspector complete (4/8)*
+*Last action: 06-05 OpenCode TypeScript plugins complete (5/8)*
 
 ### Roadmap Evolution
 
