@@ -71,6 +71,8 @@ PLUGIN="${PROJECT_ROOT}/scripts/infra/plugins/workspace_init.py"
 HANDOFF_FILE=".handoffs/workspace_init.json"
 
 mkdir -p "$(dirname "$HANDOFF_FILE")"
+set +e
 python3 "$PLUGIN" --template "$TEMPLATE" --target "$TARGET" ${FORCE:+--force} > "$HANDOFF_FILE"
+set -e
 
 check_handoff_result "workspace_init"
