@@ -30,7 +30,7 @@ Agent dispatch: `python -m scripts.agents --agent orchestrator --input handoff.j
 ## Parameters
 | Parameter | Config Key | CLI Flag | Default | Description |
 |-----------|------------|----------|---------|-------------|
-| Config file | `general.config` | `--config` | `config.ini` | Workflow configuration used to resolve stage order and paths. |
+| Config file | *(CLI flag)* | `--config` | `config.ini` | Workflow configuration used to resolve stage order and paths. |
 | Stage token | `orchestrator.stage` | *(wrapper stage)* | `orchestrator_resume` | Wrapper dispatch stage used for orchestration resume entrypoint. |
 | Checkpoint root | `orchestrator.checkpoint_root` | *(internal)* | `.checkpoints/` | Persisted checkpoint directory used by agent base infrastructure. |
 

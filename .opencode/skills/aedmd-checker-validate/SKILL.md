@@ -30,7 +30,7 @@ Agent dispatch: `python -m scripts.agents --agent checker --input handoff.json`
 ## Parameters
 | Parameter | Config Key | CLI Flag | Default | Description |
 |-----------|------------|----------|---------|-------------|
-| Config file | `general.config` | `--config` | `config.ini` | Path to workflow configuration used for validation context. |
+| Config file | *(CLI flag)* | `--config` | `config.ini` | Path to workflow configuration used for validation context. |
 | Extra params passthrough | `checker.*` | `--<key> <value>` | *(none)* | Additional flags are passed through wrapper `parse_flags` into agent params JSON. |
 
 ## Expected Output

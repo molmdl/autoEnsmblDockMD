@@ -30,7 +30,7 @@ Agent dispatch: `python -m scripts.agents --agent debugger --input handoff.json`
 ## Parameters
 | Parameter | Config Key | CLI Flag | Default | Description |
 |-----------|------------|----------|---------|-------------|
-| Config file | `general.config` | `--config` | `config.ini` | Workflow configuration providing stage paths and runtime settings. |
+| Config file | *(CLI flag)* | `--config` | `config.ini` | Workflow configuration providing stage paths and runtime settings. |
 | Extra params passthrough | `debugger.*` | `--<key> <value>` | *(none)* | Additional flags are passed through wrapper `parse_flags` into agent params JSON. |
 
 ## Expected Output
