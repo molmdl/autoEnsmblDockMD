@@ -12,7 +12,7 @@
 |-------|-------|
 | **Current Phase** | Quick tasks (post-phase baseline complete) |
 | **Current Plan** | quick-005 (documentation-cleanup-2bxo-pdb-purpose-m) complete |
-| **Last Activity** | 2026-04-28 - Completed quick task 005 (documentation consistency cleanup) |
+| **Last Activity** | 2026-04-28 - Completed quick tasks 004-005 (doc remediation) |
 | **Progress** | ███████████░ 45/46 plans complete (98%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Core phases complete; quick task analysis completed |
@@ -70,7 +70,9 @@ Superseded decision notes are retained for traceability and should not be treate
 |---|-------------|------|--------|-----------|
 | 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
 | 004 | Fix targeted docking parameter documentation (reference_ligand and autobox_ligand) | 2026-04-28 | 68a9599 | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
+| 005 | Documentation cleanup: 2bxo.pdb purpose, metadata-stage naming, and config drift fixes | 2026-04-28 | 8a5770c | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
 | 004 | Fix targeted docking parameter documentation (`reference_ligand` vs `autobox_ligand`) | 2026-04-28 | d15309d | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
+| 005 | Documentation cleanup: 2bxo.pdb purpose, metadata-stage naming, and config drift fixes | 2026-04-28 | 8a5770c | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
 | 005 | Documentation cleanup for 2bxo purpose, metadata stage tokens, and config-flag labeling | 2026-04-28 | 25878ac | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
 
 ---
