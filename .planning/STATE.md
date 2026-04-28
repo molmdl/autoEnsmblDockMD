@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-02 complete (2/8 plans in Phase 6) |
-| **Last Activity** | 2026-04-28 - Completed 06-02-PLAN.md (preflight validation) |
-| **Progress** | ██████████░░ 42/51 plans complete (82%) |
+| **Current Plan** | 06-04 complete (3/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-04-PLAN.md (group ID checker + conversion cache) |
+| **Progress** | ██████████░░ 43/51 plans complete (84%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -66,6 +66,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Delegate wrapper exit semantics to `check_handoff_result` after persisting handoff JSON | Keeps status handling consistent with existing command wrappers for success/blocked/failure paths |
 | Use `ConfigParser` with `ExtendedInterpolation` in preflight validation | Preserves compatibility with `${section:key}` interpolation in template configs while validating mode and section requirements |
 | Keep missing-tool and input-readiness checks as WARNING severity | Surfaces actionable setup gaps without hard-blocking valid partially initialized environments |
+| Treat `index.ndx` header order as canonical group-ID source for MM/PBSA validation | Keeps receptor/ligand ID checks deterministic across generated index files |
+| Keep conversion cache isolated per-workspace under `.cache/` with mtime staleness detection | Prevents cross-workspace contamination while skipping redundant deterministic conversions |
 
 ### Known Pitfalls
 
@@ -85,13 +87,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 14:14 UTC
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-28 14:24 UTC
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed with 06-03-PLAN.md (handoff inspector).
+Proceed with 06-05-PLAN.md (OpenCode TypeScript plugins).
 
 ---
 
@@ -104,7 +106,7 @@ Proceed with 06-03-PLAN.md (handoff inspector).
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-02 preflight validation complete (2/8)*
+*Last action: 06-04 group ID checker + conversion cache complete (3/8)*
 
 ### Roadmap Evolution
 
