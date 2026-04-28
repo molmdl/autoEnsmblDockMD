@@ -71,9 +71,6 @@ Superseded decision notes are retained for traceability and should not be treate
 | 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
 | 004 | Fix targeted docking parameter documentation (reference_ligand and autobox_ligand) | 2026-04-28 | 68a9599 | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
 | 005 | Documentation cleanup: 2bxo.pdb purpose, metadata-stage naming, and config drift fixes | 2026-04-28 | 8a5770c | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
-| 004 | Fix targeted docking parameter documentation (`reference_ligand` vs `autobox_ligand`) | 2026-04-28 | d15309d | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
-| 005 | Documentation cleanup: 2bxo.pdb purpose, metadata-stage naming, and config drift fixes | 2026-04-28 | 8a5770c | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
-| 005 | Documentation cleanup for 2bxo purpose, metadata stage tokens, and config-flag labeling | 2026-04-28 | 25878ac | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
 
 ---
 
