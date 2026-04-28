@@ -61,6 +61,12 @@ Superseded decision notes are retained for traceability and should not be treate
 - Missing hydrogens can break docking/MD/MM/PBSA.
 - Context/session overflow risk remains; checkpoint-based resumption is required.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
+
 ---
 
 ## Session Continuity
