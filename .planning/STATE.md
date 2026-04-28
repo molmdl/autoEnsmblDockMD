@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Quick tasks (post-phase baseline complete) |
-| **Current Plan** | quick-003 (dry-run-targeted-docking-workflow-analys) complete |
-| **Last Activity** | 2026-04-28 - Completed quick task 003 dry-run analysis |
-| **Progress** | ███████████░ 43/46 plans complete (93%) |
+| **Current Plan** | quick-004 (fix-targeted-docking-parameter-documenta) complete |
+| **Last Activity** | 2026-04-28 - Completed quick task 004 targeted docking docs fix |
+| **Progress** | ███████████░ 44/46 plans complete (96%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Core phases complete; quick task analysis completed |
 
@@ -53,6 +53,7 @@ Superseded decision notes are retained for traceability and should not be treate
 |----------|-----------|
 | Enforce workspace copy pattern (`work/input` → `work/test` or `work/run_DATE`) | Preserves immutable input sources and improves reproducibility across runs |
 | Prioritize targeted docking docs fix for `reference_ligand` vs `autobox_ligand` | Reduces first-run configuration ambiguity in Mode A |
+| Keep `reference_ligand` and `autobox_ligand` documented as distinct targeted-mode controls in skill parameter tables | Prevents misconfiguration drift between docs, config keys, and runtime behavior |
 | Prioritize preflight/workspace-init/handoff-inspector automation hooks first | Highest estimated token savings for repeated run-support workflows |
 
 ### Known Pitfalls
@@ -66,18 +67,19 @@ Superseded decision notes are retained for traceability and should not be treate
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
+| 004 | Fix targeted docking parameter documentation (`reference_ligand` vs `autobox_ligand`) | 2026-04-28 | d15309d | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
 
 ---
 
 ## Session Continuity
 
-Last session: 2026-04-28 11:31 UTC
-Stopped at: Completed quick-003-01 dry-run targeted docking workflow analysis
+Last session: 2026-04-28 12:02 UTC
+Stopped at: Completed quick-004-01 fix targeted docking parameter documentation
 Resume file: None
 
 ### Next Action
 
-Address quick-003 documentation remediation items (targeted docking parameter clarity + metadata-stage alignment), then proceed with controlled targeted workflow execution in isolated workspace.
+Continue remaining quick-task remediation items (metadata-stage alignment), then proceed with controlled targeted workflow execution in isolated workspace.
 
 ---
 
@@ -90,7 +92,7 @@ Address quick-003 documentation remediation items (targeted docking parameter cl
 
 *State updated: 2026-04-28*
 *Current phase: quick tasks (post-phase maintenance)*
-*Last action: quick-003 dry-run analysis complete (4/4 tasks)*
+*Last action: quick-004 targeted docking documentation fix complete (1/1 tasks)*
 
 ### Roadmap Evolution
 
@@ -98,4 +100,3 @@ Address quick-003 documentation remediation items (targeted docking parameter cl
 |------|--------|-----------|
 | 2026-04-28 | Phase 6 added: Automation Infrastructure | Implement hooks/plugins identified in quick-003 dry-run analysis (estimated 6,600-13,300 token savings/run) |
 | 2026-04-28 | Phase 7 added: First Controlled Execution | Execute and validate full targeted docking workflow (Mode A) in isolated workspace using example data |
-
