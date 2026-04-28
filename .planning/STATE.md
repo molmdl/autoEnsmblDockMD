@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-08 complete (7/8 plans in Phase 6; 06-07 pending summary) |
-| **Last Activity** | 2026-04-28 - Completed 06-08-PLAN.md (skill best-practices audit and CSO updates) |
-| **Progress** | ███████████░ 47/51 plans complete (92%) |
+| **Current Plan** | 06-08 complete (8/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-07-PLAN.md (dry-run audit + integration test) and backfilled planning artifacts |
+| **Progress** | ███████████░ 48/51 plans complete (94%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -77,6 +77,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Document conversion-cache as plugin/library integration rather than a standalone wrapper command | Avoids contract drift by reflecting actual implementation boundaries |
 | Use frontmatter descriptions for discovery triggers/symptoms only (avoid workflow summaries) | Improves skill selection reliability and forces full-skill reads for execution logic |
 | Standardize phase-6 skills on Overview/When to Use/Quick Reference/Implementation/Common Mistakes | Improves scan speed, consistency, and CSO discoverability across automation hooks |
+| Keep dry-run audit script read-only with artifact/syntax/metadata checks and explicit summary counters | Enables safe repeatable validation in any workspace without mutating user data |
+| Use `/tmp`-isolated integration harness with trap-based cleanup for Phase 6 wrapper/plugin validation | Prevents contamination of real workspaces while testing end-to-end wrapper behavior |
 
 ### Known Pitfalls
 
@@ -97,12 +99,12 @@ Superseded decision notes are retained for traceability and should not be treate
 ## Session Continuity
 
 Last session: 2026-04-28 15:03 UTC
-Stopped at: Completed 06-08-PLAN.md
+Stopped at: Completed 06-07-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Backfill planning artifacts for 06-07 (missing SUMMARY/STATE update) to restore in-order phase tracking.
+Proceed to Phase 7 planning/execution (Phase 6 is complete at 8/8 plans).
 
 ---
 
@@ -115,7 +117,7 @@ Backfill planning artifacts for 06-07 (missing SUMMARY/STATE update) to restore 
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-08 skill audit and CSO optimization complete (7/8)*
+*Last action: 06-07 dry-run audit + integration test backfill complete; Phase 6 complete (8/8)*
 
 ### Roadmap Evolution
 
