@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 6 of 6 (5.1-critical-correctness-and-namespace-fixes) |
-| **Current Plan** | 7 of 7 in current phase |
-| **Last Activity** | 2026-04-19 - Phase 5.1 verified complete |
-| **Progress** | ███████████░ 39/42 plans complete (93%) |
+| **Current Phase** | Quick tasks (post-phase baseline complete) |
+| **Current Plan** | quick-003 (dry-run-targeted-docking-workflow-analys) complete |
+| **Last Activity** | 2026-04-28 - Completed quick task 003 dry-run analysis |
+| **Progress** | ███████████░ 43/46 plans complete (93%) |
 | **Phase 5.1 Blocker** | None |
-| **Status** | Phase verified complete |
+| **Status** | Core phases complete; quick task analysis completed |
 
 ---
 
@@ -47,6 +47,14 @@
 
 Superseded decision notes are retained for traceability and should not be treated as current implementation guarantees.
 
+### Key Decisions (Quick Tasks)
+
+| Decision | Rationale |
+|----------|-----------|
+| Enforce workspace copy pattern (`work/input` → `work/test` or `work/run_DATE`) | Preserves immutable input sources and improves reproducibility across runs |
+| Prioritize targeted docking docs fix for `reference_ligand` vs `autobox_ligand` | Reduces first-run configuration ambiguity in Mode A |
+| Prioritize preflight/workspace-init/handoff-inspector automation hooks first | Highest estimated token savings for repeated run-support workflows |
+
 ### Known Pitfalls
 
 - Force-field incompatibility (AMBER protein + CGenFF ligand) can crash downstream stages.
@@ -57,13 +65,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-19 20:17 UTC
-Stopped at: Phase 5.1 verification complete (18/18 must-haves passed)
+Last session: 2026-04-28 11:31 UTC
+Stopped at: Completed quick-003-01 dry-run targeted docking workflow analysis
 Resume file: None
 
 ### Next Action
 
-Phase 5.1 verified and complete. All phases (1-5.1) complete. Proceed to 05-11 and 05-12 plans in Phase 5, or audit milestone.
+Address quick-003 documentation remediation items (targeted docking parameter clarity + metadata-stage alignment), then proceed with controlled targeted workflow execution in isolated workspace.
 
 ---
 
@@ -74,6 +82,6 @@ Phase 5.1 verified and complete. All phases (1-5.1) complete. Proceed to 05-11 a
 
 ---
 
-*State updated: 2026-04-19*
-*Current phase: 5.1-critical-correctness-and-namespace-fixes (complete)*
-*Last action: Phase 5.1 verification passed (18/18 must-haves verified)*
+*State updated: 2026-04-28*
+*Current phase: quick tasks (post-phase maintenance)*
+*Last action: quick-003 dry-run analysis complete (4/4 tasks)*
