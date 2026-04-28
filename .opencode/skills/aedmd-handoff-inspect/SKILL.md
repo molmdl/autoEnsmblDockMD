@@ -1,6 +1,6 @@
 ---
 name: aedmd-handoff-inspect
-description: Parse latest handoff and provide next-action guidance
+description: Use when stage outcomes are unclear, `.handoffs/*.json` needs quick triage, or resume/debug flow requires normalized status (`SUCCESS`, `FAILED`, `NEEDS_REVIEW`, `BLOCKED`) with next-action guidance.
 license: MIT
 compatibility: Requires python 3.10+, conda environment
 metadata:
@@ -13,45 +13,49 @@ metadata:
 
 # Handoff Inspection
 
-This skill inspects the latest handoff artifact for a workspace, normalizes status for quick interpretation, and provides an actionable next-step recommendation.
+## Overview
 
-## When to use this skill
-- Immediately after stage execution to confirm outcome.
-- During workflow debugging to inspect latest errors/warnings.
-- During resume flows to determine the next valid action from persisted handoff state.
+Core principle: treat handoff files as the canonical run-state ledger. Normalize latest status fast so operators and orchestrators can decide the next command without manually parsing JSON.
+
+## When to Use
+- You need immediate pass/fail/review triage after a stage run.
+- Resume flow is ambiguous and latest handoff status must be interpreted.
+- Debugging requires extracting errors, warnings, and recommendations from `.handoffs`.
 
 ## Prerequisites
 - Workspace exists and is accessible.
 - `.handoffs/` directory is present or expected for stage outputs.
 - Conda/project environment is active (`source ./scripts/setenv.sh`).
 
-## Usage
-- Bash wrapper command:
-  - `scripts/commands/aedmd-handoff-inspect.sh --workspace work/test`
-- OpenCode plugin:
-  - `.opencode/plugins/handoff-inspect.js`
-  - Plugin name: `aedmd-handoff-inspect`
+## Quick Reference
+- Wrapper: `scripts/commands/aedmd-handoff-inspect.sh --workspace work/test`
+- Plugin: `.opencode/plugins/handoff-inspect.js` (`aedmd-handoff-inspect`)
+- Output artifact: `.handoffs/handoff_inspection.json`
+- Normalized labels: `SUCCESS`, `FAILED`, `NEEDS_REVIEW`, `BLOCKED`
 
 ## Parameters
 | Parameter | Required | Default | Description |
 |---|---|---|---|
 | `workspace` | No | Auto-detected workspace root (wrapper) | Workspace containing `.handoffs` artifacts to inspect. |
 
-## Expected Output
-- HandoffRecord JSON persisted by wrapper to `.handoffs/handoff_inspection.json`.
-- Core extracted fields include:
+## Implementation
+- Run wrapper/plugin to inspect the latest handoff by file mtime.
+- Extract and normalize stage status for compact operator-facing summaries.
+- Preserve downstream-consumable fields for checker/debugger handoff:
   - latest stage name
-  - normalized status (`SUCCESS`, `FAILED`, `NEEDS_REVIEW`, `BLOCKED`)
-  - next-action recommendation tailored to status
-- Warnings/errors from latest handoff are surfaced for downstream checker/debugger use.
+  - normalized status
+  - next-action recommendation
+  - surfaced warnings/errors
 
-## Troubleshooting
-- **No handoff files found**
-  - Confirm stage commands were run and handoff persistence is enabled.
-- **Unexpected status mapping**
-  - Verify latest handoff uses canonical status vocabulary expected by wrappers.
-- **Workspace detection mismatch**
-  - Pass explicit `--workspace` path to avoid resolving the wrong workspace root.
+## Common Mistakes
+- **Inspecting stale workspace**
+  - Explicitly pass `--workspace` when multiple runs coexist.
+- **Assuming unknown status is success**
+  - Treat unmapped/unknown values as failure-path and inspect raw JSON.
+- **Skipping follow-up after `NEEDS_REVIEW`**
+  - Review warnings before triggering next heavy stage.
+- **Running before any handoffs exist**
+  - Confirm at least one stage wrapper has persisted `.handoffs/*.json`.
 
 ## Related Automation Links
 - Wrapper: `scripts/commands/aedmd-handoff-inspect.sh`

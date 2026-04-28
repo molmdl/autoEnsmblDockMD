@@ -1,6 +1,6 @@
 ---
 name: aedmd-group-id-check
-description: Validate MM/PBSA group IDs against index.ndx before MM/PBSA execution
+description: Use when MM/PBSA setup may be wrong because receptor/ligand group IDs can drift from `index.ndx` ordering, especially after index regeneration, trajectory prep changes, or suspicious binding-energy results.
 license: MIT
 compatibility: Requires python 3.10+, gmx_MMPBSA workflow artifacts
 metadata:
@@ -13,42 +13,48 @@ metadata:
 
 # MM/PBSA Group ID Consistency Check
 
-This skill validates receptor/ligand MM/PBSA group IDs against the canonical `index.ndx` header ordering to prevent silent mis-grouped energy calculations.
+## Overview
 
-## When to use this skill
-- Before running MM/PBSA stage.
-- After trajectory/index preparation changes.
-- When troubleshooting suspicious MM/PBSA results that might come from group-ID mismatch.
+Core principle: treat `index.ndx` header order as canonical and detect group-ID mismatch before MM/PBSA execution. Prevent silent receptor/ligand swap or wrong-group energy decomposition.
+
+## When to Use
+- Before MM/PBSA runs when group assignments were regenerated or edited.
+- After trajectory/index preparation changes that may reorder groups.
+- When results look suspicious (unexpected ΔG trends, inconsistent decomposition) and group mismatch is a candidate cause.
 
 ## Prerequisites
 - Workspace contains prepared MM/PBSA inputs.
 - `index.ndx` is available in expected location for the workspace/stage.
 - Conda/project environment is active (`source ./scripts/setenv.sh`).
 
-## Usage
-- Bash wrapper command:
-  - `scripts/commands/aedmd-group-id-check.sh --workspace work/test`
-- OpenCode plugin:
-  - `.opencode/plugins/group-id-check.js`
-  - Plugin name: `aedmd-group-id-check`
+## Quick Reference
+- Wrapper: `scripts/commands/aedmd-group-id-check.sh --workspace work/test`
+- Plugin: `.opencode/plugins/group-id-check.js` (`aedmd-group-id-check`)
+- Artifact: `.handoffs/group_id_check.json`
+- Failure symptom: configured receptor/ligand IDs diverge from `index.ndx` order
 
 ## Parameters
 | Parameter | Required | Default | Description |
 |---|---|---|---|
 | `workspace` | No | Auto-detected workspace root (wrapper) | Workspace to validate for group-ID consistency. |
 
-## Expected Output
-- HandoffRecord JSON persisted to `.handoffs/group_id_check.json`.
-- Includes detected receptor/ligand group IDs and validation status.
-- Outputs warnings/errors when configured IDs diverge from index-derived expectations.
+## Implementation
+- Run wrapper/plugin before MM/PBSA stage dispatch.
+- Parse `index.ndx` headers and compare against configured or propagated IDs.
+- Emit HandoffRecord JSON including:
+  - resolved receptor/ligand IDs
+  - validation status
+  - mismatch warnings/errors and recommendations
 
-## Troubleshooting
-- **index.ndx missing**
-  - Complete trajectory/index prep stage before running this check.
-- **Group mismatch detected**
-  - Use index-header-derived IDs or explicit validated overrides in config.
-- **Unexpected IDs from stale files**
-  - Regenerate index file from current workspace artifacts and rerun check.
+## Common Mistakes
+- **Using stale `index.ndx`**
+  - Regenerate index from current trajectory/topology artifacts before check.
+- **Ignoring explicit mismatch warnings**
+  - Resolve mismatch first; do not proceed to MM/PBSA with uncertain group mapping.
+- **Assuming IDs are stable across runs**
+  - Group order can change with regenerated files; re-check each workspace.
+- **Skipping environment activation**
+  - Source `./scripts/setenv.sh` to ensure consistent plugin behavior.
 
 ## Related Automation Links
 - Wrapper: `scripts/commands/aedmd-group-id-check.sh`

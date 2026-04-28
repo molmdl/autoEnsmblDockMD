@@ -1,6 +1,6 @@
 ---
 name: aedmd-workspace-init
-description: Use when creating isolated workspace from template for workflow execution
+description: Use when starting a new run and `work/input` must be copied into an isolated workspace (`work/test` or `work/run_DATE`), especially when initialization fails due to missing template files or existing target directories.
 license: MIT
 compatibility: Requires python 3.10+, conda environment
 metadata:
@@ -13,25 +13,25 @@ metadata:
 
 # Workspace Initialization
 
-This skill creates an isolated run workspace by copying a validated template (typically `work/input`) into a target run directory (for example `work/test` or `work/run_YYYY-MM-DD`) and emits a machine-readable handoff record.
+## Overview
 
-## When to use this skill
-- Initialize a fresh workspace before any stage execution.
-- Recreate a workspace from a known-good template after cleanup.
-- Verify that expected workspace directories/files exist before starting expensive jobs.
+Core principle: create reproducible runs from a known template, never from ad-hoc manual directory edits. Use wrapper/plugin outputs (HandoffRecord JSON) as the source of truth for downstream automation.
+
+## When to Use
+- New run setup needs `work/input` copied into `work/test` or `work/run_YYYY-MM-DD`.
+- You hit setup blockers like `Workspace exists` or missing `config.ini` in template.
+- You need deterministic workspace creation before preflight or stage wrappers.
 
 ## Prerequisites
 - Template directory exists and contains `config.ini`.
 - Template includes required subdirectories such as `mdp/` (with stage-specific inputs under it).
 - Command environment is prepared (`source ./scripts/setenv.sh`) so Python and project modules resolve correctly.
 
-## Usage
-- Bash wrapper command:
-  - `scripts/commands/aedmd-workspace-init.sh --template work/input --target work/test`
-  - Optional overwrite: `scripts/commands/aedmd-workspace-init.sh --template work/input --target work/test --force`
-- OpenCode plugin:
-  - `.opencode/plugins/workspace-init.js`
-  - Plugin name: `aedmd-workspace-init`
+## Quick Reference
+- Wrapper: `scripts/commands/aedmd-workspace-init.sh`
+- Plugin: `.opencode/plugins/workspace-init.js` (`aedmd-workspace-init`)
+- Typical success artifact: `.handoffs/workspace_init.json`
+- Common follow-up: `scripts/commands/aedmd-preflight.sh`
 
 ## Parameters
 | Parameter | Required | Default | Description |
@@ -40,23 +40,26 @@ This skill creates an isolated run workspace by copying a validated template (ty
 | `target` | Yes | None | Destination workspace directory to create (for example `work/test`). |
 | `force` | No | `false` | Overwrite target directory if it already exists. |
 
-## Expected Output
-- HandoffRecord JSON persisted by wrapper to `.handoffs/workspace_init.json`.
-- Includes deterministic fields such as:
+## Implementation
+- Run wrapper for deterministic initialization:
+  - `scripts/commands/aedmd-workspace-init.sh --template work/input --target work/test`
+  - Optional overwrite: `... --force`
+- Or use OpenCode plugin directly:
+  - `.opencode/plugins/workspace-init.js`
+- Expected output is HandoffRecord JSON with status (`success`, `blocked`, `failure`, `needs_review`) and fields like:
   - `data.workspace_path`
   - `data.template_source`
   - `metadata.created_dirs`
-- Status semantics remain aligned with wrapper/common handoff handling (`success`, `blocked`, `failure`, `needs_review`).
 
-## Troubleshooting
-- **Template missing required files**
-  - Ensure `config.ini` and `mdp/` exist in the template path.
-- **Target already exists**
-  - Re-run with `--force` only when overwrite is intended.
-- **Permission denied**
-  - Confirm write access to parent directory of the target path.
-- **Plugin/module import errors**
-  - Re-source environment with `source ./scripts/setenv.sh` and retry.
+## Common Mistakes
+- **Copying from wrong source directory**
+  - Confirm template points to `work/input` (or intentional equivalent), not a stale run directory.
+- **Overwriting prior results unintentionally**
+  - Use `--force` only when replacement is deliberate and previous outputs are archived.
+- **Skipping environment sourcing**
+  - Always run `source ./scripts/setenv.sh` before wrapper/plugin calls.
+- **Ignoring blocked status**
+  - If handoff status is `blocked`, resolve workspace conflict before downstream stages.
 
 ## Related Automation Links
 - Wrapper: `scripts/commands/aedmd-workspace-init.sh`
