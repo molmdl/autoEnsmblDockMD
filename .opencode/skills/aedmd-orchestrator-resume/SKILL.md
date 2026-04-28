@@ -7,7 +7,7 @@ metadata:
   author: autoEnsmblDockMD
   version: "1.0"
   agent: orchestrator
-  stage: workflow_resume
+  stage: orchestrator_resume
 ---
 
 # Workflow Resume

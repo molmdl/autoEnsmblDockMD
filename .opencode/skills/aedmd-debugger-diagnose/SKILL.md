@@ -7,7 +7,7 @@ metadata:
   author: autoEnsmblDockMD
   version: "1.0"
   agent: debugger
-  stage: failure_diagnosis
+  stage: debugger_diagnose
 ---
 
 # Failure Diagnosis

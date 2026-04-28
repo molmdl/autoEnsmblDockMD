@@ -7,7 +7,7 @@ metadata:
   author: autoEnsmblDockMD
   version: "1.0"
   agent: checker
-  stage: quality_validation
+  stage: checker_validate
 ---
 
 # Result Validation
