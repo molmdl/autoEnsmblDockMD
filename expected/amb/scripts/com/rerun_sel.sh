@@ -12,8 +12,8 @@ for line in `cat list4rerun.txt` ; do
 #SBATCH -J ${sys}_${trial}
 #SBATCH -c 22
 #SBATCH -n 1
-##SBATCH -p rtx4090-short
-#SBATCH -p rtx4090
+#SBATCH -p rtx4090-short
+##SBATCH -p rtx4090
 ##SBATCH -p workq
 ##SBATCH -p l40
 #SBATCH --gres=gpu:1
