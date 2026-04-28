@@ -12,7 +12,7 @@
 |-------|-------|
 | **Current Phase** | Quick tasks (post-phase baseline complete) |
 | **Current Plan** | quick-004 (fix-targeted-docking-parameter-documenta) complete |
-| **Last Activity** | 2026-04-28 - Completed quick task 004 targeted docking docs fix |
+| **Last Activity** | 2026-04-28 - Completed quick task 004 (targeted docking docs) |
 | **Progress** | ███████████░ 44/46 plans complete (96%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Core phases complete; quick task analysis completed |
@@ -67,6 +67,7 @@ Superseded decision notes are retained for traceability and should not be treate
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
+| 004 | Fix targeted docking parameter documentation (reference_ligand and autobox_ligand) | 2026-04-28 | 68a9599 | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
 | 004 | Fix targeted docking parameter documentation (`reference_ligand` vs `autobox_ligand`) | 2026-04-28 | d15309d | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
 
 ---
