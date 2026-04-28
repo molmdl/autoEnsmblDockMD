@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Quick tasks (post-phase baseline complete) |
-| **Current Plan** | quick-005 (documentation-cleanup-2bxo-pdb-purpose-m) complete |
-| **Last Activity** | 2026-04-28 - Completed quick tasks 004-005 (doc remediation) |
-| **Progress** | ███████████░ 45/46 plans complete (98%) |
+| **Current Phase** | 06-automation-infrastructure |
+| **Current Plan** | 06-01 complete (1/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-01-PLAN.md (plugin infrastructure + workspace-init) |
+| **Progress** | ████████░░░░ 41/51 plans complete (80%) |
 | **Phase 5.1 Blocker** | None |
-| **Status** | Core phases complete; quick task analysis completed |
+| **Status** | Phase 6 in progress |
 
 ---
 
@@ -58,6 +58,13 @@ Superseded decision notes are retained for traceability and should not be treate
 | Keep `metadata.stage` values identical to wrapper dispatch tokens | Preserves deterministic agent-stage traceability across wrappers and skills |
 | Document `--config` as a CLI flag marker instead of `general.config` INI key | Prevents wrapper-arg vs config-key confusion in skill parameter tables |
 
+### Key Decisions (Phase 6)
+
+| Decision | Rationale |
+|----------|-----------|
+| Keep workspace-init as a standalone Python plugin emitting HandoffRecord JSON | Reuses established handoff schema and enables deterministic machine-readable plugin outputs |
+| Delegate wrapper exit semantics to `check_handoff_result` after persisting handoff JSON | Keeps status handling consistent with existing command wrappers for success/blocked/failure paths |
+
 ### Known Pitfalls
 
 - Force-field incompatibility (AMBER protein + CGenFF ligand) can crash downstream stages.
@@ -76,13 +83,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 12:03 UTC
-Stopped at: Completed quick-005-01 documentation cleanup (2bxo purpose + metadata/config drift)
+Last session: 2026-04-28 14:08 UTC
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed with remaining quick-task or Phase 7 controlled targeted workflow execution in isolated workspace.
+Proceed with 06-02-PLAN.md (preflight validation plugin).
 
 ---
 
@@ -94,8 +101,8 @@ Proceed with remaining quick-task or Phase 7 controlled targeted workflow execut
 ---
 
 *State updated: 2026-04-28*
-*Current phase: quick tasks (post-phase maintenance)*
-*Last action: quick-005 documentation cleanup complete (3/3 tasks)*
+*Current phase: 06-automation-infrastructure*
+*Last action: 06-01 plugin infrastructure + workspace-init complete (1/8)*
 
 ### Roadmap Evolution
 
