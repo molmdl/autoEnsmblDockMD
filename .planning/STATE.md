@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-05 complete (5/8 plans in Phase 6) |
-| **Last Activity** | 2026-04-28 - Completed 06-05-PLAN.md (OpenCode TypeScript plugins) |
-| **Progress** | ███████████░ 45/51 plans complete (88%) |
+| **Current Plan** | 06-06 complete (6/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-06-PLAN.md (dual-format Markdown skills) |
+| **Progress** | ███████████░ 46/51 plans complete (90%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -73,6 +73,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Use `definePlugin` JS wrappers as OpenCode-native layer over Python plugins | Completes dual-format architecture while keeping Python as source of core logic |
 | Normalize JS plugin outputs to `{ success, data, warnings, errors }` | Gives orchestrator and hooks a stable machine-readable contract |
 | Bridge conversion cache via Python inline driver loading `conversion_cache.py` module path | Supports class-based get/put/clear operations without requiring a standalone Python CLI entrypoint |
+| Keep one Markdown SKILL.md per Phase 6 automation hook with YAML frontmatter parity | Ensures universal agent-readable fallback for all native OpenCode plugin hooks |
+| Document conversion-cache as plugin/library integration rather than a standalone wrapper command | Avoids contract drift by reflecting actual implementation boundaries |
 
 ### Known Pitfalls
 
@@ -92,13 +94,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 14:45 UTC
-Stopped at: Completed 06-05-PLAN.md
+Last session: 2026-04-28 14:54 UTC
+Stopped at: Completed 06-06-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed with 06-06-PLAN.md (dual-format Markdown skills).
+Proceed with 06-07-PLAN.md (dry-run audit + integration test).
 
 ---
 
@@ -111,7 +113,7 @@ Proceed with 06-06-PLAN.md (dual-format Markdown skills).
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-05 OpenCode TypeScript plugins complete (5/8)*
+*Last action: 06-06 dual-format Markdown skills complete (6/8)*
 
 ### Roadmap Evolution
 
