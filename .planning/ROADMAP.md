@@ -366,10 +366,16 @@ Plans:
 
 **Depends on:** Phase 5.1
 
-**Plans:** 0 plans
+**Plans:** 7 plans in 4 waves
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 6 to break down)
+- [ ] 06-01-PLAN.md — Plugin infrastructure + workspace-init (Wave 1)
+- [ ] 06-02-PLAN.md — Preflight validation (Wave 1)
+- [ ] 06-03-PLAN.md — Handoff inspector (Wave 2)
+- [ ] 06-04-PLAN.md — Group ID checker + conversion cache (Wave 2)
+- [ ] 06-05-PLAN.md — OpenCode TypeScript plugins (Wave 3)
+- [ ] 06-06-PLAN.md — Dual-format Markdown skills (Wave 3)
+- [ ] 06-07-PLAN.md — Dry-run audit + integration test (Wave 4)
 
 **Details:**
 
