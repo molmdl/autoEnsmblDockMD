@@ -1,0 +1,327 @@
+---
+phase: quick-003
+plan: 01
+type: execute
+wave: 1
+depends_on: []
+files_modified: []
+autonomous: true
+
+must_haves:
+  truths:
+    - "Targeted docking workflow stages mapped from input files to agent skills"
+    - "Agent skill documentation completeness verified"
+    - "Automation opportunities identified with token savings estimates"
+    - "Missing or buggy items documented with specific references"
+  artifacts:
+    - path: ".planning/quick/003-dry-run-targeted-docking-workflow-analys/003-DRY-RUN-REPORT.md"
+      provides: "Comprehensive dry-run analysis report"
+      min_lines: 50
+    - path: ".planning/quick/003-dry-run-targeted-docking-workflow-analys/003-AUTOMATION-OPPORTUNITIES.md"
+      provides: "Hook/plugin automation opportunities"
+      min_lines: 80
+  key_links:
+    - from: "WORKFLOW.md Stage 2"
+      to: ".opencode/skills/aedmd-dock-run/SKILL.md"
+      via: "targeted mode mapping"
+      pattern: "mode.*targeted"
+    - from: "work/input/ref.pdb"
+      to: "[docking] reference_ligand config"
+      via: "reference ligand for pocket definition"
+      pattern: "reference_ligand"
+---
+
+<objective>
+Analyze the targeted docking workflow from a user perspective using example data in work/input/, identify gaps or bugs in agent skills and code, and document findings without executing scripts.
+
+Purpose: Validate workflow documentation completeness and identify issues before actual execution.
+Output: Detailed dry-run analysis report documenting workflow mapping, missing items, and bugs.
+</objective>
+
+<execution_context>
+This is a DRY RUN analysis - NO script execution allowed. Focus on documentation review, code inspection, and workflow mapping only.
+</execution_context>
+
+<context>
+@.planning/STATE.md
+@WORKFLOW.md
+@AGENTS.md
+@work/input/README.md
+@.opencode/skills/aedmd-rec-ensemble/SKILL.md
+@.opencode/skills/aedmd-dock-run/SKILL.md
+@.opencode/skills/aedmd-com-setup/SKILL.md
+@.opencode/skills/aedmd-com-md/SKILL.md
+@.opencode/skills/aedmd-com-mmpbsa/SKILL.md
+@.opencode/skills/aedmd-com-analyze/SKILL.md
+@scripts/commands/common.sh
+@scripts/config.ini.template
+</context>
+
+<tasks>
+
+<task type="auto">
+  <name>Map targeted docking workflow stages to skills and scripts</name>
+  <files>.planning/quick/003-dry-run-targeted-docking-workflow-analys/003-WORKFLOW-MAPPING.md</files>
+  <action>
+    Create workflow mapping document that traces:
+    
+    1. **Input file mapping** - Map work/input/ files to workflow stages:
+        - **Workspace pattern** → work/input/ files copied to work/test/ or work/run_YYYY-MM-DD/
+       - rec.pdb → receptor ensemble generation (Stage 1)
+       - ref.pdb → reference ligand for targeted docking autobox (Stage 2)
+       - 2bxo.pdb → additional receptor structure (purpose unclear - document)
+       - dzp/, ibp/ directories → ligand inputs with AMBER topology (.itp, .gro, .mol2, .top)
+    
+    2. **Workflow stage mapping** - For targeted docking Mode A from WORKFLOW.md:
+       - Stage 0: Input preparation → config.ini validation
+       - Stage 1: Receptor ensemble → aedmd-rec-ensemble skill → scripts/rec/*.sh
+       - Stage 2: Docking (targeted mode) → aedmd-dock-run skill → scripts/dock/*.sh
+       - Stage 3: Complex setup (AMBER) → aedmd-com-setup skill → scripts/com/0_prep.sh
+       - Stage 4: MD simulation → aedmd-com-md skill → scripts/com/1_pr_prod.sh
+       - Stage 5: MM/PBSA → aedmd-com-mmpbsa skill → scripts/com/2_run_mmpbsa.sh
+       - Stage 6: Analysis → aedmd-com-analyze skill → scripts/com/3_ana.sh
+    
+    3. **Configuration requirements** - Document required config.ini sections:
+       - [general] workdir
+       - [receptor] input_pdb, ff (AMBER for Mode A), water_model, mdp_dir
+       - [docking] mode=targeted, reference_ligand=ref.pdb, receptor_dir, ligand_pattern
+       - [dock2com] AMBER topology handling
+       - [complex] mode=amber, receptor_gro, receptor_top
+       - [production] n_trials, equilibration stages
+       - [mmpbsa] amber_topology_file path
+       - [analysis] analysis toggles
+    
+    4. **Agent skill → wrapper → script chain** - Document call path:
+       - Slash command → scripts/commands/aedmd-*.sh wrapper
+       - Wrapper calls dispatch_agent() from common.sh
+       - common.sh resolves stage to script via STAGE_SCRIPT_MAP
+       - Python agent module executes script and creates handoff JSON
+       - Wrapper checks handoff status via check_handoff_result()
+    
+    Include file paths, config keys, and workflow dependencies. Use table format for clarity.
+  </action>
+  <verify>
+    - Workflow mapping document exists and is >100 lines
+    - All 6 stages mapped with file paths and config requirements
+    - work/input/ files mapped to stages
+    - Agent skill call chain documented
+  </verify>
+  <done>
+    Complete workflow mapping from input files through all stages with config/script/skill references.
+  </done>
+</task>
+
+<task type="auto">
+  <name>Audit agent skills for completeness and bugs</name>
+  <files>.planning/quick/003-dry-run-targeted-docking-workflow-analys/003-SKILL-AUDIT.md</files>
+  <action>
+    Review all agent skill files in .opencode/skills/aedmd-*/ and document issues:
+    
+    1. **Frontmatter validation** (per AGENTS.md Skill File Contract):
+       - Check YAML frontmatter has: name, description, license, compatibility, metadata
+       - Verify name matches skill directory and slash command
+       - Verify metadata.agent and metadata.stage align with AGENTS.md table
+    
+    2. **Documentation completeness** - Each skill should have:
+       - "When to use this skill" section
+       - "Prerequisites" section
+       - "Usage" section with command examples
+       - "Parameters" table with config keys and CLI flags
+       - "Expected Output" section with handoff file path
+       - "Troubleshooting" section
+    
+    3. **Parameter mapping verification**:
+       - Cross-reference skill parameter tables with scripts/config.ini.template
+       - Flag missing config keys referenced in skills but not in template
+       - Flag deprecated parameters in skills that don't match template
+    
+    4. **Targeted docking specific checks** for aedmd-dock-run skill:
+       - Verify mode=targeted is documented
+       - Verify reference_ligand parameter is documented
+       - Verify autobox_ligand parameter explanation (WORKFLOW.md shows "autobox_ligand = receptor OR path-to-reference-ligand")
+       - Check if skill explains difference between reference_ligand and autobox_ligand
+    
+    5. **Handoff status documentation**:
+       - Check if skills document expected handoff status values (success, needs_review, failure, blocked)
+       - Verify handoff file paths match AGENTS.md pattern (.handoffs/{stage}.json)
+    
+    6. **Code-skill alignment**:
+       - For each skill, verify scripts/commands/aedmd-*.sh wrapper exists
+       - Check wrapper calls correct dispatch_agent() with correct stage token
+       - Verify stage token in wrapper matches STAGE_SCRIPT_MAP in common.sh
+    
+    Document findings in structured format: skill name, issue category, severity (critical/warning/info), description, recommendation.
+  </action>
+  <verify>
+    - Skill audit document exists and is >50 lines
+    - All 10 aedmd-* skills reviewed
+    - Issues categorized by severity
+    - Specific file paths and line numbers included for bugs
+  </verify>
+  <done>
+    Comprehensive skill audit with categorized issues, severity levels, and actionable recommendations.
+  </done>
+</task>
+
+<task type="auto">
+  <name>Document dry-run findings and create final report</name>
+  <files>.planning/quick/003-dry-run-targeted-docking-workflow-analys/003-DRY-RUN-REPORT.md</files>
+  <action>
+    Synthesize findings from workflow mapping and skill audit into comprehensive report:
+    
+    **Report structure:**
+    
+    1. **Executive Summary**
+       - Workflow understanding confidence level (high/medium/low)
+       - Total issues found (critical/warning/info)
+       - Readiness assessment for actual workflow execution
+    
+    2. **Workflow Analysis**
+       - Summary of targeted docking workflow stages
+       - Input file → output artifact flow diagram
+       - Critical dependencies and checkpoints
+       - Reference workflow mapping document
+    
+    3. **Issues Found**
+       - Critical issues (blockers for execution)
+       - Warnings (workflow may succeed but with degraded experience)
+       - Informational (documentation improvements)
+       - For each issue: affected files, description, impact, recommendation
+    
+    4. **Missing or Unclear Items**
+       - 2bxo.pdb purpose (additional receptor - for ensemble or validation?)
+       - Ligand preparation workflow (dzp/ibp already have topologies - how were they generated?)
+       - AMBER vs CHARMM mode selection guidance
+       - Receptor alignment reference (config shows align_reference but workflow unclear on when used)
+       - Handoff JSON schema documentation (structure not documented in AGENTS.md)
+    
+    5. **Code Quality Observations**
+       - Wrapper consistency (all follow same pattern)
+       - Error handling coverage
+       - Configuration validation approach
+       - Logging and debugging support
+    
+    6. **Recommendations**
+       - Priority fixes before first workflow run
+       - Documentation improvements
+       - Configuration template clarifications
+       - Example workflow walkthrough needs
+    
+    7. **Next Steps**
+       - Suggested order for addressing issues
+       - Pre-execution checklist
+       - Test workflow validation approach
+    
+    Use markdown tables for structured data. Include specific file paths and config keys. Keep technical and actionable.
+  </action>
+  <verify>
+    - Report exists and is >100 lines
+    - All sections present with content
+    - Issues include file paths and actionable recommendations
+    - Executive summary provides clear assessment
+  </verify>
+  <done>
+    Complete dry-run analysis report documenting workflow understanding, issues found, and recommendations for workflow execution readiness.
+  </done>
+</task>
+
+</tasks>
+
+<verification>
+After task completion:
+1. Verify all four documents exist in .planning/quick/003-dry-run-targeted-docking-workflow-analys/
+2. Check workflow mapping covers all 6 stages with file/config references
+3. Check skill audit reviews all 10 aedmd-* skills with severity-categorized issues
+4. Check automation opportunities document analyzes 6+ categories with token savings
+4. Check final report synthesizes findings with actionable recommendations
+5. Confirm NO scripts were executed (dry run constraint honored)
+</verification>
+
+<success_criteria>
+- Workflow mapping document created with complete stage → skill → script → config tracing
+- Skill audit document created with structured issue categorization
+- Final dry-run report created with executive summary and recommendations
+- All findings based on code/documentation review only (no execution)
+- Clear understanding documented of targeted docking workflow from user perspective
+- Specific bugs and missing items identified with file paths and line numbers
+- Automation opportunities document created with hook/plugin candidates and savings estimates
+- Workspace pattern documented (work/input/ → work/test/ file copy flow)
+</success_criteria>
+
+<output>
+After completion, this plan produces four analysis artifacts in `.planning/quick/003-dry-run-targeted-docking-workflow-analys/`:
+- 003-WORKFLOW-MAPPING.md (workflow stage mapping)
+- 003-SKILL-AUDIT.md (skill documentation audit)
+- 003-DRY-RUN-REPORT.md (consolidated findings report)
+- 003-AUTOMATION-OPPORTUNITIES.md (hook/plugin opportunities)
+
+These documents provide actionable intelligence for workflow execution readiness.
+</output>
+
+<task type="auto">
+  <name>Identify automation opportunities for hooks and plugins</name>
+  <files>.planning/quick/003-dry-run-targeted-docking-workflow-analys/003-AUTOMATION-OPPORTUNITIES.md</files>
+  <action>
+    Analyze the workflow to identify steps that could be converted to hooks (other agents) or plugins (OpenCode extensions) to reduce token usage:
+    
+    1. **Repetitive validation patterns** - Identify validation checks repeated across stages:
+       - File existence checks (PDB, GRO, ITP, TOP files)
+       - Configuration key validation (required vs optional)
+       - Topology atom count matching
+       - Handoff status parsing
+       - These could become validation hooks or pre-flight check plugins
+    
+    2. **File transformation tasks** - Identify format conversion candidates:
+       - SDF → GRO conversion (dock/0_sdf2gro.sh)
+       - GRO → MOL2 conversion (dock/0_gro2mol2.sh)
+       - PDB → GRO topology generation
+       - These could become file-transformation plugins with caching
+    
+    3. **Configuration derivation** - Identify config generation patterns:
+       - MDP parameter templating (mdp/rec/, mdp/com/)
+       - Topology merging (sys.top assembly from receptor + ligand)
+       - Index group detection and mmpbsa_groups.dat generation
+       - These could become config-generation hooks
+    
+    4. **Status monitoring workflows** - Identify monitoring candidates:
+       - Slurm job queue checking (squeue, sacct)
+       - Handoff file polling and status aggregation
+       - Multi-ligand progress tracking
+       - These could become background monitoring agents
+    
+    5. **Workspace setup patterns** - Document the workspace pattern:
+       - work/input/ → work/test/ or work/run_YYYY-MM-DD/ pattern
+       - Input file copying and validation
+       - Directory structure initialization (rec/, dock/, com/, mdp/)
+       - Config.ini creation from template with workspace-specific paths
+       - This could become a workspace-init plugin
+    
+    6. **Error diagnosis patterns** - Identify common failure modes:
+       - GROMACS error parsing (fatal errors, warnings)
+       - Topology mismatch detection (atom count, naming)
+       - Missing dependency detection (gmx, gnina, gmx_MMPBSA)
+       - These could become debugger hooks with version-aware solutions
+    
+    For each opportunity, document:
+    - Current implementation (file paths, line numbers)
+    - Token cost estimate (context loading, repeated operations)
+    - Automation approach (hook/plugin/agent)
+    - Expected token savings
+    - Implementation complexity (low/medium/high)
+    - Priority (high/medium/low)
+    
+    Organize by potential token savings (highest first).
+  </action>
+  <verify>
+    - Automation opportunities document exists and is >80 lines
+    - At least 6 opportunity categories analyzed
+    - Each opportunity includes current implementation file paths
+    - Token savings estimates provided
+    - Implementation complexity assessed
+    - Workspace pattern documented with file copy flow
+  </verify>
+  <done>
+    Comprehensive automation opportunities analysis documenting hook/plugin candidates with token savings estimates and priority recommendations.
+  </done>
+</task>
+

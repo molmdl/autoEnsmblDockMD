@@ -91,3 +91,11 @@ Address quick-003 documentation remediation items (targeted docking parameter cl
 *State updated: 2026-04-28*
 *Current phase: quick tasks (post-phase maintenance)*
 *Last action: quick-003 dry-run analysis complete (4/4 tasks)*
+
+### Roadmap Evolution
+
+| Date | Change | Rationale |
+|------|--------|-----------|
+| 2026-04-28 | Phase 6 added: Automation Infrastructure | Implement hooks/plugins identified in quick-003 dry-run analysis (estimated 6,600-13,300 token savings/run) |
+| 2026-04-28 | Phase 7 added: First Controlled Execution | Execute and validate full targeted docking workflow (Mode A) in isolated workspace using example data |
+

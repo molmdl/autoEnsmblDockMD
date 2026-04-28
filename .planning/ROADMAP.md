@@ -23,8 +23,11 @@ The roadmap derives phases from the natural groupings of requirements, following
 | **3 - Agent Infrastructure** | Implement five agent types with distinct responsibilities and file-based state passing | AGENT-01 to AGENT-06 | 4 criteria |
 | **4 - Integration** | Connect agents to scripts via slash commands and loadable skills | CMD-01 to CMD-03, SKILL-01 to SKILL-03, AGENT-07 | 4 criteria |
 | **5 - Polish** | Finalize documentation, mark agents as experimental, validate end-to-end workflow | DOC-01 to DOC-04 | 4 criteria |
+| **5.1 - Correctness & Namespace** | Address critical code correctness and establish project namespace | Inserted fix phase | 7 plans |
+| **6 - Automation Infrastructure** | Implement hooks and plugins to reduce token usage | Phase 6 automation | 5 criteria |
+| **7 - First Controlled Execution** | Execute and validate full targeted docking workflow | Phase 7 validation | 5 criteria |
 
-**Total Phases:** 5
+**Total Phases:** 7
 **Coverage:** 37/37 requirements mapped ✓
 
 ---
@@ -355,6 +358,105 @@ Plans:
 
 ---
 
+---
+
+### Phase 6: Automation Infrastructure
+
+**Goal:** Implement hooks and plugins to reduce token usage in repeated workflow support operations.
+
+**Depends on:** Phase 5.1
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 6 to break down)
+
+**Details:**
+
+Based on quick-003 dry-run analysis, implement automation opportunities with highest token savings potential:
+
+1. **Workspace initialization plugin** (Est. 1,500-3,000 tokens/run)
+   - Create isolated workspace from work/input/ template
+   - Generate config.ini from template with workspace-specific paths
+   - Validate required files and emit readiness report
+
+2. **Preflight validation bundle** (Est. 2,000-4,000 tokens/run)
+   - Validate config.ini completeness and file existence
+   - Check topology file compatibility
+   - Emit pass/fail JSON for runner/checker/debugger consumption
+
+3. **Handoff inspector hook** (Est. 1,200-2,500 tokens/run)
+   - Parse .handoffs/*.json files
+   - Normalize status and blocking errors
+   - Provide actionable next command suggestions
+
+4. **File transformation cache** (Est. 1,000-2,000 tokens/run)
+   - Cache SDF→GRO, GRO→MOL2 conversions
+   - Detect unchanged inputs and skip redundant conversions
+
+5. **MM/PBSA group-ID consistency checker** (Est. 900-1,800 tokens/run)
+   - Validate receptor/ligand group IDs against index.ndx
+   - Generate or validate mmpbsa_groups.dat
+
+**Estimated total token savings:** 6,600-13,300 tokens per run-support cycle
+
+**Success Criteria:**
+- [ ] Workspace-init plugin creates isolated workspace with validated structure
+- [ ] Preflight validation hook reduces config/file validation context loading
+- [ ] Handoff inspector provides normalized status without repeated JSON parsing
+- [ ] File transformation cache prevents redundant conversions
+- [ ] MM/PBSA checker prevents silent wrong-group calculations
+
+
+---
+
+### Phase 7: First Controlled Execution
+
+**Goal:** Execute full targeted docking workflow (Mode A) in isolated workspace and validate outputs against expected results.
+
+**Depends on:** Phase 6
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 7 to break down)
+
+**Details:**
+
+Perform first end-to-end execution of the targeted docking workflow using example data:
+
+1. **Workspace setup**
+   - Copy work/input/ files to work/run_2026-04-28/
+   - Use workspace-init plugin (from Phase 6)
+   - Configure for targeted mode with dzp or ibp ligand
+
+2. **Stage-by-stage execution** (Stages 0-6)
+   - Stage 0: Preflight validation
+   - Stage 1: Receptor ensemble generation (rec.pdb)
+   - Stage 2: Targeted docking (mode=targeted, reference_ligand=ref.pdb)
+   - Stage 3: Complex setup (AMBER topology branch)
+   - Stage 4: MD equilibration and production
+   - Stage 5: MM/PBSA binding free energy calculation
+   - Stage 6: Trajectory analysis (RMSD, RMSF, contacts, H-bonds)
+
+3. **Output validation**
+   - Compare outputs against expected/amb/ reference
+   - Validate handoff status transitions
+   - Document actual vs expected outputs
+
+4. **Workflow refinement**
+   - Identify pain points and documentation gaps
+   - Document token costs and automation effectiveness
+   - Create execution report with recommendations
+
+**Success Criteria:**
+- [ ] Isolated workspace created and validated
+- [ ] All stages (0-6) execute without critical failures
+- [ ] Handoff status transitions are correct (success/needs_review)
+- [ ] Output artifacts match expected structure and format
+- [ ] Execution report documents workflow experience and recommendations
+
+
 
 ## Coverage Map
 
@@ -412,6 +514,8 @@ Plans:
 | 5 | Polish | Complete ✓ | 4 | None |
 | 5.1 | Critical Correctness and Namespace Fixes | Complete ✓ | 0 (inserted fix phase) | None |
 
+| 6 | Automation Infrastructure | Not Started | 0 (automation hooks/plugins) | Phase 5.1 must be complete |
+| 7 | First Controlled Execution | Not Started | 0 (validation phase) | Phase 6 must be complete |
 ---
 
 ## Notes
