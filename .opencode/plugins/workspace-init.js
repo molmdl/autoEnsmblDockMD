@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import path from 'path';
 
 const execFileAsync = promisify(execFile);
+const PYTHON_RELATIVE_PATH = 'scripts/infra/plugins/workspace_init.py';
 
 function toPluginResult(handoff) {
   return {
@@ -20,8 +21,17 @@ export default definePlugin({
   description: 'Initialize isolated workspace from template',
 
   async execute({ template, target, force = false }) {
+    if (!template || !target) {
+      return {
+        success: false,
+        data: {},
+        warnings: [],
+        errors: ['Both template and target are required.']
+      };
+    }
+
     const projectRoot = process.cwd();
-    const pythonPlugin = path.join(projectRoot, 'scripts/infra/plugins/workspace_init.py');
+    const pythonPlugin = path.join(projectRoot, PYTHON_RELATIVE_PATH);
 
     const args = ['--template', template, '--target', target];
     if (force) args.push('--force');
@@ -31,11 +41,13 @@ export default definePlugin({
       const handoff = JSON.parse(stdout);
       return toPluginResult(handoff);
     } catch (error) {
+      const stderr = error?.stderr?.toString?.().trim?.();
+      const message = stderr || error?.message || String(error);
       return {
         success: false,
         data: {},
         warnings: [],
-        errors: [error?.message ?? String(error)]
+        errors: [message]
       };
     }
   }
