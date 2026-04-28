@@ -366,7 +366,7 @@ Plans:
 
 **Depends on:** Phase 5.1
 
-**Plans:** 7 plans in 4 waves
+**Plans:** 8 plans in 5 waves
 
 Plans:
 - [ ] 06-01-PLAN.md — Plugin infrastructure + workspace-init (Wave 1)
@@ -374,8 +374,9 @@ Plans:
 - [ ] 06-03-PLAN.md — Handoff inspector (Wave 2)
 - [ ] 06-04-PLAN.md — Group ID checker + conversion cache (Wave 2)
 - [ ] 06-05-PLAN.md — OpenCode TypeScript plugins (Wave 3)
-- [ ] 06-06-PLAN.md — Dual-format Markdown skills (Wave 3)
-- [ ] 06-07-PLAN.md — Dry-run audit + integration test (Wave 4)
+- [ ] 06-06-PLAN.md — Dual-format Markdown skills (Wave 4)
+- [ ] 06-07-PLAN.md — Dry-run audit + integration test (Wave 5)
+- [ ] 06-08-PLAN.md — Audit skills against superpowers writing-skills best practices (Wave 5)
 
 **Details:**
 
@@ -520,7 +521,7 @@ Perform first end-to-end execution of the targeted docking workflow using exampl
 | 5 | Polish | Complete ✓ | 4 | None |
 | 5.1 | Critical Correctness and Namespace Fixes | Complete ✓ | 0 (inserted fix phase) | None |
 
-| 6 | Automation Infrastructure | Not Started | 0 (automation hooks/plugins) | Phase 5.1 must be complete |
+| 6 | Automation Infrastructure | Complete ✓ | 0 (automation hooks/plugins) | None |
 | 7 | First Controlled Execution | Not Started | 0 (validation phase) | Phase 6 must be complete |
 ---
 
