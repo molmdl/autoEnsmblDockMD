@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-04 complete (3/8 plans in Phase 6) |
-| **Last Activity** | 2026-04-28 - Completed 06-04-PLAN.md (group ID checker + conversion cache) |
-| **Progress** | ██████████░░ 43/51 plans complete (84%) |
+| **Current Plan** | 06-03 complete (4/8 plans in Phase 6; 06-04 also complete) |
+| **Last Activity** | 2026-04-28 - Completed 06-03-PLAN.md (handoff inspector) |
+| **Progress** | ██████████░░ 44/51 plans complete (86%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -68,6 +68,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Keep missing-tool and input-readiness checks as WARNING severity | Surfaces actionable setup gaps without hard-blocking valid partially initialized environments |
 | Treat `index.ndx` header order as canonical group-ID source for MM/PBSA validation | Keeps receptor/ligand ID checks deterministic across generated index files |
 | Keep conversion cache isolated per-workspace under `.cache/` with mtime staleness detection | Prevents cross-workspace contamination while skipping redundant deterministic conversions |
+| Normalize inspected handoff stage status into uppercase summary labels (`SUCCESS/FAILED/NEEDS_REVIEW/BLOCKED`) | Gives orchestrator-facing status summaries without changing canonical handoff enum values |
+| Select latest handoff by file `st_mtime` and generate status-specific `next_action` guidance | Minimizes repeated JSON parsing and provides immediate operator direction |
 
 ### Known Pitfalls
 
@@ -87,8 +89,8 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 14:24 UTC
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-04-28 14:28 UTC
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
 
 ### Next Action
@@ -106,7 +108,7 @@ Proceed with 06-05-PLAN.md (OpenCode TypeScript plugins).
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-04 group ID checker + conversion cache complete (3/8)*
+*Last action: 06-03 handoff inspector complete (4/8)*
 
 ### Roadmap Evolution
 
