@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Quick tasks (post-phase baseline complete) |
-| **Current Plan** | quick-004 (fix-targeted-docking-parameter-documenta) complete |
-| **Last Activity** | 2026-04-28 - Completed quick task 004 (targeted docking docs) |
-| **Progress** | ███████████░ 44/46 plans complete (96%) |
+| **Current Plan** | quick-005 (documentation-cleanup-2bxo-pdb-purpose-m) complete |
+| **Last Activity** | 2026-04-28 - Completed quick task 005 (documentation consistency cleanup) |
+| **Progress** | ███████████░ 45/46 plans complete (98%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Core phases complete; quick task analysis completed |
 
@@ -55,6 +55,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Prioritize targeted docking docs fix for `reference_ligand` vs `autobox_ligand` | Reduces first-run configuration ambiguity in Mode A |
 | Keep `reference_ligand` and `autobox_ligand` documented as distinct targeted-mode controls in skill parameter tables | Prevents misconfiguration drift between docs, config keys, and runtime behavior |
 | Prioritize preflight/workspace-init/handoff-inspector automation hooks first | Highest estimated token savings for repeated run-support workflows |
+| Keep `metadata.stage` values identical to wrapper dispatch tokens | Preserves deterministic agent-stage traceability across wrappers and skills |
+| Document `--config` as a CLI flag marker instead of `general.config` INI key | Prevents wrapper-arg vs config-key confusion in skill parameter tables |
 
 ### Known Pitfalls
 
@@ -69,18 +71,19 @@ Superseded decision notes are retained for traceability and should not be treate
 | 003 | Dry run targeted docking workflow analysis with example data | 2026-04-28 | 4bf0d4b | [003-dry-run-targeted-docking-workflow-analys](./quick/003-dry-run-targeted-docking-workflow-analys/) |
 | 004 | Fix targeted docking parameter documentation (reference_ligand and autobox_ligand) | 2026-04-28 | 68a9599 | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
 | 004 | Fix targeted docking parameter documentation (`reference_ligand` vs `autobox_ligand`) | 2026-04-28 | d15309d | [004-fix-targeted-docking-parameter-documenta](./quick/004-fix-targeted-docking-parameter-documenta/) |
+| 005 | Documentation cleanup for 2bxo purpose, metadata stage tokens, and config-flag labeling | 2026-04-28 | 25878ac | [005-documentation-cleanup-2bxo-pdb-purpose-m](./quick/005-documentation-cleanup-2bxo-pdb-purpose-m/) |
 
 ---
 
 ## Session Continuity
 
-Last session: 2026-04-28 12:02 UTC
-Stopped at: Completed quick-004-01 fix targeted docking parameter documentation
+Last session: 2026-04-28 12:03 UTC
+Stopped at: Completed quick-005-01 documentation cleanup (2bxo purpose + metadata/config drift)
 Resume file: None
 
 ### Next Action
 
-Continue remaining quick-task remediation items (metadata-stage alignment), then proceed with controlled targeted workflow execution in isolated workspace.
+Proceed with remaining quick-task or Phase 7 controlled targeted workflow execution in isolated workspace.
 
 ---
 
@@ -93,7 +96,7 @@ Continue remaining quick-task remediation items (metadata-stage alignment), then
 
 *State updated: 2026-04-28*
 *Current phase: quick tasks (post-phase maintenance)*
-*Last action: quick-004 targeted docking documentation fix complete (1/1 tasks)*
+*Last action: quick-005 documentation cleanup complete (3/3 tasks)*
 
 ### Roadmap Evolution
 
