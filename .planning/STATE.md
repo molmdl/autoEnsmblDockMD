@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06-automation-infrastructure |
-| **Current Plan** | 06-01 complete (1/8 plans in Phase 6) |
-| **Last Activity** | 2026-04-28 - Completed 06-01-PLAN.md (plugin infrastructure + workspace-init) |
-| **Progress** | ████████░░░░ 41/51 plans complete (80%) |
+| **Current Plan** | 06-02 complete (2/8 plans in Phase 6) |
+| **Last Activity** | 2026-04-28 - Completed 06-02-PLAN.md (preflight validation) |
+| **Progress** | ██████████░░ 42/51 plans complete (82%) |
 | **Phase 5.1 Blocker** | None |
 | **Status** | Phase 6 in progress |
 
@@ -64,6 +64,8 @@ Superseded decision notes are retained for traceability and should not be treate
 |----------|-----------|
 | Keep workspace-init as a standalone Python plugin emitting HandoffRecord JSON | Reuses established handoff schema and enables deterministic machine-readable plugin outputs |
 | Delegate wrapper exit semantics to `check_handoff_result` after persisting handoff JSON | Keeps status handling consistent with existing command wrappers for success/blocked/failure paths |
+| Use `ConfigParser` with `ExtendedInterpolation` in preflight validation | Preserves compatibility with `${section:key}` interpolation in template configs while validating mode and section requirements |
+| Keep missing-tool and input-readiness checks as WARNING severity | Surfaces actionable setup gaps without hard-blocking valid partially initialized environments |
 
 ### Known Pitfalls
 
@@ -83,13 +85,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 14:08 UTC
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-04-28 14:14 UTC
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed with 06-02-PLAN.md (preflight validation plugin).
+Proceed with 06-03-PLAN.md (handoff inspector).
 
 ---
 
@@ -102,7 +104,7 @@ Proceed with 06-02-PLAN.md (preflight validation plugin).
 
 *State updated: 2026-04-28*
 *Current phase: 06-automation-infrastructure*
-*Last action: 06-01 plugin infrastructure + workspace-init complete (1/8)*
+*Last action: 06-02 preflight validation complete (2/8)*
 
 ### Roadmap Evolution
 
