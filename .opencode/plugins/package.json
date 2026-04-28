@@ -1,0 +1,12 @@
+{
+  "name": "aedmd-opencode-plugins",
+  "version": "1.0.0",
+  "description": "OpenCode native plugins for autoEnsmblDockMD workflow automation",
+  "type": "module",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.4.0"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
