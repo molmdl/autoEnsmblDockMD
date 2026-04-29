@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (in progress) |
-| **Current Plan** | 3/7 plans complete (latest: 06.1-01) |
-| **Last Activity** | 2026-04-29 - Completed 06.1-01-PLAN.md |
-| **Progress** | █████████░░ 51/58 plans complete (88%) |
+| **Current Plan** | 4/7 plans complete (latest: 06.1-02) |
+| **Last Activity** | 2026-04-29 - Completed 06.1-02-PLAN.md |
+| **Progress** | █████████░ 52/58 plans complete (90%) |
 | **Phase 6.1 Blocker** | None |
 | **Status** | Phase 6.1 in progress ✓ |
 
@@ -89,6 +89,7 @@ Superseded decision notes are retained for traceability and should not be treate
 | Warn on non-sequential residue IDs in RMSF using `np.diff(residue_ids)` while preserving dictionary-key aggregation | Adds visibility for residue numbering gaps without changing already-correct residue-to-RMSF mapping |
 | Use quoted heredoc templates plus escaped sed substitution in SBATCH generation | Prevents shell metacharacter interpolation from ligand/path values in generated job scripts |
 | Return `UNKNOWN_AFTER_RETRIES` after bounded UNKNOWN-state retries with default 7-day timeout | Mitigates Slurm squeue/sacct TOCTOU windows and avoids infinite wait loops |
+| Apply GRO box-line bounds checks in `scripts/com/0_prep.sh` `write_combined_gro()` with expected-index/line-count errors | Hardens the active merged-GRO path against truncated inputs and uncaught index crashes |
 
 ### Known Pitfalls
 
@@ -108,13 +109,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-29 07:50 UTC
-Stopped at: Completed 06.1-01-PLAN.md
+Last session: 2026-04-29 07:51 UTC
+Stopped at: Completed 06.1-02-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 6.1 plan execution (4 plans remaining).
+Continue Phase 6.1 plan execution (3 plans remaining).
 
 ---
 
@@ -127,7 +128,7 @@ Continue Phase 6.1 plan execution (4 plans remaining).
 
 *State updated: 2026-04-29*
 *Current phase: 06.1-critical-security-performance-and-plugin-fixes*
-*Last action: 06.1-01 SBATCH injection hardening + Slurm TOCTOU/timeout fixes complete (3/7 plans in phase)*
+*Last action: 06.1-02 file-operation safety, atom mismatch reporting, and GRO bounds-check hardening complete (4/7 plans in phase)*
 
 ### Roadmap Evolution
 
