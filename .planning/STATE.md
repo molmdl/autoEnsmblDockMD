@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (in progress) |
-| **Current Plan** | 5/7 plans complete (latest: 06.1-03) |
-| **Last Activity** | 2026-04-29 - Completed 06.1-03-PLAN.md |
-| **Progress** | █████████░ 53/58 plans complete (91%) |
+| **Current Plan** | 6/7 plans complete (latest: 06.1-04) |
+| **Last Activity** | 2026-04-29 - Completed 06.1-04-PLAN.md |
+| **Progress** | █████████░ 54/58 plans complete (93%) |
 | **Phase 6.1 Blocker** | None |
 | **Status** | Phase 6.1 in progress ✓ |
 
@@ -91,6 +91,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Return `UNKNOWN_AFTER_RETRIES` after bounded UNKNOWN-state retries with default 7-day timeout | Mitigates Slurm squeue/sacct TOCTOU windows and avoids infinite wait loops |
 | Apply GRO box-line bounds checks in `scripts/com/0_prep.sh` `write_combined_gro()` with expected-index/line-count errors | Hardens the active merged-GRO path against truncated inputs and uncaught index crashes |
 | Use ceiling-based frame stride with `max_frames` cap and streamed subprocess output files | Keeps trajectory analysis bounded/predictable and prevents output-buffer OOM in long-running jobs |
+| Enforce workspace-init `--force` deletions to resolved paths within `work/` only | Prevents accidental/destructive deletion outside workspace boundary even with user-controlled target paths |
+| Prohibit deletion of `work/` root and require subdirectory targets | Adds defense-in-depth against catastrophic workspace root removal |
 
 ### Known Pitfalls
 
@@ -110,13 +112,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-29 07:54 UTC
-Stopped at: Completed 06.1-03-PLAN.md
+Last session: 2026-04-29 08:00 UTC
+Stopped at: Completed 06.1-04-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 6.1 plan execution (2 plans remaining).
+Continue Phase 6.1 plan execution (1 plan remaining before verification plan closure sequence).
 
 ---
 
@@ -129,7 +131,7 @@ Continue Phase 6.1 plan execution (2 plans remaining).
 
 *State updated: 2026-04-29*
 *Current phase: 06.1-critical-security-performance-and-plugin-fixes*
-*Last action: 06.1-03 trajectory-analysis performance/memory hardening complete (5/7 plans in phase)*
+*Last action: 06.1-04 plugin workspace-boundary hardening and security-model documentation complete (6/7 plans in phase)*
 
 ### Roadmap Evolution
 
