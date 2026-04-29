@@ -1,0 +1,7 @@
+
+In scripts/com/1_pr_prod.sh line 116:
+FF_NAME="$(get_config complex ff "")"
+^-----^ SC2034 (warning): FF_NAME appears unused. Verify use (or export if used externally).
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2034 -- FF_NAME appears unused. Verify us...
