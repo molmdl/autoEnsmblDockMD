@@ -199,13 +199,15 @@ if rec_n <= 0 or lig_n <= 0:
 rec_box_idx = 2 + rec_n
 lig_box_idx = 2 + lig_n
 
-if len(rec) < rec_box_idx + 1:
+if rec_box_idx >= len(rec):
     raise SystemExit(
-        f"Receptor GRO is truncated: header declares {rec_n} atoms but file has insufficient coordinate/box lines"
+        f"Receptor GRO is truncated: expected box line at index {rec_box_idx}, "
+        f"but file only has {len(rec)} lines. Check GRO file format."
     )
-if len(lig) < lig_box_idx + 1:
+if lig_box_idx >= len(lig):
     raise SystemExit(
-        f"Ligand GRO is truncated: header declares {lig_n} atoms but file has insufficient coordinate/box lines"
+        f"Ligand GRO is truncated: expected box line at index {lig_box_idx}, "
+        f"but file only has {len(lig)} lines. Check GRO file format."
     )
 
 rec_coords = rec[2:rec_box_idx]
@@ -218,6 +220,10 @@ if len(lig_coords) != lig_n:
 box = rec[rec_box_idx].strip()
 if not box:
     raise SystemExit("Invalid receptor GRO: missing box line")
+
+lig_box = lig[lig_box_idx].strip()
+if not lig_box:
+    raise SystemExit("Invalid ligand GRO: missing box line")
 
 box_tokens = box.split()
 if len(box_tokens) not in (3, 9):
