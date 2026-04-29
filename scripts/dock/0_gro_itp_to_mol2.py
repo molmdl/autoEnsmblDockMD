@@ -527,10 +527,21 @@ def build_mol2_records(
     missing_in_itp = sorted(gro_indices - itp_indices)
     missing_in_gro = sorted(itp_indices - gro_indices)
     if missing_in_itp or missing_in_gro:
-        raise ValueError(
-            "Atom index mismatch between GRO and ITP. "
-            f"Missing in ITP: {missing_in_itp[:10]}, Missing in GRO: {missing_in_gro[:10]}"
+        summary_itp = missing_in_itp[:10] if len(missing_in_itp) > 10 else missing_in_itp
+        summary_gro = missing_in_gro[:10] if len(missing_in_gro) > 10 else missing_in_gro
+
+        error_msg = (
+            "Atom index mismatch between GRO and ITP.\n"
+            f"Missing in ITP ({len(missing_in_itp)} total): {summary_itp}\n"
+            f"Missing in GRO ({len(missing_in_gro)} total): {summary_gro}"
         )
+
+        if len(missing_in_itp) > 10 or len(missing_in_gro) > 10:
+            logging.error("Full missing_in_itp: %s", missing_in_itp)
+            logging.error("Full missing_in_gro: %s", missing_in_gro)
+            error_msg += "\n(Full index lists logged to stderr)"
+
+        raise ValueError(error_msg)
 
     atom_to_sub_id, substructures, sub_name_by_id = _build_substructures(gro_atoms)
 
