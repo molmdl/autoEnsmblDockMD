@@ -125,3 +125,4 @@ Proceed to Phase 7 planning/execution (Phase 6 verified and complete).
 |------|--------|-----------|
 | 2026-04-28 | Phase 6 added: Automation Infrastructure | Implement hooks/plugins identified in quick-003 dry-run analysis (estimated 6,600-13,300 token savings/run) |
 | 2026-04-28 | Phase 7 added: First Controlled Execution | Execute and validate full targeted docking workflow (Mode A) in isolated workspace using example data |
+| 2026-04-29 | Phase 6.1 inserted after Phase 6: Critical Security, Performance, and Plugin Fixes | Address 4 critical security issues, 8 high-severity performance bottlenecks, and 2 plugin hardening fixes from scancode analysis (URGENT)

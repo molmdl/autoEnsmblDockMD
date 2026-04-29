@@ -25,9 +25,10 @@ The roadmap derives phases from the natural groupings of requirements, following
 | **5 - Polish** | Finalize documentation, mark agents as experimental, validate end-to-end workflow | DOC-01 to DOC-04 | 4 criteria |
 | **5.1 - Correctness & Namespace** | Address critical code correctness and establish project namespace | Inserted fix phase | 7 plans |
 | **6 - Automation Infrastructure** | Implement hooks and plugins to reduce token usage | Phase 6 automation | 5 criteria |
+| **6.1 - Security & Performance** | Fix critical security vulnerabilities, performance bottlenecks, and plugin issues | Inserted fix phase | 0 plans |
 | **7 - First Controlled Execution** | Execute and validate full targeted docking workflow | Phase 7 validation | 5 criteria |
 
-**Total Phases:** 7
+**Total Phases:** 8 (including 2 inserted urgent phases)
 **Coverage:** 37/37 requirements mapped ✓
 
 ---
@@ -417,11 +418,60 @@ Based on quick-003 dry-run analysis, implement automation opportunities with hig
 
 ---
 
+### Phase 6.1: Critical Security, Performance, and Plugin Fixes (INSERTED)
+
+**Goal:** Address critical security vulnerabilities, performance bottlenecks, and plugin issues discovered in scancode analysis.
+
+**Depends on:** Phase 6
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 6.1 to break down)
+
+**Details:**
+
+This urgent phase addresses critical findings from scancode analysis (`.planning/code_analysis/20260429_140009/*.md`):
+
+**A. Critical Security Issues (4 issues - BLOCKING):**
+1. **Command injection** - Unquoted variable interpolation in SBATCH script generation (`scripts/infra/slurm.sh`)
+2. **Unchecked file operations** - Potential data loss in cache clearing (`scripts/infra/plugins/conversion_cache.py`)
+3. **TOCTOU race conditions** - Slurm job status checking (`scripts/infra/slurm.sh`)
+4. **Insufficient atom mismatch validation** - Only shows first 10 indices, potential silent failures (`scripts/com/0_prep.sh`)
+
+**B. High-Severity Performance Issues (8 issues - HIGH PRIORITY):**
+1. **Infinite loop risk** - Job waiting without default timeout (`scripts/infra/slurm.sh`)
+2. **O(n×m) nested loop** - Contact frequency analysis bottleneck, ~2.5B operations potential (`scripts/com/4_ana.sh`)
+3. **Memory leaks** - Unclosed matplotlib figures (`scripts/com/4_ana.sh`)
+4. **Unit conversion assumptions** - nm→Angstrom without validation (`scripts/com/4_ana.sh`)
+5. **Atom index off-by-one** - RMSF calculation risks (`scripts/com/4_ana.sh`)
+6. **Race conditions** - Checkpoint save/load (`scripts/infra/checkpoint.py`)
+7. **Subprocess buffer overflow** - stdout/stderr can consume GBs (`scripts/commands/*.sh`)
+8. **GRO file parsing vulnerabilities** - Missing bounds checks (`scripts/dock/4_dock2com*.py`)
+
+**C. Plugin Issues (2 critical fixes from Report D):**
+1. **Workspace boundary check** - Add safety validation to `workspace_init.py --force` deletion (30 min)
+2. **Security model documentation** - Document custom hook security in `AGENTS.md` (15 min)
+
+**Rationale for insertion:**
+- Command injection and race conditions are critical security vulnerabilities
+- Performance issues can cause multi-hour delays or out-of-memory failures on large systems
+- Better to fix before Phase 7 controlled execution reveals these in production workflow
+- Plugin security gaps need hardening before recommending production use
+
+**Success Criteria:**
+- [ ] All 4 critical security issues resolved and tested
+- [ ] All 8 high-severity performance issues resolved
+- [ ] Plugin boundary checks implemented
+- [ ] Security model documented
+- [ ] No regressions in existing functionality
+
+---
+
 ### Phase 7: First Controlled Execution
 
 **Goal:** Execute full targeted docking workflow (Mode A) in isolated workspace and validate outputs against expected results.
 
-**Depends on:** Phase 6
+**Depends on:** Phase 6.1
 
 **Plans:** 0 plans
 
@@ -522,7 +572,8 @@ Perform first end-to-end execution of the targeted docking workflow using exampl
 | 5.1 | Critical Correctness and Namespace Fixes | Complete ✓ | 0 (inserted fix phase) | None |
 
 | 6 | Automation Infrastructure | Complete ✓ | 0 (automation hooks/plugins) | None |
-| 7 | First Controlled Execution | Not Started | 0 (validation phase) | Phase 6 must be complete |
+| 6.1 | Security & Performance Fixes | Not Started | 0 (inserted urgent phase) | Phase 6 must be complete |
+| 7 | First Controlled Execution | Not Started | 0 (validation phase) | Phase 6.1 must be complete |
 ---
 
 ## Notes
