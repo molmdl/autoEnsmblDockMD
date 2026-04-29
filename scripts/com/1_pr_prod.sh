@@ -205,6 +205,14 @@ require_safe_partition() {
     fi
 }
 
+escape_sed_replacement() {
+    local value="$1"
+    value="${value//\\/\\\\}"
+    value="${value//|/\\|}"
+    value="${value//&/\\&}"
+    printf '%s' "${value}"
+}
+
 submit_chain_for_trial() {
     local lig_name="$1"
     local lig_dir="$2"
@@ -213,8 +221,8 @@ submit_chain_for_trial() {
     local eq_job_id prod_job_id
     local stage stage_mdp last_eq_name
     local -a stage_mdps=()
-    local q_lig_dir q_eq_input_gro q_index_file q_pr0_mdp q_ntomp q_mdp_dir
-    local q_last_eq_name q_production_mdp q_stage_mdp
+    local s_job_name s_lig_dir s_eq_input_gro s_index_file s_pr0_mdp s_ntomp s_mdp_dir
+    local s_last_eq_name s_production_mdp s_stage_mdp s_stage_idx
 
     eq_job_script="${lig_dir}/pr_equil_${trial_idx}.sbatch"
     prod_job_script="${lig_dir}/prod_${trial_idx}.sbatch"
@@ -232,46 +240,59 @@ submit_chain_for_trial() {
         last_eq_name="pr${stage}_${trial_idx}"
     done
 
-    printf -v q_lig_dir '%q' "${lig_dir}"
-    printf -v q_eq_input_gro '%q' "${EQ_INPUT_GRO}"
-    printf -v q_index_file '%q' "${INDEX_FILE}"
-    printf -v q_pr0_mdp '%q' "${PR0_MDP}"
-    printf -v q_ntomp '%q' "${NTOMP}"
-    printf -v q_mdp_dir '%q' "${MDP_DIR}"
-    printf -v q_last_eq_name '%q' "${last_eq_name}"
-    printf -v q_production_mdp '%q' "${PRODUCTION_MDP}"
+    s_job_name="$(escape_sed_replacement "${lig_name}_eq_${trial_idx}")"
+    s_lig_dir="$(escape_sed_replacement "${lig_dir}")"
+    s_eq_input_gro="$(escape_sed_replacement "${EQ_INPUT_GRO}")"
+    s_index_file="$(escape_sed_replacement "${INDEX_FILE}")"
+    s_pr0_mdp="$(escape_sed_replacement "${PR0_MDP}")"
+    s_ntomp="$(escape_sed_replacement "${NTOMP}")"
+    s_mdp_dir="$(escape_sed_replacement "${MDP_DIR}")"
 
-    cat > "${eq_job_script}" <<EOF
+    cat > "${eq_job_script}" <<'EOF'
 #!/usr/bin/env bash
-#SBATCH -J ${lig_name}_eq_${trial_idx}
+#SBATCH -J __JOB_NAME__
 #SBATCH -n 1
-#SBATCH -c ${NTOMP}
-#SBATCH -p ${SLURM_PARTITION}
-#SBATCH --gres=gpu:${SLURM_GPUS}
+#SBATCH -c __NTOMP__
+#SBATCH -p __PARTITION__
+#SBATCH --gres=gpu:__GPUS__
 
 set -euo pipefail
-cd ${q_lig_dir}
+cd __LIG_DIR__
 
-readonly START_GRO=${q_eq_input_gro}
-readonly INDEX_FILE=${q_index_file}
-readonly PR0_MDP=${q_pr0_mdp}
-readonly NTOMP=${q_ntomp}
-readonly MDP_DIR=${q_mdp_dir}
+readonly START_GRO=__EQ_INPUT_GRO__
+readonly INDEX_FILE=__INDEX_FILE__
+readonly PR0_MDP=__PR0_MDP__
+readonly NTOMP=__NTOMP__
+readonly MDP_DIR=__MDP_DIR__
 
-gmx grompp -f "\${MDP_DIR}/\${PR0_MDP}" -c "\${START_GRO}" -p sys.top -n "\${INDEX_FILE}" -o "pr_${trial_idx}.tpr" -maxwarn 2
-gmx mdrun -deffnm "pr_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
+gmx grompp -f "${MDP_DIR}/${PR0_MDP}" -c "${START_GRO}" -p sys.top -n "${INDEX_FILE}" -o "pr___TRIAL_IDX__.tpr" -maxwarn 2
+gmx mdrun -deffnm "pr___TRIAL_IDX__" -ntmpi 1 -ntomp "${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
 
-last_eq_name="pr_${trial_idx}"
+last_eq_name="pr___TRIAL_IDX__"
 EOF
+
+    sed -i "s|__JOB_NAME__|${s_job_name}|g" "${eq_job_script}"
+    sed -i "s|__LIG_DIR__|${s_lig_dir}|g" "${eq_job_script}"
+    sed -i "s|__EQ_INPUT_GRO__|${s_eq_input_gro}|g" "${eq_job_script}"
+    sed -i "s|__INDEX_FILE__|${s_index_file}|g" "${eq_job_script}"
+    sed -i "s|__PR0_MDP__|${s_pr0_mdp}|g" "${eq_job_script}"
+    sed -i "s|__NTOMP__|${s_ntomp}|g" "${eq_job_script}"
+    sed -i "s|__MDP_DIR__|${s_mdp_dir}|g" "${eq_job_script}"
+    sed -i "s|__PARTITION__|$(escape_sed_replacement "${SLURM_PARTITION}")|g" "${eq_job_script}"
+    sed -i "s|__GPUS__|$(escape_sed_replacement "${SLURM_GPUS}")|g" "${eq_job_script}"
+    sed -i "s|__TRIAL_IDX__|$(escape_sed_replacement "${trial_idx}")|g" "${eq_job_script}"
 
     for stage in $(seq 1 "${N_EQ_STAGES}"); do
         stage_mdp="${stage_mdps[$((stage - 1))]}"
-        printf -v q_stage_mdp '%q' "${stage_mdp}"
-        cat >> "${eq_job_script}" <<EOF
-gmx grompp -f ${q_stage_mdp} -c "\${last_eq_name}.gro" -p sys.top -n "\${INDEX_FILE}" -o "pr${stage}_${trial_idx}.tpr" -maxwarn 2
-gmx mdrun -deffnm "pr${stage}_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
-last_eq_name="pr${stage}_${trial_idx}"
+        s_stage_mdp="$(escape_sed_replacement "${stage_mdp}")"
+        s_stage_idx="$(escape_sed_replacement "${stage}")"
+        cat >> "${eq_job_script}" <<'EOF'
+gmx grompp -f __STAGE_MDP__ -c "${last_eq_name}.gro" -p sys.top -n "${INDEX_FILE}" -o "pr__STAGE_IDX_____TRIAL_IDX__.tpr" -maxwarn 2
+gmx mdrun -deffnm "pr__STAGE_IDX_____TRIAL_IDX__" -ntmpi 1 -ntomp "${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
+last_eq_name="pr__STAGE_IDX_____TRIAL_IDX__"
 EOF
+        sed -i "s|__STAGE_MDP__|${s_stage_mdp}|g" "${eq_job_script}"
+        sed -i "s|__STAGE_IDX__|${s_stage_idx}|g" "${eq_job_script}"
     done
 
     chmod +x "${eq_job_script}"
@@ -281,26 +302,40 @@ EOF
         exit 1
     fi
 
-    cat > "${prod_job_script}" <<EOF
+    s_last_eq_name="$(escape_sed_replacement "${last_eq_name}")"
+    s_production_mdp="$(escape_sed_replacement "${PRODUCTION_MDP}")"
+
+    cat > "${prod_job_script}" <<'EOF'
 #!/usr/bin/env bash
-#SBATCH -J ${lig_name}_${MD_TIME}_${trial_idx}
+#SBATCH -J __JOB_NAME__
 #SBATCH -n 1
-#SBATCH -c ${NTOMP}
-#SBATCH -p ${SLURM_PARTITION}
-#SBATCH --gres=gpu:${SLURM_GPUS}
+#SBATCH -c __NTOMP__
+#SBATCH -p __PARTITION__
+#SBATCH --gres=gpu:__GPUS__
 
 set -euo pipefail
-cd ${q_lig_dir}
+cd __LIG_DIR__
 
-readonly LAST_EQ_GRO=${q_last_eq_name}.gro
-readonly INDEX_FILE=${q_index_file}
-readonly PRODUCTION_MDP=${q_production_mdp}
-readonly NTOMP=${q_ntomp}
-readonly MDP_DIR=${q_mdp_dir}
+readonly LAST_EQ_GRO=__LAST_EQ_NAME__.gro
+readonly INDEX_FILE=__INDEX_FILE__
+readonly PRODUCTION_MDP=__PRODUCTION_MDP__
+readonly NTOMP=__NTOMP__
+readonly MDP_DIR=__MDP_DIR__
 
-gmx grompp -f "\${MDP_DIR}/\${PRODUCTION_MDP}" -c "\${LAST_EQ_GRO}" -p sys.top -n "\${INDEX_FILE}" -o "prod_${trial_idx}.tpr" -maxwarn 2
-gmx mdrun -deffnm "prod_${trial_idx}" -ntmpi 1 -ntomp "\${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
+gmx grompp -f "${MDP_DIR}/${PRODUCTION_MDP}" -c "${LAST_EQ_GRO}" -p sys.top -n "${INDEX_FILE}" -o "prod___TRIAL_IDX__.tpr" -maxwarn 2
+gmx mdrun -deffnm "prod___TRIAL_IDX__" -ntmpi 1 -ntomp "${NTOMP}" -bonded gpu -nb gpu -update gpu -pme gpu -cpt 5
 EOF
+
+    sed -i "s|__JOB_NAME__|$(escape_sed_replacement "${lig_name}_${MD_TIME}_${trial_idx}")|g" "${prod_job_script}"
+    sed -i "s|__LIG_DIR__|${s_lig_dir}|g" "${prod_job_script}"
+    sed -i "s|__LAST_EQ_NAME__|${s_last_eq_name}|g" "${prod_job_script}"
+    sed -i "s|__INDEX_FILE__|${s_index_file}|g" "${prod_job_script}"
+    sed -i "s|__PRODUCTION_MDP__|${s_production_mdp}|g" "${prod_job_script}"
+    sed -i "s|__NTOMP__|${s_ntomp}|g" "${prod_job_script}"
+    sed -i "s|__MDP_DIR__|${s_mdp_dir}|g" "${prod_job_script}"
+    sed -i "s|__PARTITION__|$(escape_sed_replacement "${SLURM_PARTITION}")|g" "${prod_job_script}"
+    sed -i "s|__GPUS__|$(escape_sed_replacement "${SLURM_GPUS}")|g" "${prod_job_script}"
+    sed -i "s|__TRIAL_IDX__|$(escape_sed_replacement "${trial_idx}")|g" "${prod_job_script}"
 
     chmod +x "${prod_job_script}"
     prod_job_id="$(sbatch --parsable --dependency="afterok:${eq_job_id}" "${prod_job_script}" | tr -d '[:space:]')"
