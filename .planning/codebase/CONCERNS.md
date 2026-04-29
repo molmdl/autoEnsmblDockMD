@@ -1,178 +1,174 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-04-19
+**Analysis Date:** 2026-04-29
 
 ## Tech Debt
 
-**INI template interpolation is wider than shell loader support:**
-- Issue: `scripts/config.ini.template` uses `${section:key}` references throughout, but `scripts/infra/config_loader.sh` stores literal values and never resolves interpolation.
-- Files: `scripts/config.ini.template`, `scripts/infra/config_loader.sh`
-- Impact: configs copied directly from the template can hand shell stages unresolved paths such as `${general:workdir}/com`, which breaks stage discovery and path resolution in `scripts/rec/*.sh`, `scripts/dock/*.sh`, and `scripts/com/*.sh`.
-- Fix approach: either implement `${section:key}` expansion in `scripts/infra/config_loader.sh` or flatten the template to shell-resolvable literal defaults.
+**Configuration parsing is implemented three different ways:**
+- Issue: shell stages use `scripts/infra/config_loader.sh`, agent CLI uses `scripts/infra/config.py`, and preflight uses `configparser.ExtendedInterpolation()` in `scripts/infra/plugins/preflight.py`.
+- Files: `scripts/infra/config_loader.sh`, `scripts/infra/config.py`, `scripts/infra/plugins/preflight.py`, `work/test/config.ini`, `scripts/config.ini.template`
+- Impact: the same `config.ini` can resolve differently across shell stages, Python helpers, and preflight checks, especially for `${section:key}` values used throughout `work/test/config.ini` and `scripts/config.ini.template`.
+- Fix approach: centralize config parsing behind one interpolation-aware implementation and make shell/Python callers share the same resolved values.
 
-**Dock2com helpers still use the wrong config namespace for direct CLI use:**
-- Issue: both `scripts/dock/4_dock2com_1.py` and `scripts/dock/4_dock2com_2.py` load overrides from `DEFAULT_SECTION = "docking"` even though the documented keys live under `[dock2com]` and `[dock2com_ref]`.
-- Files: `scripts/dock/4_dock2com_1.py`, `scripts/dock/4_dock2com_2.py`, `scripts/config.ini.template`, `docs/GUIDE.md`
-- Impact: wrapper-driven runs work because shell wrappers pass explicit arguments, but direct Python invocations silently ignore the documented dock2com config blocks.
-- Fix approach: load `[dock2com]` / `[dock2com_ref]` explicitly or add a required `--config-section` argument and document it in `docs/GUIDE.md`.
+**Large stage scripts still combine validation, orchestration, and job-script generation:**
+- Issue: core workflow scripts build Slurm heredocs, discover inputs, validate config, and execute domain logic in single files.
+- Files: `scripts/dock/2_gnina.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_trj4mmpbsa.sh`, `scripts/infra/executor.py`
+- Impact: small changes are high-risk because command rendering, file contracts, and workflow semantics are tightly coupled.
+- Fix approach: split input discovery, config validation, Slurm rendering, and stage execution into reusable units with direct tests.
 
-**Hand-maintained command/schema docs drift faster than runtime code:**
-- Issue: public command naming is consistently namespaced with `aedmd-*`, but the surrounding workflow/schema documentation is manually duplicated and no longer matches runtime structures.
-- Files: `AGENTS.md`, `.opencode/docs/AGENT-WORKFLOW.md`, `scripts/commands/aedmd-status.sh`, `scripts/commands/common.sh`, `scripts/agents/schemas/handoff.py`, `scripts/run_pipeline.sh`
-- Impact: namespace collision is not detected in current code, but future maintenance risk is high because docs can describe the wrong handoff JSON shape, stage outputs, or command behavior while the names still look correct.
-- Fix approach: generate command inventory and handoff-schema docs from `scripts/run_pipeline.sh`, `scripts/commands/*.sh`, and `scripts/agents/schemas/handoff.py` instead of hand-editing tables.
+**Safety rules documented in `AGENTS.md` are not enforced by runtime code:**
+- Issue: repository guidance says no `rm` outside test workspaces and emphasizes controlled environment handling, but stage scripts still remove files and auto-source environment files without policy checks.
+- Files: `AGENTS.md`, `scripts/rec/3_ana.sh`, `scripts/infra/common.sh`, `scripts/commands/common.sh`, `scripts/setenv.sh`
+- Impact: operator expectations differ from actual runtime behavior, which makes automation behavior harder to trust.
+- Fix approach: codify policy in shared helpers instead of leaving it as documentation-only guidance.
 
-**Large single-file scripts mix parsing, validation, and orchestration:**
-- Issue: several Python and shell entrypoints bundle CLI parsing, filesystem orchestration, domain validation, and output generation in one file.
-- Files: `scripts/dock/0_gro_itp_to_mol2.py`, `scripts/com/0_prep.sh`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_fp.py`, `scripts/dock/2_gnina.sh`
-- Impact: small behavior changes are hard to isolate, review, and test, especially in correctness-sensitive paths such as topology assembly and trajectory analysis.
-- Fix approach: split conversion logic, topology logic, and Slurm-script rendering into reusable functions/modules with direct regression tests.
-
-**Tracked bytecode artifacts remain in the repository:**
-- Issue: committed `__pycache__` trees are present under active script directories.
-- Files: `scripts/agents/__pycache__/`, `scripts/com/__pycache__/`, `scripts/dock/__pycache__/`, `scripts/rec/__pycache__/`, `scripts/infra/__pycache__/`
-- Impact: stale bytecode adds review noise and can obscure whether runtime behavior comes from source changes or leftover compiled artifacts.
-- Fix approach: stop tracking cache directories and ignore them in version control.
+**Core pipeline coverage is missing beyond infrastructure smoke tests:**
+- Issue: current tests only exercise infrastructure helpers and Phase 6 wrappers, not the receptor, docking, complex-prep, MD, or MM/PBSA stage scripts.
+- Files: `tests/phase06_integration_test.sh`, `work/test/infrastructure/test_infra.py`, `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`
+- Impact: regressions in stage contracts are likely to surface only after long-running jobs.
+- Fix approach: add fixture-driven tests for stage argument handling, rendered Slurm scripts, and stage-to-stage artifact contracts.
 
 ## Known Bugs
 
-**Strict atom-name validation can reject RDKit-generated docked GRO files even when atom order is correct:**
-- Symptoms: `scripts/dock/4_dock2com.sh` and `scripts/dock/4_dock2com_ref.sh` can fail during position-restraint generation with `Atom-order/name mismatch between GRO and ITP` after `scripts/dock/4_dock2com_1.py` writes synthetic atom names such as `C1`, `O2`, `N3`.
-- Files: `scripts/dock/4_dock2com_1.py`, `scripts/dock/4_dock2com_2.2.1.py`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_ref.sh`
-- Trigger: run dock2com through the RDKit conversion path on a ligand whose ITP atom names do not match the symbol-plus-index names emitted by `_write_gro_from_records()`.
-- Workaround: use the Open Babel path when available, or pre-generate a ligand GRO whose atom names already match the ITP before calling `scripts/dock/4_dock2com_2.2.1.py`.
+**Agent runner drops the configured `--config` path before executing stage scripts:**
+- Symptoms: slash-command wrappers can dispatch a runner handoff successfully, but the actual stage script runs with default values or an empty config path instead of the requested config file.
+- Files: `scripts/commands/common.sh`, `scripts/agents/runner.py`, `scripts/agents/__main__.py`
+- Trigger: run any runner-backed command such as `scripts/commands/aedmd-rec-ensemble.sh` or `scripts/commands/aedmd-dock-run.sh` with `--config`.
+- Workaround: run stage scripts directly with explicit `--config`, or modify wrapper params so `config` is forwarded as a real script flag.
 
-**Copied dock2com outputs are not self-contained topologies:**
-- Symptoms: the `sys.top` copied into `${COM_DIR}/${ligand}` includes generated files like `*_rec.itp` and `*_clean.itp`, but the wrappers copy only `sys.top`, `complex.gro`, `posre_lig.itp`, `best.gro`, and the original ligand ITP.
-- Files: `scripts/dock/4_dock2com_2.py`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_ref.sh`
-- Trigger: use the copied files under `${general:workdir}/com` or `${general:workdir}/com/ref` as if they were a portable complex-prep bundle.
-- Workaround: run downstream prep from the original ligand docking directory, or manually copy the generated `*_rec.itp` and `*_clean.itp` files alongside `sys.top`.
+**`run_pipeline.sh` advances into downstream stages after async submissions without waiting for outputs:**
+- Symptoms: the wrapper can submit receptor MD, complex MD, or MM/PBSA jobs and then immediately continue into analysis or dependent stages before artifacts exist.
+- Files: `scripts/run_pipeline.sh`, `scripts/rec/1_pr_rec.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_run_mmpbsa.sh`, `scripts/com/2_sub_mmpbsa.sh`, `WORKFLOW.md`
+- Trigger: run `bash scripts/run_pipeline.sh --config <file>` for the default full pipeline.
+- Workaround: run asynchronous stages manually and wait for scheduler completion before invoking dependent stages.
 
-**Analysis and fingerprint stages expect root-level files that the production stage does not create:**
-- Symptoms: `scripts/com/3_ana.sh` and `scripts/com/4_cal_fp.sh` require `com.tpr` and `com_traj.xtc` inside each ligand directory, while `scripts/com/1_pr_prod.sh` produces `prod_*.tpr` and `prod_*.xtc`, and `scripts/com/2_trj4mmpbsa.sh` writes `com.tpr` / `com_traj.xtc` only inside `mmpbsa_*` chunk directories.
-- Files: `scripts/com/1_pr_prod.sh`, `scripts/com/2_trj4mmpbsa.sh`, `scripts/com/3_ana.sh`, `scripts/com/4_cal_fp.sh`, `WORKFLOW.md`, `.opencode/docs/AGENT-WORKFLOW.md`
-- Trigger: run `scripts/com/3_ana.sh` or `scripts/com/4_cal_fp.sh` directly after production MD on a fresh ligand directory.
-- Workaround: manually supply or symlink `com.tpr` and `com_traj.xtc` into the ligand root, or point the fingerprint wrapper at chunk outputs explicitly.
+**Handoff inspection masks failed latest handoffs as success:**
+- Symptoms: `scripts/commands/aedmd-handoff-inspect.sh` can exit successfully even when the latest inspected handoff represents `failure` or `blocked`.
+- Files: `scripts/infra/plugins/handoff_inspect.py`, `scripts/commands/aedmd-handoff-inspect.sh`, `scripts/commands/common.sh`
+- Trigger: inspect a workspace whose newest `.handoffs/*.json` file has status `failure` or `blocked`.
+- Workaround: read the generated `.handoffs/handoff_inspection.json` and the original handoff file directly instead of trusting the wrapper exit code.
 
-**Direct config-driven dock2com Python usage still ignores documented section values:**
-- Symptoms: `python scripts/dock/4_dock2com_1.py --config ...` and `python scripts/dock/4_dock2com_2.py --config ...` do not consume `[dock2com]` / `[dock2com_ref]` keys documented in `scripts/config.ini.template` and `docs/GUIDE.md`.
-- Files: `scripts/dock/4_dock2com_1.py`, `scripts/dock/4_dock2com_2.py`, `scripts/config.ini.template`, `docs/GUIDE.md`
-- Trigger: rely on config-only invocation without passing explicit `--sdf`, `--output`, `--receptor-top`, `--ligand-itp`, or `--output-top` arguments.
-- Workaround: pass all required paths explicitly on the CLI instead of relying on config-based defaults.
+**Group-ID checker looks in the wrong place for normal MM/PBSA outputs:**
+- Symptoms: `scripts/commands/aedmd-group-id-check.sh` validates only one workspace directory root, while MM/PBSA preparation writes `index.ndx` and `mmpbsa_groups.dat` inside ligand directories.
+- Files: `scripts/infra/plugins/group_id_check.py`, `scripts/commands/aedmd-group-id-check.sh`, `scripts/com/2_trj4mmpbsa.sh`
+- Trigger: run the checker against a standard workspace root such as `work/test` instead of a specific ligand directory.
+- Workaround: point the checker at an individual ligand directory that actually contains `index.ndx` and `mmpbsa_groups.dat`.
+
+**Preflight input validation hardcodes `work/input` and can warn on valid workspaces:**
+- Symptoms: preflight reports missing inputs even when a workspace is configured correctly but does not mirror the fixed `work/input` layout.
+- Files: `scripts/infra/plugins/preflight.py`, `work/test/config.ini`, `WORKFLOW.md`
+- Trigger: run `scripts/commands/aedmd-preflight.sh` from a workspace that stores inputs according to config paths rather than under `work/input`.
+- Workaround: treat preflight input warnings as advisory and verify actual configured paths manually.
+
+**Workspace initialization is still project-specific despite being presented as generic:**
+- Symptoms: workspace init warns about missing `rec.pdb`, `ref.pdb`, `dzp`, and `ibp` even though the broader workflow is config-driven and uses receptor/ligand paths from `config.ini`.
+- Files: `scripts/infra/plugins/workspace_init.py`, `scripts/config.ini.template`, `WORKFLOW.md`
+- Trigger: initialize a valid template that lacks those hardcoded filenames.
+- Workaround: ignore those warnings when the template is otherwise complete, or rename assets to match the plugin's assumptions.
 
 ## Security Considerations
 
-**Slurm job scripts interpolate unsanitized ligand names and config values into shell heredocs:**
-- Risk: ligand names, paths, and config-derived values are inserted directly into heredoc-generated batch scripts, which allows shell metacharacters or embedded newlines to alter submitted commands.
-- Files: `scripts/dock/2_gnina.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_sub_mmpbsa.sh`
-- Current mitigation: most direct command calls quote file paths, and the workflow assumes trusted local inputs.
-- Recommendations: restrict ligand identifiers to a safe character set, escape all heredoc substitutions, and reject unsafe config values before writing batch scripts.
-
-**Repository-local environment sourcing executes arbitrary shell on every stage startup:**
-- Risk: `init_script()` and `ensure_env()` source `scripts/setenv.sh` automatically, so any edit to that file executes in every shell stage and command wrapper.
+**Repository-local shell sourcing is an implicit code-execution boundary:**
+- Risk: every shell stage and command wrapper sources `scripts/setenv.sh`, so any edit to that file executes automatically in operator shells and batch-launch contexts.
 - Files: `scripts/infra/common.sh`, `scripts/commands/common.sh`, `scripts/setenv.sh`
 - Current mitigation: none beyond repository trust.
-- Recommendations: keep `scripts/setenv.sh` minimal, validate tool presence separately, and gate auto-sourcing behind an explicit opt-in for unattended runs.
+- Recommendations: make environment sourcing opt-in or validate expected commands without sourcing arbitrary repository shell code.
+
+**Generated Slurm scripts still depend on trusted filesystem and config inputs:**
+- Risk: stage scripts embed config-derived values into heredoc-generated batch files; several values are validated, but path-like fields and some free-form strings still flow into job scripts.
+- Files: `scripts/dock/2_gnina.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_sub_mmpbsa.sh`
+- Current mitigation: some identifiers are restricted with `require_safe_id`, integer checks, and partition validation.
+- Recommendations: validate all interpolated path/string fields before heredoc generation and prefer passing values as arguments or environment files instead of inline shell fragments.
 
 ## Performance Bottlenecks
 
-**Nested frame × residue distance loops dominate contact analysis time:**
-- Problem: contact code walks every trajectory frame and then every receptor residue, rebuilding a full residue-to-ligand distance array for each residue.
-- Files: `scripts/com/3_com_ana_trj.py`, `scripts/com/4_fp.py`
-- Cause: `compute_contact_frequency()` and `calculate_fingerprints()` use nested Python loops around `mda.lib.distances.distance_array()` instead of vectorized residue-contact workflows.
-- Improvement path: precompute residue atom groups, use MDAnalysis contact utilities, or compute one receptor–ligand distance tensor per frame instead of one matrix per residue.
-
-**Fingerprint heatmap creation scales quadratically with frame count:**
-- Problem: `_pairwise_dice()` materializes an `n_frames × n_frames` dense matrix and `_write_heatmap_png()` renders the full matrix regardless of trajectory length.
-- Files: `scripts/com/4_fp.py`
-- Cause: full pairwise similarity is computed for every frame pair.
-- Improvement path: sample frames, use a windowed/banded comparison, or make heatmap generation optional above a frame threshold.
-
-**RMSF computation loads every frame into memory before reduction:**
-- Problem: `compute_rmsf()` appends every coordinate frame into `coords` and then runs `np.stack()` on the full trajectory.
-- Files: `scripts/com/3_com_ana_trj.py`
-- Cause: the implementation uses batch statistics instead of streaming accumulation.
-- Improvement path: replace the list-of-arrays approach with online mean/variance accumulation or chunked frame processing.
-
-**Docking parallelism stops at one Slurm job per ligand:**
-- Problem: each docking job loops serially across `seq 0 $((ENSEMBLE_SIZE - 1))` inside the job body.
+**Docking scheduling scales only at ligand-job granularity:**
+- Problem: each ligand is submitted as one Slurm job, and receptor conformers are processed inside that job with bounded background parallelism.
 - Files: `scripts/dock/2_gnina.sh`
-- Cause: scheduling is ligand-level only, not receptor–ligand-pair level.
-- Improvement path: move receptor conformers into a Slurm array or split each receptor–ligand pair into an independent task.
+- Cause: the script submits per-ligand jobs and loops over receptor indices inside the batch script.
+- Improvement path: submit receptor–ligand pairs as array tasks and merge outputs afterward.
+
+**Log monitoring utilities read entire files repeatedly:**
+- Problem: monitoring methods load whole logs into memory for status checks, summary generation, and even `tail()`.
+- Files: `scripts/infra/monitor.py`
+- Cause: `_read_lines()` reads full files and higher-level methods call it repeatedly.
+- Improvement path: stream incremental reads, cache parsed state, and implement real seek-based tailing for large HPC logs.
+
+**Executor and stage wrappers offer little batching around scheduler polling:**
+- Problem: common Slurm helpers rely on repeated `squeue`/`sacct` polling and many stages submit one job per ligand/trial independently.
+- Files: `scripts/infra/common.sh`, `scripts/infra/executor.py`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_sub_mmpbsa.sh`
+- Cause: orchestration is mostly per-job rather than array- or stage-batch-oriented.
+- Improvement path: consolidate polling, use richer array jobs, and record job dependency graphs instead of launching many small independent submissions.
 
 ## Fragile Areas
 
-**Topology assembly and include propagation depend on filename conventions and intermediate side files:**
-- Files: `scripts/dock/4_dock2com_2.py`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_ref.sh`, `scripts/com/0_prep.sh`
-- Why fragile: `scripts/dock/4_dock2com_2.py` emits generated `*_rec.itp` and `*_clean.itp` files beside `sys.top`, wrapper copy logic looks for `rec.itp` instead, and `scripts/com/0_prep.sh` has its own topology-construction path.
-- Safe modification: change topology handling only after validating both the original ligand directory workflow and the copied `${COM_DIR}` outputs for AMBER and CHARMM cases.
-- Test coverage: no automated tests detected for include propagation, copied-output completeness, or cross-wrapper topology consistency.
-
-**Production-to-analysis file contracts are internally inconsistent:**
-- Files: `scripts/com/1_pr_prod.sh`, `scripts/com/2_trj4mmpbsa.sh`, `scripts/com/3_ana.sh`, `scripts/com/4_cal_fp.sh`, `WORKFLOW.md`, `.opencode/docs/AGENT-WORKFLOW.md`
-- Why fragile: stage documentation describes analysis of production outputs, but analysis wrappers search for MM/PBSA-style filenames in different locations.
-- Safe modification: align on one canonical analysis input contract (`prod_*` or generated `com_*`) and update both wrappers and docs together.
-- Test coverage: no automated tests detected for stage-to-stage artifact naming or analysis-target discovery.
+**Stage contracts between runner/analyzer/wrappers are easy to break:**
+- Files: `scripts/commands/common.sh`, `scripts/agents/runner.py`, `scripts/agents/analyzer.py`, `scripts/agents/schemas/state.py`, `scripts/agents/utils/routing.py`
+- Why fragile: wrappers, stage enums, explicit script mapping, and agent command builders are maintained separately; one mismatch silently changes what script actually runs.
+- Safe modification: update stage enums, command mappings, and wrapper dispatch behavior together, then validate generated handoffs end to end.
+- Test coverage: only infrastructure-level smoke coverage exists in `tests/phase06_integration_test.sh` and `work/test/infrastructure/test_infra.py`.
 
 **Environment bootstrap is brittle in non-interactive shells:**
-- Files: `scripts/infra/common.sh`, `scripts/commands/common.sh`, `scripts/setenv.sh`
-- Why fragile: `conda activate autoEnsmblDockMD` is sourced without checking that Conda shell hooks are loaded, and every stage assumes the source succeeds.
-- Safe modification: make activation idempotent, tolerate already-active environments, and detect missing Conda initialization before sourcing.
-- Test coverage: no automated tests detected for shell initialization behavior.
+- Files: `scripts/setenv.sh`, `scripts/infra/common.sh`, `scripts/commands/common.sh`
+- Why fragile: `scripts/setenv.sh` runs `conda activate autoEnsmblDockMD` without initializing Conda shell hooks or checking whether activation succeeded.
+- Safe modification: make activation idempotent, detect missing Conda initialization explicitly, and fail with a clear message when the environment cannot be activated.
+- Test coverage: no automated coverage detected for shell startup behavior.
+
+**MM/PBSA helper plugins assume workspace layouts that differ from stage outputs:**
+- Files: `scripts/infra/plugins/group_id_check.py`, `scripts/infra/plugins/preflight.py`, `scripts/com/2_trj4mmpbsa.sh`, `work/test/config.ini`
+- Why fragile: plugins inspect fixed locations while the pipeline writes many outputs per ligand and relies heavily on config-driven paths.
+- Safe modification: derive plugin paths from resolved config and ligand targets instead of hardcoded workspace conventions.
+- Test coverage: wrapper tests cover missing-file behavior, not successful validation against real per-ligand outputs.
 
 ## Scaling Limits
 
-**Trajectory analysis runtime and memory are bounded by dense in-memory arrays:**
-- Current capacity: limited by `n_frames × n_atoms × 3` storage in `scripts/com/3_com_ana_trj.py` and by `n_frames × n_residues` plus `n_frames × n_frames` matrices in `scripts/com/4_fp.py`; no hard safety threshold is enforced.
-- Limit: long production trajectories can exhaust memory or make analysis impractically slow.
-- Scaling path: chunk trajectories, stream per-frame statistics, and disable quadratic outputs automatically above a configured size.
+**Job count grows with ligands × trials × MM/PBSA chunks:**
+- Current capacity: `scripts/com/1_pr_prod.sh` submits one equilibration job and one dependent production job per ligand/trial, and `scripts/com/2_sub_mmpbsa.sh` submits one array per ligand.
+- Limit: large ligand sets create many scheduler objects and long orchestration times before computation even starts.
+- Scaling path: consolidate jobs with larger arrays and make job metadata machine-readable for resumable monitoring.
 
-**Docking throughput grows linearly with ligand count times ensemble size:**
-- Current capacity: one submitted job per ligand, with each job looping over all receptor conformers in `scripts/dock/2_gnina.sh`.
-- Limit: a single slow receptor blocks completion of the whole ligand job, and large ensembles waste available cluster parallelism.
-- Scaling path: submit receptor–ligand pairs independently and merge results after all pair jobs complete.
+**Single-node analysis assumptions limit large-trajectory handling:**
+- Current capacity: analysis and monitoring helpers assume local file access and in-memory processing on one node.
+- Limit: large log files and large trajectory-derived outputs become slow or memory-heavy to inspect and summarize.
+- Scaling path: stream outputs, checkpoint partial analysis, and separate metadata collection from heavy numeric processing.
 
 ## Dependencies at Risk
 
-**Dual RDKit / Open Babel conversion backends do not share a validated atom-naming contract:**
-- Risk: `scripts/dock/4_dock2com_1.py` can generate `best.gro` through either RDKit or `obabel`, but the later hard validation in `scripts/dock/4_dock2com_2.2.1.py` assumes the backend preserves ITP-compatible atom names and ordering.
-- Impact: identical inputs can behave differently depending on which backend is installed, causing backend-specific dock2com failures.
-- Migration plan: standardize on one supported backend or add an explicit normalization step that maps converted GRO atoms to the ligand ITP before validation.
+**Workflow correctness depends on external HPC tools with only runtime availability checks:**
+- Risk: many stages require `gmx`, `gnina`, `gmx_MMPBSA`, `sbatch`, `squeue`, and `sacct`, but compatibility and feature assumptions are validated only when stages start.
+- Impact: failures appear late after workspace setup and partial job submission.
+- Migration plan: extend preflight to verify tool versions and scheduler capabilities against the expectations documented in `WORKFLOW.md` and `scripts/env.yml`.
 
 ## Missing Critical Features
 
-**No regression checks for nm↔Å conversion and atom-order preservation across the ligand-conversion chain:**
-- Problem: current code scales coordinates in `scripts/dock/4_dock2com_1.py` and `scripts/dock/0_gro_itp_to_mol2.py`, and analysis scripts report angstrom-based metrics in `scripts/com/3_com_ana_trj.py` and `scripts/com/4_fp.py`, but there is no automated guard that proves unit labels and atom ordering stay correct end to end.
-- Blocks: safe extension to new ligand sources, conversion backends, or refactors in the dock-to-complex path.
+**No end-to-end regression test for the full config-to-wrapper-to-stage path:**
+- Problem: there is no automated proof that a wrapper command passes config, workspace, and params correctly into the underlying stage script.
+- Blocks: safe refactoring of `scripts/commands/common.sh`, `scripts/agents/__main__.py`, and `scripts/agents/runner.py`.
 
-**No automated check that workflow docs match actual handoff JSON and stage artifact contracts:**
-- Problem: `.opencode/docs/AGENT-WORKFLOW.md` documents an `inputs` / `outputs` / `next_action` handoff schema, while `scripts/agents/schemas/handoff.py` serializes `from_agent`, `to_agent`, `data`, `warnings`, `errors`, `recommendations`, and `metadata`.
-- Blocks: reliable agent orchestration based on documentation alone, and safe doc edits during future namespace or workflow updates.
-
-**No automated script-level test suite for core pipeline stages:**
-- Problem: no `*.test.*` or `*.spec.*` files are present for the shell/Python workflow scripts despite heavy branching across `scripts/dock/*.py`, `scripts/com/*.sh`, and `scripts/infra/*.sh`.
-- Blocks: low-risk refactoring of correctness-sensitive pipeline logic without manual end-to-end reruns.
+**No workflow-level wait/resume contract inside `run_pipeline.sh`:**
+- Problem: the top-level wrapper does not pause on async stages or persist scheduler state needed for deterministic resume.
+- Blocks: reliable unattended full-pipeline runs from `scripts/run_pipeline.sh` alone.
 
 ## Test Coverage Gaps
 
-**Dock2com backend behavior and restraint validation are untested:**
-- What's not tested: RDKit-vs-Open-Babel conversion parity, GRO atom naming normalization, generated `*_clean.itp` / `*_rec.itp` propagation, and strict GRO↔ITP validation behavior.
-- Files: `scripts/dock/4_dock2com_1.py`, `scripts/dock/4_dock2com_2.py`, `scripts/dock/4_dock2com_2.2.1.py`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_ref.sh`
-- Risk: correctness fixes around atom-name/order mismatches can still break one backend or one wrapper path silently.
+**Agent wrapper execution path is under-tested:**
+- What's not tested: whether wrapper `--config` arguments propagate into executed stage scripts, whether analyzer/runner mappings stay correct, and whether failed handoffs return the right exit code.
+- Files: `scripts/commands/common.sh`, `scripts/agents/__main__.py`, `scripts/agents/runner.py`, `scripts/infra/plugins/handoff_inspect.py`
+- Risk: orchestration can appear healthy while running with the wrong config or masking failures.
 - Priority: High
 
-**Production-to-analysis artifact discovery is untested:**
-- What's not tested: whether `scripts/com/1_pr_prod.sh` outputs can be consumed directly by `scripts/com/3_ana.sh` and `scripts/com/4_cal_fp.sh`, or whether MM/PBSA chunk outputs are the real expected inputs.
-- Files: `scripts/com/1_pr_prod.sh`, `scripts/com/2_trj4mmpbsa.sh`, `scripts/com/3_ana.sh`, `scripts/com/4_cal_fp.sh`
-- Risk: analysis stages can fail late or be run against unintended files after long production jobs complete.
+**Async stage sequencing is untested:**
+- What's not tested: that `scripts/run_pipeline.sh` respects Slurm completion boundaries between `rec_prod`, `com_prod`, `com_mmpbsa`, and downstream stages.
+- Files: `scripts/run_pipeline.sh`, `scripts/rec/1_pr_rec.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_run_mmpbsa.sh`, `scripts/com/2_sub_mmpbsa.sh`
+- Risk: full pipeline runs can fail late because dependent stages start before required artifacts exist.
 - Priority: High
 
-**Config loading and documentation contracts are untested:**
-- What's not tested: `${section:key}` interpolation behavior, direct Python helper section selection, `aedmd-*` command documentation drift, and handoff-schema agreement between docs and runtime JSON.
-- Files: `scripts/infra/config_loader.sh`, `scripts/config.ini.template`, `scripts/dock/4_dock2com_1.py`, `scripts/dock/4_dock2com_2.py`, `AGENTS.md`, `.opencode/docs/AGENT-WORKFLOW.md`, `scripts/agents/schemas/handoff.py`
-- Risk: users can follow current docs and still hit setup or orchestration failures without any failing unit test to catch the mismatch.
+**Plugin assumptions versus real workspace layouts are untested:**
+- What's not tested: successful plugin behavior against real ligand directories, config-resolved paths, and non-template workspaces.
+- Files: `scripts/infra/plugins/preflight.py`, `scripts/infra/plugins/group_id_check.py`, `scripts/infra/plugins/workspace_init.py`, `scripts/com/2_trj4mmpbsa.sh`
+- Risk: support tooling can produce false warnings or validate the wrong directory structure.
 - Priority: High
 
 ---
 
-*Concerns audit: 2026-04-19*
+*Concerns audit: 2026-04-29*

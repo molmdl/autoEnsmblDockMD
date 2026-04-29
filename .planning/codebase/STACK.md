@@ -1,96 +1,90 @@
 # Technology Stack
 
-**Analysis Date:** 2026-04-19
+**Analysis Date:** 2026-04-29
 
 ## Languages
 
 **Primary:**
-- Bash Not pinned - primary workflow orchestration in `scripts/run_pipeline.sh`, `scripts/rec/*.sh`, `scripts/dock/*.sh`, `scripts/com/*.sh`, `scripts/infra/*.sh`, and `scripts/commands/*.sh`
-- Python >=3.11 - analysis, conversion, agent, and infrastructure code in `scripts/com/*.py`, `scripts/dock/*.py`, `scripts/rec/5_align.py`, `scripts/agents/*.py`, and `scripts/infra/*.py`; version floor is declared in `scripts/env.yml`
+- Bash - pipeline orchestration, scheduler submission, and stage wrappers in `scripts/run_pipeline.sh`, `scripts/rec/*.sh`, `scripts/dock/*.sh`, `scripts/com/*.sh`, and `scripts/commands/*.sh`
+- Python 3.11+ - analysis cores, config/state helpers, plugins, and agent entrypoints in `scripts/env.yml`, `scripts/infra/*.py`, `scripts/agents/*.py`, `scripts/dock/*.py`, `scripts/com/*.py`, and `scripts/rec/5_align.py`
 
 **Secondary:**
-- INI Not pinned - runtime configuration format in `scripts/config.ini.template`, loaded by `scripts/infra/config_loader.sh` and `scripts/infra/config.py`
-- YAML Not pinned - Conda/runtime metadata in `scripts/env.yml` and dependency automation config in `.github/dependabot.yml`
-- JSON Not pinned - OpenCode/editor configuration in `opencode.json`, `.opencode/package.json`, and `.opencode/package-lock.json`
+- JavaScript (ES modules) - OpenCode plugin bridges in `.opencode/plugins/*.js`
+- INI/YAML/JSON - runtime configuration and plugin metadata in `scripts/config.ini.template`, `scripts/env.yml`, `opencode.json`, and `.opencode/package.json`
 
 ## Runtime
 
 **Environment:**
-- Conda environment `autoEnsmblDockMD` from `scripts/env.yml`; activated by `scripts/setenv.sh`
-- Bash-driven local/HPC shell runtime for all stage entrypoints under `scripts/`
-- Python CLI runtime for agent dispatch in `scripts/commands/common.sh` and Python stage scripts launched by `scripts/run_pipeline.sh`
+- Conda environment `autoEnsmblDockMD` activated by `scripts/setenv.sh`
+- Python >=3.11 declared in `scripts/env.yml`
+- Node.js runtime required for `.opencode/plugins/*.js`; version is not pinned in `.opencode/package.json`
 
 **Package Manager:**
-- Conda Version not pinned - primary environment manager defined by `scripts/env.yml`
-- pip Version not pinned - secondary installer inside `scripts/env.yml` for `gmx_MMPBSA` and related Amber packages
-- npm Version not pinned - plugin-only package manager for `.opencode/package.json`
-- Lockfile: present in `.opencode/package-lock.json`; no root-level Node or Python lockfile is detected for the main workflow code
+- Conda for base scientific environment in `scripts/env.yml`
+- pip for Python packages nested under `scripts/env.yml`
+- npm for OpenCode plugin dependency installation in `.opencode/package.json`
+- Lockfile: present for plugin dependencies at `.opencode/package-lock.json`; missing for the root scientific environment because `scripts/env.yml` is the source of truth
 
 ## Frameworks
 
 **Core:**
-- Script-first pipeline Not applicable - the main execution model is the stage wrapper `scripts/run_pipeline.sh`, not a web/application framework
-- MDAnalysis 2.7.0 - structure alignment and trajectory analysis in `scripts/rec/5_align.py`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_fp.py`, and `scripts/com/3_selection_defaults.py`
-- OpenCode agent layer via `@opencode-ai/plugin` 1.4.0 - experimental orchestration configured in `opencode.json`, `.opencode/package.json`, `AGENTS.md`, and `scripts/commands/*.sh`
+- Script-first CLI pipeline - stage dispatcher in `scripts/run_pipeline.sh` coordinates the workflow defined across `scripts/rec/`, `scripts/dock/`, and `scripts/com/`
+- OpenCode agent runtime - agent bridge and handoff execution in `scripts/commands/common.sh`, `scripts/agents/__main__.py`, and `opencode.json`
+- OpenCode plugin SDK `@opencode-ai/plugin` 1.4.0 - native plugin layer in `.opencode/package.json` and `.opencode/plugins/package.json`
 
 **Testing:**
-- Not detected - no `pytest`, `jest`, `vitest`, `unittest` runner config, or `.github/workflows/*` CI test workflow is present in the explored repository files
+- Shell integration testing - end-to-end wrapper/plugin validation in `tests/phase06_integration_test.sh`
+- Python standard tooling - plugin syntax/import validation patterns referenced by `scripts/infra/plugins/dry_run_audit.sh`
 
 **Build/Dev:**
-- Conda environment spec Not pinned - reproducible scientific runtime setup in `scripts/env.yml`
-- Dependabot Not pinned - dependency update automation for the Conda ecosystem in `.github/dependabot.yml`
-- No compiled build step detected - there is no Dockerfile, Makefile, packaging backend, or frontend bundler in the explored root files
+- Conda environment build via `conda env create -f scripts/env.yml` documented in `README.md`
+- INI-based configuration loading through `scripts/infra/config_loader.sh` and `scripts/infra/config.py`
+- Slurm-backed execution as the operational job runner in `scripts/infra/common.sh`, `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/1_pr_prod.sh`, and `scripts/com/2_sub_mmpbsa.sh`
 
 ## Key Dependencies
 
 **Critical:**
-- `mdanalysis=2.7.0` - required for receptor alignment and advanced complex analysis in `scripts/rec/5_align.py`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_fp.py`, and `scripts/com/3_selection_defaults.py`
-- `numpy=1.26.4` - numeric backbone for RMSD/RMSF/contact and fingerprint calculations in `scripts/com/3_com_ana_trj.py` and `scripts/com/4_fp.py`
-- `matplotlib=3.7.3` - non-interactive plot generation in `scripts/com/3_com_ana_trj.py` and `scripts/com/4_fp.py`
-- `ambertools=23.6` - Amber-side topology/MM-PBSA support declared in `scripts/env.yml` and used with the AMBER branch documented in `scripts/com/0_prep.sh` and `scripts/com/2_mmpbsa.sh`
-- `gmx_MMPBSA` Version not pinned - MM/PBSA engine invoked by `scripts/com/2_mmpbsa.sh`
-- `@opencode-ai/plugin@1.4.0` - OpenCode integration dependency declared in `.opencode/package.json`
+- GROMACS >= 2022 - core receptor prep, MD, and trajectory tooling invoked throughout `scripts/rec/0_prep.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, and `scripts/com/2_trj4mmpbsa.sh`
+- `gnina` - docking engine required by `scripts/dock/2_gnina.sh`
+- `gmx_MMPBSA` - MM/PBSA engine required by `scripts/com/2_mmpbsa.sh` and installed from `scripts/env.yml`
+- `MDAnalysis` 2.7.0 - trajectory analysis and alignment in `scripts/env.yml`, `scripts/com/3_com_ana_trj.py`, and `scripts/rec/5_align.py`
+- `mdtraj` 1.10.0 - scientific trajectory support installed from `scripts/env.yml`
+- `ambertools` 23.6 - AMBER-oriented preparation utilities installed from `scripts/env.yml`
 
 **Infrastructure:**
-- `gmx` External CLI - required across receptor prep, complex prep, MD, and analysis in `scripts/rec/0_prep.sh`, `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_trj4mmpbsa.sh`, and `scripts/com/3_ana.sh`
-- `gnina` External CLI - docking engine required by `scripts/dock/2_gnina.sh`
-- `pdb2pqr` / `pdb2pqr30` External CLI - receptor protonation tool required by `scripts/rec/0_prep.sh`
-- `propka` Version from Conda environment - bundled with the protonation toolchain in `scripts/env.yml`
-- `obabel` Optional external CLI - ligand conversion helper used by `scripts/dock/0_sdf2gro.sh` and as fallback in `scripts/dock/4_dock2com_1.py`
-- `rdkit` Optional Python package - in-process SDF-to-GRO conversion path in `scripts/dock/4_dock2com_1.py`; not pinned in `scripts/env.yml`
-- `sbatch` / `squeue` / `sacct` External CLI - Slurm job submission and monitoring used by `scripts/infra/common.sh`, `scripts/dock/2_gnina.sh`, `scripts/rec/0_prep.sh`, and `scripts/com/1_pr_prod.sh`
-- `mpirun` External CLI - MPI launcher used for `gmx_MMPBSA` in `scripts/com/2_mmpbsa.sh`
-- `jq` External CLI - JSON assembly/parsing for slash-command bridges in `scripts/commands/common.sh` and `scripts/commands/aedmd-status.sh`
+- `pdb2pqr` and `propka` - receptor protonation path declared in `scripts/env.yml` and used in `scripts/rec/0_prep.sh`
+- `apbs` - electrostatics dependency installed in `scripts/env.yml`
+- `numpy` 1.26.4, `scipy` 1.14.1, `scikit-learn` 1.5.2, `matplotlib` 3.7.3, `networkx` 3.3, and `biopython` - analysis/conversion support installed in `scripts/env.yml` and used by `scripts/com/3_com_ana_trj.py` and docking helpers under `scripts/dock/*.py`
+- `parmed` 4.2.2 - topology handling installed in `scripts/env.yml`
+- `requests` 2.32.3 and `urllib3` 2.2.3 - available in `scripts/env.yml`, but direct outbound HTTP usage is not detected in active pipeline code under `scripts/`
+- `jq` - JSON parameter and handoff manipulation in `scripts/commands/common.sh` and `tests/phase06_integration_test.sh`
+- `@opencode-ai/plugin` 1.4.0 and transitive `zod` 4.1.8 / `@opencode-ai/sdk` 1.4.0 - plugin runtime dependencies resolved in `.opencode/package-lock.json`
 
 ## Configuration
 
 **Environment:**
-- Source `scripts/setenv.sh` before running workflow or slash-command wrappers; it activates the `autoEnsmblDockMD` Conda environment declared in `scripts/env.yml`
-- Create run configs from `scripts/config.ini.template`; active workspaces typically place the file at `work/test/config.ini` or another path passed to `scripts/run_pipeline.sh --config`
-- Keep required sections aligned to `scripts/config.ini.template`: `[general]`, `[slurm]`, `[receptor]`, `[dock]`, `[docking]`, `[dock2com]`, `[dock2com_ref]`, `[complex]`, `[production]`, `[mmpbsa]`, and `[analysis]`
-- Bash-stage overrides use environment variables generated by `scripts/infra/config_loader.sh`; follow the `SECTION_KEY` convention such as `GENERAL_WORKDIR`, `SLURM_PARTITION`, `DOCKING_MODE`, and `MMPBSA_MPI_RANKS`
-- Python-side config loading uses `scripts/infra/config.py` and `scripts/agents/__main__.py`
+- Use `scripts/config.ini.template` as the canonical run configuration; it defines `[general]`, `[slurm]`, `[receptor]`, `[dock]`, `[docking]`, `[dock2com]`, `[dock2com_ref]`, `[complex]`, `[production]`, `[mmpbsa]`, `[analysis]`, `[fingerprint]`, `[archive]`, `[rerun]`, and `[monitor_patterns]`
+- Source `scripts/setenv.sh` before wrappers or stage scripts so the `autoEnsmblDockMD` conda environment is active
+- Use `SECTION_KEY` environment overrides generated by `scripts/infra/config_loader.sh`; examples already supported by that loader include variables such as `GENERAL_WORKDIR`, `SLURM_PARTITION`, `DOCKING_MODE`, and `MMPBSA_MPI_RANKS`
+- Expect runtime tool availability from the active shell rather than from checked-in secrets or service credentials; preflight validates this in `scripts/infra/plugins/preflight.py`
 
 **Build:**
-- Runtime manifests: `scripts/env.yml`, `.opencode/package.json`, `.opencode/package-lock.json`
-- Execution entrypoints: `scripts/run_pipeline.sh`, `scripts/commands/*.sh`, and `scripts/agents/__main__.py`
-- OpenCode configuration: `opencode.json`
-- Dependency automation config: `.github/dependabot.yml`
+- Core environment definition: `scripts/env.yml`
+- Canonical run config template: `scripts/config.ini.template`
+- OpenCode runtime config: `opencode.json`
+- Plugin package manifests: `.opencode/package.json` and `.opencode/plugins/package.json`
 
 ## Platform Requirements
 
 **Development:**
-- Linux/HPC shell environment with Conda available to create `scripts/env.yml`
-- `bash`, `python`, and `jq` available for `scripts/run_pipeline.sh` and `scripts/commands/common.sh`
-- Scientific executables on `PATH`: `gmx`, `gnina`, `gmx_MMPBSA`, `pdb2pqr`; optional `obabel`; optional `rdkit` for the Python fallback in `scripts/dock/4_dock2com_1.py`
-- Workspace layout matching `WORKFLOW.md` and `docs/GUIDE.md`, with user inputs stored under `work/input` or a run-specific `workdir`
+- Linux/bash environment expected by `scripts/run_pipeline.sh` and the stage scripts under `scripts/`
+- Conda installation required by `README.md`, `WORKFLOW.md`, and `scripts/setenv.sh`
+- Local availability of `gmx`, `gnina`, `gmx_MMPBSA`, `sbatch`, `squeue`, `sacct`, `mpirun`, and optional `obabel`; command checks are enforced in `scripts/infra/common.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/2_mmpbsa.sh`, and `scripts/dock/0_sdf2gro.sh`
 
 **Production:**
-- Local filesystem workspace rooted by `[general] workdir` from `scripts/config.ini.template`
-- Slurm-backed execution target for heavy stages, with GPU partitions used by `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/0_prep.sh`, and `scripts/com/1_pr_prod.sh`
-- CPU-oriented MM/PBSA batch execution through `scripts/com/2_sub_mmpbsa.sh` and MPI execution in `scripts/com/2_mmpbsa.sh`
-- No container, SaaS deployment, or web-hosting target detected in `README.md`, `WORKFLOW.md`, or root configuration files
+- Primary target is Slurm-based HPC execution with GPU and CPU partitions, as encoded in `scripts/config.ini.template`, `scripts/infra/common.sh`, `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/1_pr_prod.sh`, and `scripts/com/2_sub_mmpbsa.sh`
+- Local execution remains available for lightweight validation and plugin flows, especially via `scripts/infra/plugins/*.py`, `scripts/commands/*.sh`, and `tests/phase06_integration_test.sh`
 
 ---
 
-*Stack analysis: 2026-04-19*
+*Stack analysis: 2026-04-29*

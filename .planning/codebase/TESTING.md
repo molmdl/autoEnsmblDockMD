@@ -1,152 +1,172 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-04-19
+**Analysis Date:** 2026-04-29
 
 ## Test Framework
 
 **Runner:**
-- No dedicated automated unit-test runner is detected in the project root or under `scripts/`; `pytest.ini`, `tox.ini`, `jest.config.*`, `vitest.config.*`, and `tests/` are not present under `/share/home/nglokwan/autoEnsmblDockMD`.
-- Current verification is script-level and document-driven, centered on `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- No dedicated test runner such as `pytest`, `unittest` discovery, `jest`, or `vitest` is configured in `/share/home/nglokwan/autoEnsmblDockMD`; `pytest.ini`, `tox.ini`, `pyproject.toml`, `jest.config.*`, and `vitest.config.*` are not present.
+- Committed automated checks use executable test scripts instead: `tests/phase06_integration_test.sh` for wrapper/plugin integration and `work/test/infrastructure/test_infra.py` for infrastructure integration.
 - Config: Not detected.
 
 **Assertion Library:**
-- Not applicable as a formal test framework.
-- Current assertions rely on shell exit codes, Python syntax compilation, artifact existence, JSON handoff status values, and verification report checklists in `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- Shell assertions rely on exit codes, `test -f`, captured `$?`, and JSON field inspection with `jq` inside `tests/phase06_integration_test.sh`.
+- Python assertions rely on built-in `assert` statements and plain exception handling inside `work/test/infrastructure/test_infra.py`.
 
 **Run Commands:**
 ```bash
-for cmd in scripts/commands/aedmd-*.sh; do bash -n "$cmd"; done   # Syntax-check command wrappers
-python -m py_compile scripts/agents/*.py scripts/infra/*.py         # Syntax-check Python modules
-source ./scripts/setenv.sh && bash scripts/commands/aedmd-status.sh --workdir work/my_project   # Wrapper smoke check after env init
+bash tests/phase06_integration_test.sh                                         # Run wrapper/plugin integration checks
+python work/test/infrastructure/test_infra.py                                  # Run infrastructure integration checks
+bash -n tests/phase06_integration_test.sh && python -m py_compile scripts/agents/*.py scripts/infra/*.py   # Syntax/smoke validation
 ```
 
 ## Test File Organization
 
 **Location:**
-- No co-located test tree is detected under `scripts/`, `tests/`, or `src/`.
-- Validation evidence is stored as planning artifacts under `.planning/phases/**`, especially `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- Shell integration tests live under `tests/`, currently `tests/phase06_integration_test.sh`.
+- Python integration tests live in a disposable validation workspace under `work/test/infrastructure/`, currently `work/test/infrastructure/test_infra.py`.
+- There is no co-located `test_*.py` tree under `scripts/`.
 
 **Naming:**
-- Verification documents use `*-VERIFICATION.md`, `*-SUMMARY.md`, and `*-e2e-test-report.md` naming under `.planning/phases/**`.
-- No `test_*.py`, `*.spec.py`, `*.test.sh`, or `*.test.ts` files are present in the project code.
+- Shell integration tests use descriptive workflow names ending in `_integration_test.sh`, following `tests/phase06_integration_test.sh`.
+- Python tests use `test_*.py` naming even without `pytest`, following `work/test/infrastructure/test_infra.py`.
 
 **Structure:**
 ```text
-.planning/phases/<phase>/<plan>-VERIFICATION.md
-.planning/phases/<phase>/<plan>-SUMMARY.md
-.planning/phases/<phase>/<plan>-e2e-test-report.md
+tests/
+└── phase06_integration_test.sh
+
+work/test/infrastructure/
+└── test_infra.py
 ```
 
 ## Test Structure
 
 **Suite Organization:**
-```bash
-for cmd in scripts/commands/aedmd-{rec-ensemble,dock-run,com-setup,com-md,com-mmpbsa,com-analyze,checker-validate,debugger-diagnose,orchestrator-resume,status}.sh; do
-  bash -n "$cmd"
-done
+```python
+def run_all_tests():
+    tests = [
+        test_config_to_executor_integration,
+        test_checkpoint_to_verification_integration,
+        test_executor_to_monitor_integration,
+        test_state_persistence_across_operations,
+    ]
+
+    passed = 0
+    failed = 0
+    for test in tests:
+        try:
+            test()
+            passed += 1
+        except Exception as e:
+            print(f"  ✗ FAILED: {e}")
+            failed += 1
 ```
+- The pattern above comes directly from `work/test/infrastructure/test_infra.py`.
 
 **Patterns:**
-- Setup pattern: initialize the environment with `source ./scripts/setenv.sh` before running wrapper smoke checks, as documented in `README.md`, `AGENTS.md`, and `docs/GUIDE.md`.
-- Setup pattern: create a disposable workspace from `scripts/config.ini.template`, following the workspace guidance in `README.md` and `AGENTS.md`.
-- Teardown pattern: no centralized teardown harness is detected; current checks are mostly syntax/help/report validation and read-only inspection.
-- Assertion pattern: treat a zero exit code, valid syntax, expected artifact presence, and correct handoff status strings (`success`, `needs_review`, `failure`, `blocked`) from `scripts/commands/common.sh` and `scripts/agents/schemas/handoff.py` as the primary pass/fail signals.
-- Regression pattern after the namespace fixes: verify documentation and wrappers use the `aedmd-*` command names shown in `README.md`, `docs/EXPERIMENTAL.md`, `docs/GUIDE.md`, `AGENTS.md`, and `.opencode/docs/AGENT-WORKFLOW.md`.
+- Setup pattern: shell tests create isolated temporary workspaces in `/tmp` and seed required files before invoking wrappers, following `tests/phase06_integration_test.sh`.
+- Setup pattern: Python tests use `tempfile.NamedTemporaryFile(...)` and `tempfile.TemporaryDirectory()` to build disposable config, checkpoint, gate, and state fixtures in `work/test/infrastructure/test_infra.py`.
+- Teardown pattern: shell tests register `trap cleanup EXIT` and delete temporary directories in `tests/phase06_integration_test.sh`; Python tests rely on `TemporaryDirectory()` context managers in `work/test/infrastructure/test_infra.py`.
+- Assertion pattern: verify files, persisted state, enum outcomes, and handoff statuses instead of internal implementation details, following `tests/phase06_integration_test.sh` and `work/test/infrastructure/test_infra.py`.
 
 ## Mocking
 
 **Framework:**
-- None detected.
+- None.
 
 **Patterns:**
-```python
-def check_return_code(data: Dict[str, Any]) -> CheckResult:
-    returncode = data.get("returncode")
-    if returncode is None:
-        return CheckResult(level="warning", message="returncode not provided for validation.")
-    if int(returncode) != 0:
-        return CheckResult(level="error", message=f"Stage returned non-zero exit code: {returncode}")
-    return CheckResult(level="info", message="Return code indicates success.")
+```bash
+set +e
+"${PROJECT_ROOT}/scripts/commands/aedmd-group-id-check.sh" --workspace "${TEST_WORKSPACE}"
+GROUP_EXIT=$?
+set -e
+
+if [[ $GROUP_EXIT -ne 0 ]]; then
+  echo "  ✓ Wrapper returned non-zero on missing index"
+fi
 ```
-- The dominant pattern is to validate concrete execution results, logs, files, and handoff payloads rather than replacing dependencies with mocks. The example above comes from `scripts/agents/checker.py`.
+- The dominant pattern in `tests/phase06_integration_test.sh` is to exercise real wrappers and inspect their real outputs rather than replace dependencies with mocks.
 
 **What to Mock:**
-- Not documented as a project convention.
-- If extra tests are added, mock only thin outer boundaries that are expensive or unavailable in CI, such as external executables (`gmx`, `gnina`, `gmx_MMPBSA`) invoked through `scripts/infra/common.sh` or `scripts/agents/debugger.py`.
+- No formal project rule is documented.
+- If new automated tests are added, mock only expensive or unavailable outer boundaries such as `sbatch`, `squeue`, `sacct`, `gmx`, `gnina`, and `gmx_MMPBSA` when a test cannot run against a real environment. Those boundaries are concentrated in `scripts/infra/common.sh`, `scripts/infra/executor.py`, and `scripts/dock/2_gnina.sh`.
 
 **What NOT to Mock:**
-- Do not mock the JSON handoff shape defined in `scripts/agents/schemas/handoff.py`; tests should use real `HandoffRecord` payloads.
-- Do not mock gate state files when validating workflow gating; use the real file-backed behavior in `scripts/infra/verification.py`.
-- Do not replace wrapper flag handling with synthetic shortcuts; exercise `scripts/commands/common.sh:parse_flags` and the namespaced wrappers in `scripts/commands/aedmd-*.sh` directly.
+- Do not mock the JSON handoff contract from `scripts/agents/schemas/handoff.py`; use real `HandoffRecord`-shaped payloads and on-disk `.handoffs/*.json` files.
+- Do not mock file-backed state and gate behavior when validating orchestration flow; use the real implementations in `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, and `scripts/infra/verification.py`.
+- Do not bypass wrapper CLI parsing in `scripts/commands/common.sh`; invoke the real wrapper scripts under `scripts/commands/`.
 
 ## Fixtures and Factories
 
 **Test Data:**
-```bash
-mkdir -p work/test
-cp scripts/config.ini.template work/test/config.ini
+```python
+with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+    f.write("""
+[execution]
+backend = auto
+
+[slurm]
+account = test_account
+time_limit = 01:00:00
+""")
 ```
-- Use `work/test/` as the disposable validation workspace, consistent with `AGENTS.md`.
-- Use `work/input/` for user-provided inputs and compare against example/reference outputs in `expected/` and `.reference/`, as documented in `AGENTS.md`.
+- The pattern above comes from `work/test/infrastructure/test_infra.py` and is the main Python fixture style.
+- Shell tests build fixture directories and copy the template config before execution, following `tests/phase06_integration_test.sh` with `${TEST_TEMPLATE}/config.ini` sourced from `scripts/config.ini.template`.
 
 **Location:**
-- Working validation workspace: `work/test/`
-- User inputs: `work/input/`
-- Reference outputs and examples: `expected/` and `.reference/`
+- Shell test fixtures are created dynamically under `/tmp` by `tests/phase06_integration_test.sh`.
+- Python test fixtures are created dynamically by `tempfile` inside `work/test/infrastructure/test_infra.py`.
+- Reusable static template input comes from `scripts/config.ini.template` and runtime wrapper code under `scripts/commands/`.
 
 ## Coverage
 
 **Requirements:**
-- No line-coverage or branch-coverage tooling is enforced.
-- Current “coverage” is scenario coverage captured in `.planning/phases/02-core-pipeline/02-VERIFICATION.md`, `.planning/phases/04-integration/04-VERIFICATION.md`, and `.planning/phases/05-polish/05-12-e2e-test-report.md`.
-- The most explicit command-wrapper regression coverage currently checks syntax, help-path behavior, YAML frontmatter, and command→skill cross-reference chains in `.planning/phases/05-polish/05-12-e2e-test-report.md`.
+- No line-coverage or branch-coverage tool is configured.
+- No `coverage.py`, `pytest-cov`, `nyc`, or equivalent config is detected in `/share/home/nglokwan/autoEnsmblDockMD`.
+- Current automated coverage is behavior-based: `tests/phase06_integration_test.sh` exercises `scripts/commands/aedmd-workspace-init.sh`, `scripts/commands/aedmd-preflight.sh`, `scripts/commands/aedmd-handoff-inspect.sh`, `scripts/commands/aedmd-group-id-check.sh`, and `scripts/infra/plugins/conversion_cache.py`; `work/test/infrastructure/test_infra.py` exercises `scripts/infra/config.py`, `scripts/infra/checkpoint.py`, `scripts/infra/verification.py`, `scripts/infra/executor.py`, `scripts/infra/monitor.py`, and `scripts/infra/state.py` through public APIs.
 
 **View Coverage:**
 ```bash
-rg -n "L1 Syntax|L2 Help|L3 YAML|L4 Cross-ref|Overall Results" .planning/phases/05-polish/05-12-e2e-test-report.md
+# Not applicable: no coverage report command is configured in this repository.
 ```
 
 ## Test Types
 
 **Unit Tests:**
-- Not used as standalone files.
-- Python helpers are still written in a unit-testable style in `scripts/agents/checker.py`, `scripts/agents/runner.py`, `scripts/infra/config.py`, `scripts/infra/verification.py`, `scripts/com/4_fp.py`, and `scripts/dock/4_dock2com_2.py`.
+- No dedicated unit-test suite is detected.
+- The closest unit-style coverage is function-level validation inside `work/test/infrastructure/test_infra.py`, where individual helper interactions are tested directly against `scripts.infra` exports from `scripts/infra/__init__.py`.
 
 **Integration Tests:**
-- Current integration testing is command and module verification:
-  - `bash -n` for `scripts/commands/aedmd-*.sh` and `scripts/commands/common.sh`
-  - `python -m py_compile` for Python modules under `scripts/agents/` and `scripts/infra/`
-  - `--help` smoke checks for namespaced wrappers after environment initialization
-  - command→skill→docs cross-reference checks in `.planning/phases/05-polish/05-12-e2e-test-report.md`
+- `work/test/infrastructure/test_infra.py` is an integration-oriented Python harness that validates cross-module behavior among `ConfigManager`, `CheckpointManager`, `VerificationGate`, `LocalExecutor`, `LogMonitor`, and `AgentState`.
+- `tests/phase06_integration_test.sh` is a shell integration harness that validates wrapper execution, handoff creation, failure handling, and plugin import behavior across `scripts/commands/` and `scripts/infra/plugins/`.
 
 **E2E Tests:**
-- Manual or semi-automated workflow validation is the current E2E strategy.
-- Primary reference: `.planning/phases/05-polish/05-12-e2e-test-report.md`.
-- Supporting references: `.planning/phases/02-core-pipeline/02-VERIFICATION.md` and `.planning/phases/04-integration/04-VERIFICATION.md`.
-- Environment-sensitive checks currently acknowledge the `ensure_env` → `scripts/setenv.sh` path in `scripts/commands/common.sh` and `scripts/setenv.sh`; this is why wrapper `--help` checks are recorded as `ENV_GATE` in `.planning/phases/05-polish/05-12-e2e-test-report.md` when Conda is not initialized.
+- `tests/phase06_integration_test.sh` is the current closest E2E check because it creates a workspace, runs multiple wrappers in sequence, inspects generated `.handoffs/*.json` files, and verifies a controlled failure path.
+- No browser, UI, or full scientific-production E2E framework is configured.
 
 ## Common Patterns
 
 **Async Testing:**
 ```python
-gate = VerificationGate("docking", ".gates")
-gate.create_gate("Review docking results", metadata={"ligand_count": 5})
-gate.approve(notes="Looks good")
+gate = VerificationGate('docking', os.path.join(tmpdir, 'gates'))
+gate.create_gate('Review docking results', output_paths=[str(ckpt_path)], metrics={'best_score': -8.5})
+gate.approve(notes='Docking results acceptable')
 assert gate.can_proceed()
 ```
-- There is no async test runner, but stateful workflow behavior is illustrated with doctest-style examples in `scripts/infra/verification.py`.
-- For job-like waiting behavior, runtime polling lives in `scripts/infra/common.sh:wait_job`; this behavior is not covered by an automated async test suite.
+- The pattern above comes from `work/test/infrastructure/test_infra.py` and represents stateful workflow progression testing rather than true async concurrency.
 
 **Error Testing:**
-```python
-def check_log_errors(data: Dict[str, Any]) -> CheckResult:
-    log_file = Path(data.get("log_file"))
-    content = log_file.read_text(encoding="utf-8", errors="ignore")
-    if "error" in content.lower() or "fatal" in content.lower():
-        return CheckResult(level="error", message=f"Detected ERROR/FATAL patterns in log file: {log_file}")
+```bash
+if jq -r '.status' ".handoffs/group_id_check.json" | grep -q "failure"; then
+  echo "  ✓ Handled missing index"
+else
+  echo "  ✗ Wrong status"
+  exit 1
+fi
 ```
-- Error-oriented validation is built around real logs, return codes, and persisted artifacts in `scripts/agents/checker.py`, `scripts/agents/debugger.py`, `scripts/infra/monitor.py`, and `scripts/commands/common.sh`.
+- The pattern above comes from `tests/phase06_integration_test.sh` and shows the preferred style: trigger a real failure mode, then assert the wrapper exit code and persisted handoff status.
 
 ---
 
-*Testing analysis: 2026-04-19*
+*Testing analysis: 2026-04-29*

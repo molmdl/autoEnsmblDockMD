@@ -1,153 +1,164 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-04-19
+**Analysis Date:** 2026-04-29
 
 ## Directory Layout
 
 ```text
 autoEnsmblDockMD/
-├── scripts/              # Pipeline entrypoints, stage scripts, shared infra, agents, slash-command bridges
-├── docs/                 # Human-facing configuration and experimental-operation guides
-├── work/                 # Example inputs, test config, and runtime workspace roots
-├── expected/             # Reference force-field/example assets used by workflow examples
+├── scripts/              # Pipeline scripts, shared infra, agents, and command bridges
+├── docs/                 # User-facing workflow and experimental-operation guides
+├── tests/                # Shell integration test entrypoints
+├── work/                 # Committed input fixtures and sample workspace roots
+├── expected/             # Reference assets and example force-field outputs
 ├── .opencode/            # Skill definitions and local OpenCode assets
-├── .planning/            # Project state, phase plans, and generated codebase maps
-├── .reference/           # Supporting external reference materials
+├── .planning/            # Planning state and generated mapping documents
+├── .reference/           # Supporting reference material
 ├── .github/              # Repository automation metadata
-├── README.md             # Quick-start overview and project entry document
-├── WORKFLOW.md           # Authoritative stage-by-stage script map
-├── AGENTS.md             # Agent roles, boundaries, and namespaced command mapping
-├── environment.yml       # Root Conda environment definition
-└── opencode.json         # OpenCode model and permission configuration
+├── README.md             # Top-level quick start and pipeline summary
+├── WORKFLOW.md           # Authoritative stage map and execution reference
+├── AGENTS.md             # Agent roles, constraints, and command mapping
+├── environment.yml       # Root Conda environment file
+└── opencode.json         # OpenCode runtime configuration
 ```
 
 ## Directory Purposes
 
 **`scripts/`:**
-- Purpose: Keep executable workflow logic and orchestration code in one tree.
-- Contains: Pipeline entrypoints, subsystem stage scripts, shared infra helpers, Python agents, and namespaced command wrappers.
-- Key files: `scripts/run_pipeline.sh`, `scripts/setenv.sh`, `scripts/config.ini.template`, `scripts/run_oc.sh`, `scripts/CONTEXT.md`
+- Purpose: Keep all executable workflow logic under one top-level tree.
+- Contains: Pipeline entrypoints, scientific stage scripts, shared infrastructure, agent implementations, command wrappers, MDP assets, and environment bootstrap.
+- Key files: `scripts/run_pipeline.sh`, `scripts/setenv.sh`, `scripts/config.ini.template`, `scripts/CONTEXT.md`, `scripts/run_oc.sh`
 
 **`scripts/rec/`:**
-- Purpose: Hold receptor-ensemble generation stages.
-- Contains: Receptor preparation, receptor production MD submission, receptor analysis, clustering, and alignment scripts.
+- Purpose: Hold receptor ensemble generation stages.
+- Contains: Receptor preparation, production MD, trajectory analysis, clustering, and alignment scripts.
 - Key files: `scripts/rec/0_prep.sh`, `scripts/rec/1_pr_rec.sh`, `scripts/rec/3_ana.sh`, `scripts/rec/4_cluster.sh`, `scripts/rec/5_align.py`
 
 **`scripts/dock/`:**
-- Purpose: Hold docking preparation, gnina execution, reporting, and dock-to-complex conversion logic.
-- Contains: Ligand conversion helpers, receptor prep for docking, gnina launcher, ranking utilities, and multiple dock2com topology utilities.
-- Key files: `scripts/dock/0_gro2mol2.sh`, `scripts/dock/0_gro_itp_to_mol2.py`, `scripts/dock/1_rec4dock.sh`, `scripts/dock/2_gnina.sh`, `scripts/dock/4_dock2com.sh`, `scripts/dock/4_dock2com_2.2.1.py`
+- Purpose: Hold docking preparation, docking execution, reporting, and dock-to-complex conversion logic.
+- Contains: Ligand conversion wrappers, gnina runner, report generation, and dock2com helper modules.
+- Key files: `scripts/dock/0_gro2mol2.sh`, `scripts/dock/0_gro_itp_to_mol2.py`, `scripts/dock/1_rec4dock.sh`, `scripts/dock/2_gnina.sh`, `scripts/dock/3_dock_report.sh`, `scripts/dock/4_dock2com.sh`
 
 **`scripts/com/`:**
-- Purpose: Hold complex setup, production MD, MM/PBSA, and analysis stages.
-- Contains: Complex assembly, production submission, MM/PBSA orchestration, advanced trajectory analysis, fingerprint helpers, and rerun/archive helpers.
-- Key files: `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_run_mmpbsa.sh`, `scripts/com/3_ana.sh`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_cal_fp.sh`
+- Purpose: Hold complex setup, production MD, MM/PBSA, and trajectory analysis stages.
+- Contains: Complex preparation, production submission, MM/PBSA wrappers, advanced analysis helpers, fingerprint utilities, and rerun/archive helpers.
+- Key files: `scripts/com/0_prep.sh`, `scripts/com/1_pr_prod.sh`, `scripts/com/2_run_mmpbsa.sh`, `scripts/com/3_ana.sh`, `scripts/com/3_com_ana_trj.py`, `scripts/com/4_fp.py`
 
 **`scripts/infra/`:**
-- Purpose: Centralize shared config, logging, execution, state, checkpoint, and verification utilities.
-- Contains: Bash helper libraries and Python infra modules.
+- Purpose: Hold cross-stage infrastructure shared by shell scripts, Python agents, and plugins.
+- Contains: Shell helper libraries, Python config/state/checkpoint/monitoring modules, and plugin utilities under `scripts/infra/plugins/`.
 - Key files: `scripts/infra/common.sh`, `scripts/infra/config_loader.sh`, `scripts/infra/config.py`, `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, `scripts/infra/verification.py`
 
+**`scripts/infra/plugins/`:**
+- Purpose: Hold focused Python utilities invoked by wrapper commands instead of the main agent registry.
+- Contains: Preflight validation, workspace initialization, handoff inspection, group ID checking, conversion cache, and dry-run audit helpers.
+- Key files: `scripts/infra/plugins/preflight.py`, `scripts/infra/plugins/workspace_init.py`, `scripts/infra/plugins/handoff_inspect.py`, `scripts/infra/plugins/group_id_check.py`, `scripts/infra/plugins/conversion_cache.py`
+
 **`scripts/agents/`:**
-- Purpose: Implement the experimental role-based orchestration layer.
-- Contains: Agent registry, CLI entrypoint, base class, orchestrator/runner/analyzer/checker/debugger roles, schemas, and routing helpers.
-- Key files: `scripts/agents/__main__.py`, `scripts/agents/__init__.py`, `scripts/agents/base.py`, `scripts/agents/orchestrator.py`, `scripts/agents/runner.py`, `scripts/agents/schemas/handoff.py`
+- Purpose: Hold the experimental role-based orchestration implementation.
+- Contains: Agent CLI entrypoint, registry, base class, orchestrator/runner/analyzer/checker/debugger roles, schemas, and routing helpers.
+- Key files: `scripts/agents/__main__.py`, `scripts/agents/__init__.py`, `scripts/agents/base.py`, `scripts/agents/orchestrator.py`, `scripts/agents/runner.py`, `scripts/agents/analyzer.py`
 
 **`scripts/commands/`:**
-- Purpose: Provide namespaced slash-command bridge scripts.
-- Contains: One wrapper per `aedmd-*` command and a shared helper library.
-- Key files: `scripts/commands/common.sh`, `scripts/commands/aedmd-status.sh`, `scripts/commands/aedmd-rec-ensemble.sh`, `scripts/commands/aedmd-dock-run.sh`, `scripts/commands/aedmd-com-setup.sh`, `scripts/commands/aedmd-orchestrator-resume.sh`
+- Purpose: Hold namespaced `aedmd-*` wrapper commands.
+- Contains: One shell wrapper per command plus a shared helper file.
+- Key files: `scripts/commands/common.sh`, `scripts/commands/aedmd-status.sh`, `scripts/commands/aedmd-dock-run.sh`, `scripts/commands/aedmd-com-setup.sh`, `scripts/commands/aedmd-preflight.sh`, `scripts/commands/aedmd-workspace-init.sh`
 
 **`docs/`:**
-- Purpose: Hold detailed user documentation outside the top-level quick-start docs.
-- Contains: Workflow configuration guide and agent-support caveats.
-- Key files: `docs/GUIDE.md`, `docs/EXPERIMENTAL.md`
+- Purpose: Hold extended operator documentation.
+- Contains: Detailed configuration guide, experimental agent notes, and troubleshooting references.
+- Key files: `docs/GUIDE.md`, `docs/EXPERIMENTAL.md`, `docs/TROUBLESHOOTING.md`
+
+**`tests/`:**
+- Purpose: Hold repository-level test entrypoints.
+- Contains: Shell integration tests.
+- Key files: `tests/phase06_integration_test.sh`
 
 **`work/`:**
-- Purpose: Hold example inputs and committed test/workspace assets.
-- Contains: Input receptors/ligands in `work/input/`, sample config and test assets in `work/test/`, and workspace guidance in `work/workspace/README.md`.
+- Purpose: Hold committed input fixtures and sample workspace content.
+- Contains: Input assets in `work/input/`, sample config and infrastructure tests in `work/test/`, and a placeholder workspace directory in `work/workspace/`.
 - Key files: `work/input/README.md`, `work/test/config.ini`, `work/test/infrastructure/test_infra.py`, `work/workspace/README.md`
 
 **`expected/`:**
-- Purpose: Store reference force-field/example assets consumed or mirrored by the workflow.
-- Contains: AMBER and CHARMM reference trees plus README/examples.
-- Key files: `expected/README.md`, `expected/amb/amber19SB_OL21_OL3_lipid17.ff/forcefield.itp`, `expected/chm/`
-
-**`.opencode/`:**
-- Purpose: Store OpenCode-specific project assets.
-- Contains: Skill definitions under `.opencode/skills/aedmd-*/SKILL.md`.
-- Key files: `.opencode/skills/aedmd-status/SKILL.md`, `.opencode/skills/aedmd-dock-run/SKILL.md`, `.opencode/skills/aedmd-com-setup/SKILL.md`
+- Purpose: Hold reference example outputs and force-field assets.
+- Contains: AMBER and CHARMM example trees plus a small README and sample Slurm output.
+- Key files: `expected/README.md`, `expected/amb/`, `expected/chm/`, `expected/slurm-91652.out`
 
 **`.planning/`:**
-- Purpose: Store planning state and generated mapping artifacts consumed by GSD commands.
-- Contains: Project state, requirements, phase plans/summaries, research, and `.planning/codebase/*.md` outputs.
-- Key files: `.planning/STATE.md`, `.planning/scancode.md`, `.planning/PROJECT.md`, `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/STRUCTURE.md`
+- Purpose: Hold planning state and generated analysis artifacts.
+- Contains: Project requirements, state, research, phase plans, quick plans, and `.planning/codebase/*.md` documents.
+- Key files: `.planning/PROJECT.md`, `.planning/STATE.md`, `.planning/REQUIREMENTS.md`, `.planning/scancode.md`, `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/STRUCTURE.md`
+
+**`.opencode/`:**
+- Purpose: Hold project-local OpenCode configuration and skill definitions.
+- Contains: Skill directories under `.opencode/skills/aedmd-*/`.
+- Key files: `.opencode/skills/aedmd-status/SKILL.md`, `.opencode/skills/aedmd-dock-run/SKILL.md`, `.opencode/skills/aedmd-com-setup/SKILL.md`
 
 ## Key File Locations
 
 **Entry Points:**
 - `scripts/run_pipeline.sh`: Canonical full-pipeline and single-stage dispatcher.
 - `scripts/agents/__main__.py`: Canonical Python entrypoint for agent execution.
-- `scripts/commands/aedmd-status.sh`: Workspace status command wrapper with `--workdir` handling.
-- `scripts/commands/aedmd-orchestrator-resume.sh`: Orchestrator resume command wrapper.
-- `scripts/run_oc.sh`: Convenience wrapper for launching `opencode`.
+- `scripts/commands/aedmd-status.sh`: Workspace status wrapper.
+- `scripts/commands/aedmd-orchestrator-resume.sh`: Orchestrator wrapper command.
+- `scripts/commands/aedmd-preflight.sh`: Preflight validation wrapper.
 
 **Configuration:**
-- `scripts/config.ini.template`: Canonical runtime INI template.
-- `work/test/config.ini`: Committed example instantiated runtime config.
-- `scripts/setenv.sh`: Environment bootstrap sourced before running scripts/commands.
+- `scripts/config.ini.template`: Canonical runtime config template.
+- `work/test/config.ini`: Committed sample instantiated config.
+- `scripts/setenv.sh`: Environment bootstrap sourced before running scripts and commands.
 - `environment.yml`: Root Conda environment specification.
-- `opencode.json`: OpenCode model/permission settings.
+- `opencode.json`: OpenCode runtime configuration.
 
 **Core Logic:**
-- `scripts/rec/`: Receptor ensemble workflow implementation.
+- `scripts/rec/`: Receptor workflow implementation.
 - `scripts/dock/`: Docking and dock-to-complex implementation.
 - `scripts/com/`: Complex prep, MD, MM/PBSA, and analysis implementation.
-- `scripts/infra/`: Shared config/logging/state/execution helpers.
+- `scripts/infra/`: Shared config, validation, monitoring, and persisted-state helpers.
 - `scripts/agents/`: Experimental orchestration logic.
 
 **Testing:**
-- `work/test/infrastructure/test_infra.py`: Current committed Python test file.
-- `work/test/`: Current location for committed test config and test-oriented assets.
+- `tests/phase06_integration_test.sh`: Shell integration test for wrapper/plugin flows.
+- `work/test/infrastructure/test_infra.py`: Python integration-style tests for infrastructure modules.
 
 ## Naming Conventions
 
 **Files:**
-- Numeric prefixes for ordered scientific stages: `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/3_ana.sh`, `scripts/dock/4_dock2com_2.py`, `scripts/com/5_rerun_sel.sh`.
-- Snake_case for Python modules and helper scripts: `scripts/infra/config_loader.sh`, `scripts/agents/orchestrator.py`, `scripts/com/3_selection_defaults.py`, `scripts/dock/dock2com_2_1.py`.
-- Namespaced hyphenated command wrappers under `scripts/commands/`: `scripts/commands/aedmd-status.sh`, `scripts/commands/aedmd-rec-ensemble.sh`, `scripts/commands/aedmd-com-mmpbsa.sh`.
-- Uppercase root/planning docs: `README.md`, `WORKFLOW.md`, `AGENTS.md`, `.planning/STATE.md`.
+- Use numeric prefixes for ordered scientific stage files, for example `scripts/rec/0_prep.sh`, `scripts/dock/2_gnina.sh`, `scripts/com/2_run_mmpbsa.sh`, and `scripts/com/5_arc_sel.sh`.
+- Use snake_case for Python modules and helper scripts, for example `scripts/infra/config_loader.sh`, `scripts/agents/orchestrator.py`, `scripts/com/3_selection_defaults.py`, and `scripts/infra/plugins/group_id_check.py`.
+- Use namespaced hyphenated wrapper names under `scripts/commands/`, for example `scripts/commands/aedmd-dock-run.sh` and `scripts/commands/aedmd-workspace-init.sh`.
+- Use uppercase top-level and planning reference documents, for example `README.md`, `WORKFLOW.md`, `AGENTS.md`, and `.planning/codebase/ARCHITECTURE.md`.
 
 **Directories:**
-- Short subsystem directories for pipeline partitions: `scripts/rec/`, `scripts/dock/`, `scripts/com/`, `scripts/infra/`, `scripts/agents/`, `scripts/commands/`.
-- Workspace directories mirror stage outputs and support files: `rec/`, `dock/`, `com/`, `ref/`, and `mdp/` under the active `workdir` defined in `scripts/config.ini.template`.
+- Use short subsystem directories inside `scripts/` to signal responsibility: `scripts/rec/`, `scripts/dock/`, `scripts/com/`, `scripts/infra/`, `scripts/agents/`, and `scripts/commands/`.
+- Mirror pipeline artifacts in workspace directories using `rec/`, `dock/`, `com/`, optional `ref/`, and `mdp/` under the active `workdir` from `scripts/config.ini.template`.
 
 ## Where to Add New Code
 
 **New Feature:**
-- Primary code: Put new scientific stage logic in the matching subsystem under `scripts/rec/`, `scripts/dock/`, or `scripts/com/`; put reusable plumbing in `scripts/infra/`; put orchestration-only behavior in `scripts/agents/` or `scripts/commands/`.
-- Tests: Add Python tests alongside the current committed pattern under `work/test/infrastructure/` unless a dedicated top-level test tree is introduced.
+- Primary code: Put receptor-stage logic in `scripts/rec/`, docking logic in `scripts/dock/`, complex/MD/MM-PBSA/analysis logic in `scripts/com/`, shared infrastructure in `scripts/infra/`, and orchestration-only behavior in `scripts/agents/` or `scripts/commands/`.
+- Tests: Add wrapper/integration tests in `tests/` for command-level flows and add Python infrastructure tests alongside `work/test/infrastructure/test_infra.py` for infra modules.
 
 **New Component/Module:**
-- Implementation: Use `scripts/infra/` for shared config/state/execution modules, `scripts/agents/` for role/schema/routing additions, and subsystem-specific directories like `scripts/dock/` for stage-scoped helpers.
+- Implementation: Add reusable bash helpers to `scripts/infra/common.sh` or `scripts/infra/config_loader.sh`; add reusable Python support modules to `scripts/infra/`; add agent-specific code to `scripts/agents/`; add stage-local helpers beside the owning stage in `scripts/rec/`, `scripts/dock/`, or `scripts/com/`.
 
 **Utilities:**
-- Shared helpers: Add bash utilities to `scripts/infra/common.sh` or `scripts/infra/config_loader.sh`; add Python utilities to `scripts/infra/*.py` for cross-stage reuse or to subsystem-local files such as `scripts/com/3_selection_defaults.py` when the logic is stage-specific.
+- Shared helpers: Put wrapper-facing validation and workspace utilities in `scripts/infra/plugins/` when they are invoked as standalone commands, and keep stage-scoped helpers beside the stage they support.
 
 ## Special Directories
 
 **`work/`:**
-- Purpose: Committed sample inputs plus runtime-style workspace assets.
+- Purpose: Committed sample inputs and workspace-like artifacts.
 - Generated: Mixed.
 - Committed: Yes.
 
 **`.planning/`:**
-- Purpose: Planning state, phase artifacts, and generated codebase docs.
+- Purpose: Planning state and generated codebase documentation.
 - Generated: Yes.
 - Committed: Yes.
 
 **`.opencode/skills/`:**
-- Purpose: Namespaced OpenCode skill definitions.
+- Purpose: Namespaced skill definitions used by wrappers and agents.
 - Generated: No.
 - Committed: Yes.
 
@@ -157,30 +168,31 @@ autoEnsmblDockMD/
 - Committed: No.
 
 **`expected/`:**
-- Purpose: Reference force-field/example assets.
+- Purpose: Reference example outputs and force-field assets.
 - Generated: No.
 - Committed: Yes.
 
 **`.reference/`:**
-- Purpose: External supporting reference material.
+- Purpose: Supporting reference material.
 - Generated: No.
 - Committed: Yes.
 
 ## Placement Guidance by Existing Flow
 
-**Add a new pipeline stage:**
-- Add the executable script to `scripts/rec/`, `scripts/dock/`, or `scripts/com/` using the numeric-prefix pattern already used by nearby stages.
-- Register the stage in `scripts/run_pipeline.sh` by updating `STAGE_DESC`, `STAGE_CMD`, `STAGE_SECTIONS`, `STAGE_LIGAND_MODE`, and either `DEFAULT_PIPELINE_STAGES` or optional-stage handling.
-- Add required config keys to `scripts/config.ini.template` and document the new stage in `WORKFLOW.md` and `docs/GUIDE.md`.
+**New pipeline stage:**
+- Add the executable to the owning subsystem in `scripts/rec/`, `scripts/dock/`, or `scripts/com/` using the existing numeric-prefix convention.
+- Register the stage in `scripts/run_pipeline.sh` by updating `STAGE_DESC`, `STAGE_CMD`, `STAGE_SECTIONS`, `STAGE_LIGAND_MODE`, and the ordered stage arrays.
+- Add required config keys to `scripts/config.ini.template` and document the stage in `WORKFLOW.md` and `docs/GUIDE.md`.
 
-**Add a new namespaced slash command:**
-- Add the wrapper to `scripts/commands/aedmd-<name>.sh` using the shared pattern in `scripts/commands/aedmd-rec-ensemble.sh`, `scripts/commands/aedmd-dock-run.sh`, and `scripts/commands/aedmd-orchestrator-resume.sh`.
-- Add or update the related skill under `.opencode/skills/aedmd-<name>/SKILL.md` and keep `AGENTS.md` slash-command mapping aligned.
+**New slash command:**
+- Add the wrapper to `scripts/commands/aedmd-<name>.sh` following the pattern used by `scripts/commands/aedmd-dock-run.sh`, `scripts/commands/aedmd-status.sh`, and `scripts/commands/aedmd-workspace-init.sh`.
+- If the command dispatches an agent stage, update `scripts/commands/common.sh`; if it invokes standalone validation logic, place the implementation in `scripts/infra/plugins/`.
+- Keep the skill mapping aligned in `.opencode/skills/aedmd-<name>/SKILL.md` and `AGENTS.md`.
 
-**Add new agent state or persisted review metadata:**
-- Put state in workspace-local JSON handled by `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, or `scripts/infra/verification.py`.
-- Keep persisted runtime artifacts under the active workspace, not in repository source directories.
+**New persisted workflow metadata:**
+- Put JSON-backed state in workspace-local files managed by `scripts/infra/state.py`, `scripts/infra/checkpoint.py`, or `scripts/infra/verification.py`.
+- Keep generated runtime metadata in the active workspace, not under repository source directories.
 
 ---
 
-*Structure analysis: 2026-04-19*
+*Structure analysis: 2026-04-29*
