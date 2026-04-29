@@ -240,7 +240,7 @@ class CheckpointManager:
             return False
     
     def _load_from_file(self, path: Path) -> Optional[Dict[str, Any]]:
-        """Load checkpoint from file.
+        """Load checkpoint from file with shared locking.
         
         Args:
             path: Path to checkpoint file.
@@ -250,6 +250,7 @@ class CheckpointManager:
         """
         try:
             with open(path, 'r') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_SH)
                 return json.load(f)
         except (json.JSONDecodeError, IOError):
             return None
