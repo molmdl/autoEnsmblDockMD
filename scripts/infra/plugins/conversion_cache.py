@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import shutil
 from pathlib import Path
 
@@ -71,11 +72,18 @@ class ConversionCache:
         meta_file.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
     def clear(self, source_path: Path | None = None):
-        """Clear cache entries for a source path or wipe entire cache directory."""
+        """Clear cache entries for a source path or wipe entire cache directory.
+
+        Uses missing_ok=True for race-safe deletion and logs warnings for
+        non-fatal filesystem errors.
+        """
         if source_path is None:
             for path in self.cache_dir.glob("*"):
                 if path.is_file():
-                    path.unlink()
+                    try:
+                        path.unlink(missing_ok=True)
+                    except OSError as exc:
+                        logging.warning("Failed to clear cache file %s: %s", path, exc)
             return
 
         source_str = str(source_path.resolve())
@@ -89,6 +97,8 @@ class ConversionCache:
                 continue
 
             result_file = meta_file.with_suffix(".result")
-            if result_file.exists():
-                result_file.unlink()
-            meta_file.unlink()
+            try:
+                result_file.unlink(missing_ok=True)
+                meta_file.unlink(missing_ok=True)
+            except OSError as exc:
+                logging.warning("Failed to clear cache for %s: %s", source_path, exc)
