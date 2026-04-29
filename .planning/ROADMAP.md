@@ -423,14 +423,16 @@ Based on quick-003 dry-run analysis, implement automation opportunities with hig
 **Goal:** Address critical security vulnerabilities, performance bottlenecks, and plugin issues discovered in scancode analysis.
 
 **Depends on:** Phase 6
-**Plans:** 5 plans in 3 waves
+**Plans:** 7 plans in 3 waves
 
 Plans:
 - [ ] 06.1-01-PLAN.md — Fix command injection and TOCTOU race in Slurm operations (Wave 1)
-- [ ] 06.1-02-PLAN.md — Fix file operation safety and atom mismatch validation (Wave 1)
+- [ ] 06.1-02-PLAN.md — Fix file operation safety, atom mismatch validation, and GRO parsing bounds checks (Wave 1)
 - [ ] 06.1-03-PLAN.md — Fix trajectory analysis performance and memory leaks (Wave 1)
 - [ ] 06.1-04-PLAN.md — Harden plugin security with workspace boundaries and documentation (Wave 2)
 - [ ] 06.1-05-PLAN.md — Comprehensive verification and human approval (Wave 3)
+- [ ] 06.1-06-PLAN.md — Fix RMSF calculation off-by-one risk with residue ID gap detection (Wave 1)
+- [ ] 06.1-07-PLAN.md — Fix checkpoint race conditions with file locking (Wave 1)
 
 **Details:**
 
