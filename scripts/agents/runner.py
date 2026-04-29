@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Dict, List
@@ -64,7 +65,7 @@ class RunnerAgent(BaseAgent):
         params: Dict[str, Any],
         env: Dict[str, str] = None,
     ) -> Dict[str, Any]:
-        """Run a script command and capture execution details."""
+        """Run a script command and capture execution details via file streaming."""
         command_list = self._build_command(script, params)
         command_str = " ".join(command_list)
 
@@ -72,23 +73,40 @@ class RunnerAgent(BaseAgent):
         if env:
             merged_env.update(env)
 
-        started = time.time()
-        proc = subprocess.run(
-            command_list,
-            cwd=self.workspace,
-            capture_output=True,
-            text=True,
-            env=merged_env,
-        )
-        duration = time.time() - started
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.stdout') as stdout_file, \
+             tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.stderr') as stderr_file:
 
-        return {
-            "returncode": proc.returncode,
-            "stdout": proc.stdout,
-            "stderr": proc.stderr,
-            "command": command_str,
-            "duration_seconds": duration,
-        }
+            stdout_path = stdout_file.name
+            stderr_path = stderr_file.name
+
+            try:
+                started = time.time()
+                proc = subprocess.run(
+                    command_list,
+                    cwd=self.workspace,
+                    stdout=stdout_file,
+                    stderr=stderr_file,
+                    text=True,
+                    env=merged_env,
+                )
+                duration = time.time() - started
+
+                stdout_file.seek(0)
+                stderr_file.seek(0)
+
+                return {
+                    "returncode": proc.returncode,
+                    "stdout": stdout_file.read(),
+                    "stderr": stderr_file.read(),
+                    "command": command_str,
+                    "duration_seconds": duration,
+                }
+            finally:
+                try:
+                    Path(stdout_path).unlink(missing_ok=True)
+                    Path(stderr_path).unlink(missing_ok=True)
+                except OSError:
+                    pass
 
     def _build_command(self, script: str, params: Dict[str, Any]) -> List[str]:
         """Build executable command from script path and CLI parameters."""

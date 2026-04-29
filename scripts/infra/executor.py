@@ -58,7 +58,7 @@ class LocalExecutor:
     
     def run_command(self, command: List[str], cwd: str = None,
                     env: Dict[str, str] = None, timeout: int = None) -> Tuple[int, str, str]:
-        """Run command locally and capture output.
+        """Run command locally and capture output via file streaming.
         
         Args:
             command: Command and arguments as list.
@@ -77,26 +77,43 @@ class LocalExecutor:
             >>> executor.run_command(['ls', '-la'], cwd='/tmp')
             (0, 'total 16\\ndrwxrwxrwt...', '')
         """
+        import tempfile
+
         # Merge environment variables
         run_env = os.environ.copy()
         if env:
             run_env.update(env)
-        
-        try:
-            result = subprocess.run(
-                command,
-                cwd=cwd,
-                env=run_env,
-                capture_output=True,
-                text=True,
-                timeout=timeout
-            )
-            return (result.returncode, result.stdout, result.stderr)
-        except subprocess.TimeoutExpired as e:
-            # Re-raise with context
-            raise
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"Command not found: {command[0]}") from e
+
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.stdout') as stdout_file, \
+             tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.stderr') as stderr_file:
+
+            stdout_path = stdout_file.name
+            stderr_path = stderr_file.name
+
+            try:
+                result = subprocess.run(
+                    command,
+                    cwd=cwd,
+                    env=run_env,
+                    stdout=stdout_file,
+                    stderr=stderr_file,
+                    text=True,
+                    timeout=timeout,
+                )
+
+                stdout_file.seek(0)
+                stderr_file.seek(0)
+                return (result.returncode, stdout_file.read(), stderr_file.read())
+            except subprocess.TimeoutExpired:
+                raise
+            except FileNotFoundError as e:
+                raise FileNotFoundError(f"Command not found: {command[0]}") from e
+            finally:
+                try:
+                    Path(stdout_path).unlink(missing_ok=True)
+                    Path(stderr_path).unlink(missing_ok=True)
+                except OSError:
+                    pass
     
     def run_script(self, script_path: str, args: List[str] = None, **kwargs) -> Tuple[int, str, str]:
         """Run a script file.
