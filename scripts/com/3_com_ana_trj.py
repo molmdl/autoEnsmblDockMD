@@ -273,6 +273,37 @@ def _plot_bar(x: np.ndarray, y: np.ndarray, title: str, xlabel: str, ylabel: str
             plt.close(fig)
 
 
+def _validate_coordinate_units(universe: "mda.Universe", expected_range: tuple[float, float] = (0.1, 100.0)) -> None:
+    """Warn if coordinates are outside expected range for nanometers.
+
+    MDAnalysis universes should expose positions in nanometers for this
+    workflow. This helper warns (non-blocking) on likely unit mismatches.
+    """
+    try:
+        if len(universe.trajectory) == 0:
+            return
+        universe.trajectory[0]
+        coords = universe.atoms.positions
+
+        coord_values = np.abs(coords.flatten())
+        nonzero_coords = coord_values[coord_values > 0]
+        if nonzero_coords.size == 0:
+            return
+
+        coord_min = float(np.min(nonzero_coords))
+        coord_max = float(np.max(coord_values))
+        if coord_min < expected_range[0] or coord_max > expected_range[1]:
+            logging.warning(
+                "Coordinate range [%.2f, %.2f] nm is outside expected range %s. "
+                "Possible unit mismatch detected. Verify your input files use nanometers.",
+                coord_min,
+                coord_max,
+                expected_range,
+            )
+    except Exception as exc:
+        logging.debug("Could not validate coordinate units: %s", exc)
+
+
 def analyze_trajectory(
     trajectory: str,
     topology: str,
@@ -288,6 +319,7 @@ def analyze_trajectory(
     out.mkdir(parents=True, exist_ok=True)
 
     universe = mda.Universe(topology, trajectory)
+    _validate_coordinate_units(universe)
 
     bb_sel = selections.get("protein_backbone", "protein and name N CA C O")
     lig_sel = selections.get("ligand_heavy", "resname MOL and not name H*")
