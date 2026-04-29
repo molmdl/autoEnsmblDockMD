@@ -11,8 +11,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (in progress) |
-| **Current Plan** | 1/7 plans complete (latest: 06.1-07) |
-| **Last Activity** | 2026-04-29 - Completed 06.1-07-PLAN.md |
+| **Current Plan** | 2/7 plans complete (latest: 06.1-06) |
+| **Last Activity** | 2026-04-29 - Completed 06.1-06-PLAN.md |
 | **Progress** | ████████░░ 49/58 plans complete (84%) |
 | **Phase 6.1 Blocker** | None |
 | **Status** | Phase 6.1 in progress ✓ |
@@ -86,6 +86,7 @@ Superseded decision notes are retained for traceability and should not be treate
 |----------|-----------|
 | Use `fcntl.flock(LOCK_EX)` for checkpoint writes and `os.fsync()` before `os.replace` | Prevents concurrent writer corruption and improves durability under process interruption |
 | Use `fcntl.flock(LOCK_SH)` for checkpoint reads | Blocks reads during writes to prevent partial JSON load and resume-state corruption |
+| Warn on non-sequential residue IDs in RMSF using `np.diff(residue_ids)` while preserving dictionary-key aggregation | Adds visibility for residue numbering gaps without changing already-correct residue-to-RMSF mapping |
 
 ### Known Pitfalls
 
@@ -106,12 +107,12 @@ Superseded decision notes are retained for traceability and should not be treate
 ## Session Continuity
 
 Last session: 2026-04-29 07:48 UTC
-Stopped at: Completed 06.1-07-PLAN.md
+Stopped at: Completed 06.1-06-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 6.1 plan execution (6 plans remaining).
+Continue Phase 6.1 plan execution (5 plans remaining).
 
 ---
 
@@ -124,7 +125,7 @@ Continue Phase 6.1 plan execution (6 plans remaining).
 
 *State updated: 2026-04-29*
 *Current phase: 06.1-critical-security-performance-and-plugin-fixes*
-*Last action: 06.1-07 checkpoint race-condition hardening complete (1/7 plans in phase)*
+*Last action: 06.1-06 RMSF residue-ID gap detection warning implementation complete (2/7 plans in phase)*
 
 ### Roadmap Evolution
 
