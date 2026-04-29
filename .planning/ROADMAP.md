@@ -25,7 +25,7 @@ The roadmap derives phases from the natural groupings of requirements, following
 | **5 - Polish** | Finalize documentation, mark agents as experimental, validate end-to-end workflow | DOC-01 to DOC-04 | 4 criteria |
 | **5.1 - Correctness & Namespace** | Address critical code correctness and establish project namespace | Inserted fix phase | 7 plans |
 | **6 - Automation Infrastructure** | Implement hooks and plugins to reduce token usage | Phase 6 automation | 5 criteria |
-| **6.1 - Security & Performance** | Fix critical security vulnerabilities, performance bottlenecks, and plugin issues | Inserted fix phase | 0 plans |
+| **6.1 - Security & Performance** | Fix critical security vulnerabilities, performance bottlenecks, and plugin issues | Inserted fix phase | 7 plans (complete ✓) |
 | **7 - First Controlled Execution** | Execute and validate full targeted docking workflow | Phase 7 validation | 5 criteria |
 
 **Total Phases:** 8 (including 2 inserted urgent phases)
@@ -426,13 +426,13 @@ Based on quick-003 dry-run analysis, implement automation opportunities with hig
 **Plans:** 7 plans in 3 waves
 
 Plans:
-- [ ] 06.1-01-PLAN.md — Fix command injection and TOCTOU race in Slurm operations (Wave 1)
-- [ ] 06.1-02-PLAN.md — Fix file operation safety, atom mismatch validation, and GRO parsing bounds checks (Wave 1)
-- [ ] 06.1-03-PLAN.md — Fix trajectory analysis performance and memory leaks (Wave 1)
-- [ ] 06.1-04-PLAN.md — Harden plugin security with workspace boundaries and documentation (Wave 2)
-- [ ] 06.1-05-PLAN.md — Comprehensive verification and human approval (Wave 3)
-- [ ] 06.1-06-PLAN.md — Fix RMSF calculation off-by-one risk with residue ID gap detection (Wave 1)
-- [ ] 06.1-07-PLAN.md — Fix checkpoint race conditions with file locking (Wave 1)
+- [x] 06.1-01-PLAN.md — Fix command injection and TOCTOU race in Slurm operations (Wave 1)
+- [x] 06.1-02-PLAN.md — Fix file operation safety, atom mismatch validation, and GRO parsing bounds checks (Wave 1)
+- [x] 06.1-03-PLAN.md — Fix trajectory analysis performance and memory leaks (Wave 1)
+- [x] 06.1-04-PLAN.md — Harden plugin security with workspace boundaries and documentation (Wave 2)
+- [x] 06.1-05-PLAN.md — Comprehensive verification and human approval (Wave 3)
+- [x] 06.1-06-PLAN.md — Fix RMSF calculation off-by-one risk with residue ID gap detection (Wave 1)
+- [x] 06.1-07-PLAN.md — Fix checkpoint race conditions with file locking (Wave 1)
 
 **Details:**
 
@@ -465,11 +465,11 @@ This urgent phase addresses critical findings from scancode analysis (`.planning
 - Plugin security gaps need hardening before recommending production use
 
 **Success Criteria:**
-- [ ] All 4 critical security issues resolved and tested
-- [ ] All 8 high-severity performance issues resolved
-- [ ] Plugin boundary checks implemented
-- [ ] Security model documented
-- [ ] No regressions in existing functionality
+- [x] All 4 critical security issues resolved and tested
+- [x] All 8 high-severity performance issues resolved
+- [x] Plugin boundary checks implemented
+- [x] Security model documented
+- [x] No regressions in existing functionality
 
 ---
 
