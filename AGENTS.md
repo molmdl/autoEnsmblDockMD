@@ -148,6 +148,92 @@ Skill files referenced in this document are stored at `.opencode/skills/{skill-n
 
 ---
 
+## Plugin and Hook Security Model
+
+autoEnsmblDockMD implements a hybrid plugin architecture with explicit security boundaries:
+
+### Plugin Types
+
+1. **Python validation plugins** (`scripts/infra/plugins/`)
+   - Preflight validation, workspace initialization, handoff inspection, group ID checking, conversion caching
+   - Execute in main Python process context
+   - Full filesystem access within project directory
+   - Emit structured HandoffRecord JSON for workflow gating
+
+2. **OpenCode TypeScript plugins** (`.opencode/plugins/`)
+   - Bridge layer for agent integration
+   - Execute in OpenCode extension context with sandboxed permissions
+   - Read-only access to project files by default
+
+3. **Custom analysis hooks** (`scripts/agents/analyzer.py`)
+   - User-defined analysis scripts following project conventions
+   - Execute via subprocess isolation
+   - Limited to analysis/ directory output
+
+### Security Boundaries
+
+**Workspace boundary enforcement:**
+- Destructive operations (`--force` deletion) are restricted to `work/` directory tree
+- Path resolution uses `.resolve()` to prevent symlink escape
+- Deletion of `work/` root directory itself is prohibited (must specify subdirectory)
+- Boundary violations return `HandoffStatus.FAILURE` with clear error messages
+
+**Command execution:**
+- SBATCH script generation uses quoted heredocs (`<<'EOF'`) with sed-based templating to prevent command injection
+- Subprocess calls use explicit argument arrays; avoid `shell=True` with user input
+- Tool execution (`gmx`, `gnina`, `gmx_MMPBSA`) is validated via PATH lookup before invocation
+
+**File operations:**
+- Destructive file operations should prefer `missing_ok=True` where supported to tolerate concurrent changes
+- Cache operations should be wrapped in try/except with logging to prevent silent failures
+- Configuration parsing uses `configparser` with `ExtendedInterpolation` (no eval/exec)
+
+**Privilege model:**
+- Never requires sudo or system-wide modifications
+- Conda environment only (user-space isolation)
+- Slurm submission uses user's existing scheduler credentials
+
+### Custom Hook Guidelines
+
+When adding custom analysis or processing hooks:
+
+1. **Input validation:** Always validate file paths are within expected directories
+2. **Output boundaries:** Write outputs only to designated directories (`analysis/`, `.handoffs/`, `work/`)
+3. **Error handling:** Use try/except blocks with informative `HandoffRecord` error messages
+4. **Resource cleanup:** Use context managers or try/finally for file handles and matplotlib figures
+5. **Subprocess safety:** Use argument arrays; never interpolate user input into shell strings
+
+**Example safe custom hook:**
+```python
+def custom_analysis(topology: Path, trajectory: Path, output_dir: Path) -> HandoffRecord:
+    record = HandoffRecord(stage="custom_analysis", status=HandoffStatus.SUCCESS)
+
+    # Validate inputs are within workspace
+    workspace_root = Path.cwd().resolve()
+    if not topology.resolve().is_relative_to(workspace_root):
+        record.status = HandoffStatus.FAILURE
+        record.errors.append(f"Topology {topology} is outside workspace")
+        return record
+
+    # Use try-finally for resource cleanup
+    fig = None
+    try:
+        # ... analysis logic
+        fig, ax = plt.subplots()
+        # ... plotting
+        fig.savefig(output_dir / "plot.png")
+    except Exception as e:
+        record.status = HandoffStatus.FAILURE
+        record.errors.append(f"Analysis failed: {e}")
+    finally:
+        if fig is not None:
+            plt.close(fig)
+
+    return record
+```
+
+---
+
 ## Prerequisites
 
 - Install and activate Conda environment from `scripts/env.yml`.
