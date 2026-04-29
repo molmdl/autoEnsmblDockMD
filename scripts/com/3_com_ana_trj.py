@@ -181,12 +181,16 @@ def compute_contact_frequency(
     total_frames = 0
 
     traj_length = len(universe.trajectory)
-    stride = max(1, traj_length // max_frames) if max_frames else 1
+    if max_frames is not None and max_frames <= 0:
+        raise ValueError("max_frames must be a positive integer or None")
+
+    stride = max(1, (traj_length + max_frames - 1) // max_frames) if max_frames else 1
+    sampled_frames = (traj_length + stride - 1) // stride if traj_length > 0 else 0
 
     if stride > 1:
         logging.info(
             "Analyzing %s frames with stride %s (trajectory length: %s frames)",
-            traj_length // stride,
+            sampled_frames,
             stride,
             traj_length,
         )
