@@ -356,11 +356,12 @@ class SlurmExecutor:
         Args:
             job_id: Slurm job ID.
             poll_interval: Seconds between status checks (default: 30).
-            timeout: Maximum wait time in seconds. None for no limit.
+            timeout: Maximum wait time in seconds. Defaults to 7 days when None.
         
         Returns:
             Tuple of (final_status, output_file_path).
-            - final_status: One of the terminal states or 'UNKNOWN'.
+            - final_status: One of terminal states, or 'UNKNOWN_AFTER_RETRIES'
+              when scheduler state remains indeterminate after retry backoff.
             - output_file_path: Path to job output file if detectable.
         
         Raises:
@@ -370,6 +371,8 @@ class SlurmExecutor:
             >>> status, output = executor.wait_for_job('12345', poll_interval=60)
             >>> print(f"Job finished with status: {status}")
         """
+        # Default timeout prevents indefinite waits for stuck jobs.
+        effective_timeout = timeout if timeout is not None else (7 * 24 * 3600)
         start_time = time.time()
         output_file = None
         
@@ -381,12 +384,12 @@ class SlurmExecutor:
         
         while True:
             # Check timeout
-            if timeout is not None:
-                elapsed = time.time() - start_time
-                if elapsed > timeout:
-                    raise TimeoutError(
-                        f"Timeout waiting for job {job_id} after {timeout}s"
-                    )
+            elapsed = time.time() - start_time
+            if elapsed > effective_timeout:
+                raise TimeoutError(
+                    f"Timeout waiting for job {job_id} after {effective_timeout}s. "
+                    f"Check job status with: squeue -j {job_id} or sacct -j {job_id}"
+                )
             
             # Get job status
             status = self.get_job_status(job_id)
@@ -397,14 +400,16 @@ class SlurmExecutor:
             
             # Check if job is no longer visible in squeue
             if status == 'UNKNOWN':
-                terminal_state = self.get_job_terminal_state(job_id)
-                if terminal_state == 'COMPLETED':
-                    return ('COMPLETED', output_file)
-                if terminal_state in self.FAILURE_STATES or terminal_state in self.TERMINAL_STATES:
-                    return (terminal_state, output_file)
+                # Retry to absorb transient TOCTOU windows between squeue/sacct.
+                for retry in range(3):
+                    time.sleep(poll_interval * (retry + 1))
+                    terminal_state = self.get_job_terminal_state(job_id)
+                    if terminal_state in self.TERMINAL_STATES or terminal_state in self.FAILURE_STATES:
+                        return (terminal_state, output_file)
+                    if terminal_state == 'COMPLETED':
+                        return ('COMPLETED', output_file)
 
-                # Do not assume success when scheduler state is indeterminate.
-                return ('FAILED', output_file)
+                return ('UNKNOWN_AFTER_RETRIES', output_file)
             
             # Wait before next check
             time.sleep(poll_interval)
