@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 06-automation-infrastructure complete |
-| **Current Plan** | All 8 plans in Phase 6 complete |
-| **Last Activity** | 2026-04-28 - Completed Phase 6: Automation Infrastructure (verified) |
-| **Progress** | ████████████ 51/51 plans complete (100%) |
-| **Phase 6 Blocker** | None |
-| **Status** | Phase 6 complete ✓ — Ready for Phase 7 |
+| **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (in progress) |
+| **Current Plan** | 1/7 plans complete (latest: 06.1-07) |
+| **Last Activity** | 2026-04-29 - Completed 06.1-07-PLAN.md |
+| **Progress** | ████████░░ 49/58 plans complete (84%) |
+| **Phase 6.1 Blocker** | None |
+| **Status** | Phase 6.1 in progress ✓ |
 
 ---
 
@@ -80,6 +80,13 @@ Superseded decision notes are retained for traceability and should not be treate
 | Keep dry-run audit script read-only with artifact/syntax/metadata checks and explicit summary counters | Enables safe repeatable validation in any workspace without mutating user data |
 | Use `/tmp`-isolated integration harness with trap-based cleanup for Phase 6 wrapper/plugin validation | Prevents contamination of real workspaces while testing end-to-end wrapper behavior |
 
+### Key Decisions (Phase 6.1)
+
+| Decision | Rationale |
+|----------|-----------|
+| Use `fcntl.flock(LOCK_EX)` for checkpoint writes and `os.fsync()` before `os.replace` | Prevents concurrent writer corruption and improves durability under process interruption |
+| Use `fcntl.flock(LOCK_SH)` for checkpoint reads | Blocks reads during writes to prevent partial JSON load and resume-state corruption |
+
 ### Known Pitfalls
 
 - Force-field incompatibility (AMBER protein + CGenFF ligand) can crash downstream stages.
@@ -98,13 +105,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-28 17:30 UTC
-Stopped at: Completed Phase 6 (all 8 plans executed and verified)
+Last session: 2026-04-29 07:48 UTC
+Stopped at: Completed 06.1-07-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Proceed to Phase 7 planning/execution (Phase 6 verified and complete).
+Continue Phase 6.1 plan execution (6 plans remaining).
 
 ---
 
@@ -115,9 +122,9 @@ Proceed to Phase 7 planning/execution (Phase 6 verified and complete).
 
 ---
 
-*State updated: 2026-04-28*
-*Current phase: 06-automation-infrastructure*
-*Last action: 06-07 dry-run audit + integration test backfill complete; Phase 6 complete (8/8)*
+*State updated: 2026-04-29*
+*Current phase: 06.1-critical-security-performance-and-plugin-fixes*
+*Last action: 06.1-07 checkpoint race-condition hardening complete (1/7 plans in phase)*
 
 ### Roadmap Evolution
 
