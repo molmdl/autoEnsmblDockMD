@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import shutil
 import sys
 from pathlib import Path
@@ -69,10 +70,35 @@ def initialize_workspace(
             )
 
     try:
-        if target_dir.exists() and force:
-            shutil.rmtree(target_dir)
+        if force:
+            workspace_root = Path.cwd().resolve()
+            work_root = workspace_root / "work"
+
+            target_resolved = target_dir.resolve()
+            if not target_resolved.is_relative_to(work_root):
+                record.status = HandoffStatus.FAILURE
+                record.errors.append(
+                    f"Target path '{target_dir}' is outside allowed workspace boundary ({work_root}). "
+                    f"For safety, --force deletion is only allowed within work/ directory."
+                )
+                return record
+
+            if target_resolved == work_root:
+                record.status = HandoffStatus.FAILURE
+                record.errors.append(
+                    "Cannot delete work/ root directory itself. Specify a subdirectory."
+                )
+                return record
+
+            if target_dir.exists():
+                logging.info("Removing existing target directory: %s", target_dir)
+                shutil.rmtree(target_dir)
 
         shutil.copytree(template_dir, target_dir, dirs_exist_ok=force)
+    except ValueError as exc:
+        record.status = HandoffStatus.FAILURE
+        record.errors.append(f"Invalid target path: {exc}")
+        return record
     except Exception as exc:  # pragma: no cover - defensive error path
         record.status = HandoffStatus.FAILURE
         record.errors.append(f"Workspace copy failed: {exc}")
