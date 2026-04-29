@@ -244,25 +244,33 @@ def _write_csv(path: Path, header: Iterable[str], rows: Iterable[Iterable[object
 
 
 def _plot_line(x: np.ndarray, y: np.ndarray, title: str, xlabel: str, ylabel: str, output: Path, dpi: int):
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(x, y, linewidth=1.2)
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    fig.tight_layout()
-    fig.savefig(output, dpi=dpi)
-    plt.close(fig)
+    fig = None
+    try:
+        fig, ax = plt.subplots(figsize=(8, 4))
+        ax.plot(x, y, linewidth=1.2)
+        ax.set_title(title)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.tight_layout()
+        fig.savefig(output, dpi=dpi)
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
 
 def _plot_bar(x: np.ndarray, y: np.ndarray, title: str, xlabel: str, ylabel: str, output: Path, dpi: int):
-    fig, ax = plt.subplots(figsize=(9, 4.5))
-    ax.bar(x, y, width=0.9)
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    fig.tight_layout()
-    fig.savefig(output, dpi=dpi)
-    plt.close(fig)
+    fig = None
+    try:
+        fig, ax = plt.subplots(figsize=(9, 4.5))
+        ax.bar(x, y, width=0.9)
+        ax.set_title(title)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.tight_layout()
+        fig.savefig(output, dpi=dpi)
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
 
 def analyze_trajectory(
