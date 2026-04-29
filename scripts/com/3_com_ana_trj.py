@@ -11,6 +11,7 @@ import argparse
 import configparser
 import csv
 import importlib.util
+import logging
 from pathlib import Path
 from typing import Dict, Iterable, Tuple
 
@@ -51,6 +52,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--plot-format", default="png", choices=["png", "pdf", "svg"])
     parser.add_argument("--dpi", type=int, default=300)
     parser.add_argument("--contact-cutoff", type=float, default=4.5)
+    parser.add_argument("--contact-max-frames", type=int, default=1000)
     parser.add_argument("--distance-reference", default="protein_backbone")
     return parser.parse_args()
 
@@ -134,13 +136,40 @@ def compute_rmsf(universe: "mda.Universe", selection: str) -> Tuple[np.ndarray, 
         residue_to_values.setdefault(int(atom.resid), []).append(float(value))
 
     residue_ids = np.array(sorted(residue_to_values.keys()), dtype=int)
+    if len(residue_ids) > 1:
+        gaps = np.diff(residue_ids)
+        if np.any(gaps > 1):
+            gap_positions = np.where(gaps > 1)[0]
+            gap_details = [(int(residue_ids[i]), int(residue_ids[i + 1])) for i in gap_positions]
+            logging.warning(
+                "Non-sequential residue IDs detected in RMSF calculation. "
+                f"Gaps found: {gap_details[:5]} {'...' if len(gap_details) > 5 else ''}. "
+                f"Total gaps: {len(gap_positions)}. "
+                "Residue-to-RMSF mapping uses explicit dictionary keys to maintain correctness."
+            )
+
     residue_rmsf = np.array([np.mean(residue_to_values[r]) for r in residue_ids], dtype=float)
     return residue_ids, residue_rmsf
 
 
 def compute_contact_frequency(
-    universe: "mda.Universe", receptor_sel: str, ligand_sel: str, cutoff: float
+    universe: "mda.Universe",
+    receptor_sel: str,
+    ligand_sel: str,
+    cutoff: float,
+    max_frames: int = 1000,
 ) -> Tuple[np.ndarray, np.ndarray]:
+    """Compute contact frequency with optional frame striding.
+
+    Args:
+        universe: MDAnalysis universe.
+        receptor_sel: Receptor selection for contact detection.
+        ligand_sel: Ligand selection for contact detection.
+        cutoff: Contact cutoff distance (Å).
+        max_frames: Maximum frames to analyze. Stride is auto-calculated to
+            sample uniformly across trajectory. Set to None to analyze all
+            frames.
+    """
     receptor = universe.select_atoms(receptor_sel)
     ligand = universe.select_atoms(ligand_sel)
     if len(receptor) == 0 or len(ligand) == 0:
@@ -151,7 +180,18 @@ def compute_contact_frequency(
     counts = np.zeros(len(residue_ids), dtype=int)
     total_frames = 0
 
-    for _ in universe.trajectory:
+    traj_length = len(universe.trajectory)
+    stride = max(1, traj_length // max_frames) if max_frames else 1
+
+    if stride > 1:
+        logging.info(
+            "Analyzing %s frames with stride %s (trajectory length: %s frames)",
+            traj_length // stride,
+            stride,
+            traj_length,
+        )
+
+    for _ in universe.trajectory[::stride]:
         total_frames += 1
         contacts = mda.lib.distances.capped_distance(
             receptor.positions,
@@ -229,6 +269,7 @@ def analyze_trajectory(
     plot_format: str = "png",
     dpi: int = 300,
     contact_cutoff: float = 4.5,
+    contact_max_frames: int = 1000,
     distance_reference: str = "protein_backbone",
 ) -> Dict[str, Path]:
     out = Path(output_dir)
@@ -272,7 +313,13 @@ def analyze_trajectory(
     )
 
     universe.trajectory[0]
-    contact_res, contact_freq = compute_contact_frequency(universe, rec_sel, lig_sel, contact_cutoff)
+    contact_res, contact_freq = compute_contact_frequency(
+        universe,
+        rec_sel,
+        lig_sel,
+        contact_cutoff,
+        max_frames=contact_max_frames,
+    )
     _write_csv(
         out / "contact_frequency.csv",
         ["resid", "contact_frequency"],
@@ -338,6 +385,11 @@ def _apply_config_defaults(args: argparse.Namespace) -> argparse.Namespace:
             args.contact_cutoff = float(section.get("contact_cutoff", "4.5"))
         except ValueError:
             pass
+    if args.contact_max_frames == 1000 and section.get("contact_max_frames"):
+        try:
+            args.contact_max_frames = int(section.get("contact_max_frames", "1000"))
+        except ValueError:
+            pass
     if args.distance_reference == "protein_backbone" and section.get("distance_reference"):
         args.distance_reference = section.get("distance_reference", args.distance_reference)
     return args
@@ -355,6 +407,7 @@ def main() -> int:
         plot_format=args.plot_format,
         dpi=args.dpi,
         contact_cutoff=args.contact_cutoff,
+        contact_max_frames=args.contact_max_frames,
         distance_reference=args.distance_reference,
     )
     return 0
