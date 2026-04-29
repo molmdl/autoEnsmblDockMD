@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import tempfile
+import fcntl
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -84,14 +85,17 @@ class CheckpointManager:
             'schema_version': self.SCHEMA_VERSION
         }
         
-        # Atomic write: write to temp file, then rename
+        # Atomic write: write to temp file, fsync, then rename
         with tempfile.NamedTemporaryFile(
             mode='w',
             dir=self.checkpoint_dir,
             delete=False,
             suffix='.json'
         ) as tmp:
+            fcntl.flock(tmp.fileno(), fcntl.LOCK_EX)
             json.dump(checkpoint_data, tmp, indent=2, default=str)
+            tmp.flush()
+            os.fsync(tmp.fileno())
             tmp_path = tmp.name
         
         os.replace(tmp_path, checkpoint_path)
