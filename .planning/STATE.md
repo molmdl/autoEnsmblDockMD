@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (in progress) |
-| **Current Plan** | 4/7 plans complete (latest: 06.1-02) |
-| **Last Activity** | 2026-04-29 - Completed 06.1-02-PLAN.md |
-| **Progress** | █████████░ 52/58 plans complete (90%) |
+| **Current Plan** | 5/7 plans complete (latest: 06.1-03) |
+| **Last Activity** | 2026-04-29 - Completed 06.1-03-PLAN.md |
+| **Progress** | █████████░ 53/58 plans complete (91%) |
 | **Phase 6.1 Blocker** | None |
 | **Status** | Phase 6.1 in progress ✓ |
 
@@ -90,6 +90,7 @@ Superseded decision notes are retained for traceability and should not be treate
 | Use quoted heredoc templates plus escaped sed substitution in SBATCH generation | Prevents shell metacharacter interpolation from ligand/path values in generated job scripts |
 | Return `UNKNOWN_AFTER_RETRIES` after bounded UNKNOWN-state retries with default 7-day timeout | Mitigates Slurm squeue/sacct TOCTOU windows and avoids infinite wait loops |
 | Apply GRO box-line bounds checks in `scripts/com/0_prep.sh` `write_combined_gro()` with expected-index/line-count errors | Hardens the active merged-GRO path against truncated inputs and uncaught index crashes |
+| Use ceiling-based frame stride with `max_frames` cap and streamed subprocess output files | Keeps trajectory analysis bounded/predictable and prevents output-buffer OOM in long-running jobs |
 
 ### Known Pitfalls
 
@@ -109,26 +110,26 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-29 07:51 UTC
-Stopped at: Completed 06.1-02-PLAN.md
+Last session: 2026-04-29 07:54 UTC
+Stopped at: Completed 06.1-03-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Continue Phase 6.1 plan execution (3 plans remaining).
+Continue Phase 6.1 plan execution (2 plans remaining).
 
 ---
 
 ## Notes
 
-- Phase 5 completed previously; urgent Phase 5.1 is active for correctness and namespace remediation.
+- Phase 5 and 5.1 completed previously; Phase 6.1 is active for critical security/performance remediation.
 - Agent support remains explicitly experimental across docs.
 
 ---
 
 *State updated: 2026-04-29*
 *Current phase: 06.1-critical-security-performance-and-plugin-fixes*
-*Last action: 06.1-02 file-operation safety, atom mismatch reporting, and GRO bounds-check hardening complete (4/7 plans in phase)*
+*Last action: 06.1-03 trajectory-analysis performance/memory hardening complete (5/7 plans in phase)*
 
 ### Roadmap Evolution
 
