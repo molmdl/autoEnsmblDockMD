@@ -479,10 +479,14 @@ This urgent phase addresses critical findings from scancode analysis (`.planning
 
 **Depends on:** Phase 6.1
 
-**Plans:** 0 plans
+**Plans:** 5 plans in 5 waves
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 7 to break down)
+- [ ] 07-01-PLAN.md — Dryrun preparation and report generation (Wave 1)
+- [ ] 07-02-PLAN.md — Workspace initialization and preflight validation (Wave 2)
+- [ ] 07-03-PLAN.md — Stage execution orchestration (Stages 0-6) (Wave 3)
+- [ ] 07-04-PLAN.md — Output validation and comparison (Wave 4)
+- [ ] 07-05-PLAN.md — Metrics collection and final reporting (Wave 5)
 
 **Details:**
 
