@@ -479,14 +479,15 @@ This urgent phase addresses critical findings from scancode analysis (`.planning
 
 **Depends on:** Phase 6.1
 
-**Plans:** 5 plans in 5 waves
+**Plans:** 6 plans in 6 waves
 
 Plans:
 - [ ] 07-01-PLAN.md — Dryrun preparation and report generation (Wave 1)
 - [ ] 07-02-PLAN.md — Workspace initialization and preflight validation (Wave 2)
-- [ ] 07-03-PLAN.md — Stage execution orchestration (Stages 0-6) (Wave 3)
-- [ ] 07-04-PLAN.md — Output validation and comparison (Wave 4)
-- [ ] 07-05-PLAN.md — Metrics collection and final reporting (Wave 5)
+- [ ] 07-03-PLAN.md — Stages 0-2 execution (preflight, receptor, docking) (Wave 3)
+- [ ] 07-04-PLAN.md — Stages 3-6 execution (complex, MD, MM/PBSA, analysis) (Wave 4)
+- [ ] 07-05-PLAN.md — Output validation and comparison (Wave 5)
+- [ ] 07-06-PLAN.md — Metrics collection and final reporting (Wave 6)
 
 **Details:**
 
