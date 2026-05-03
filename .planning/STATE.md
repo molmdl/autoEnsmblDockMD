@@ -10,12 +10,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 06.1-critical-security-performance-and-plugin-fixes (COMPLETE ✓) |
-| **Current Plan** | All 7/7 plans complete + verified |
-| **Last Activity** | 2026-04-29 - Phase 6.1 complete, verified, ready for Phase 7 |
-| **Progress** | ██████████ 62/65 plans complete (95%) |
-| **Phase 6.1 Status** | COMPLETE - All security/performance/plugin fixes verified ✓ |
-| **Next Phase** | 07-first-controlled-execution (ready to plan) |
+| **Current Phase** | 07-first-controlled-execution (In progress) |
+| **Current Plan** | 1 of 6 in current phase |
+| **Last Activity** | 2026-05-03 - Completed 07-01-PLAN.md |
+| **Progress** | █████████░ 57/60 plans complete (95%) |
+| **Phase 7 Status** | IN PROGRESS - Dryrun report generator complete (1/6 plans) |
+| **Next Plan** | 07-02-PLAN.md (Workspace initialization and preflight validation) |
 
 ---
 
@@ -95,6 +95,14 @@ Superseded decision notes are retained for traceability and should not be treate
 | Prohibit deletion of `work/` root and require subdirectory targets | Adds defense-in-depth against catastrophic workspace root removal |
 | Consolidate phase verification into a single evidence report with per-issue PASS traces | Simplifies human approval and provides auditable closure for security/performance remediations |
 
+### Key Decisions (Phase 7)
+
+| Decision | Rationale |
+|----------|-----------|
+| Generate markdown dryrun report before expensive execution | Provides comprehensive readiness validation with clear manual approval gate |
+| Parse stage registry from run_pipeline.sh instead of hardcoding | Ensures flowchart accuracy and maintainability as stages evolve |
+| Use three-state status system (READY, NEEDS_REVIEW, BLOCKED) | Gives clear action guidance for different validation outcomes |
+
 ### Known Pitfalls
 
 - Force-field incompatibility (AMBER protein + CGenFF ligand) can crash downstream stages.
@@ -113,13 +121,13 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-04-29 08:24 UTC
-Stopped at: Completed 06.1-05-PLAN.md
+Last session: 2026-05-03 09:34 UTC
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
 
 ### Next Action
 
-Phase 6.1 complete. Prepare/execute Phase 7 first controlled end-to-end workflow validation.
+Continue Phase 7: Execute 07-02-PLAN.md for workspace initialization and preflight validation.
 
 ---
 
@@ -130,9 +138,9 @@ Phase 6.1 complete. Prepare/execute Phase 7 first controlled end-to-end workflow
 
 ---
 
-*State updated: 2026-04-29*
-*Current phase: 06.1-critical-security-performance-and-plugin-fixes*
-*Last action: 06.1-05 comprehensive security/performance verification and human approval complete (7/7 plans in phase)*
+*State updated: 2026-05-03*
+*Current phase: 07-first-controlled-execution*
+*Last action: 07-01 dryrun report generator and flowchart generator complete (1/6 plans in phase)*
 
 ### Roadmap Evolution
 
