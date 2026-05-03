@@ -1848,3 +1848,162 @@ Traceback (most recent call last):
   File "/share/home/nglokwan/miniconda3/envs/gmxMMPBSA/lib/python3.11/site-packages/MDAnalysis/analysis/rms.py", line 261, in rmsd
     raise ValueError('a and b must have same shape')
 ValueError: a and b must have same shape
+[2026-05-03T21:54:55+0800] [INFO] [pipeline] stage_start=dock_convert ts=2026-05-03T21:54:55+0800
+Using existing environment with gmx, gnina, and gmx_MMPBSA available
+[2026-05-03T21:54:55+0800] [INFO] Loaded config from work/test/config_expanded.ini
+[2026-05-03T21:54:55+0800] [INFO] Starting script: 0_gro2mol2
+[2026-05-03T21:54:55+0800] [ERROR] No GRO files matched pattern '*.gro' in 'work/test/dock'
+[2026-05-03T21:55:12+0800] [INFO] [pipeline] stage_start=dock_run ts=2026-05-03T21:55:12+0800
+Using existing environment with gmx, gnina, and gmx_MMPBSA available
+[2026-05-03T21:55:13+0800] [INFO] Loaded config from work/test/config_expanded.ini
+[2026-05-03T21:55:13+0800] [INFO] Starting script: 2_gnina.sh
+[2026-05-03T21:55:13+0800] [INFO] Submitting 2 ligand jobs for mode=targeted
+[2026-05-03T21:55:13+0800] [INFO] Submitted ligand dzp as Slurm job 95295
+[2026-05-03T21:55:13+0800] [INFO] Submitted ligand ibp as Slurm job 95296
+[2026-05-03T21:55:13+0800] [INFO] All ligand jobs submitted
+[2026-05-03T21:55:13+0800] [INFO] [pipeline] stage_end=dock_run ts=2026-05-03T21:55:13+0800
+Using existing environment with gmx, gnina, and gmx_MMPBSA available
+[2026-05-03T21:55:51+0800] [INFO] Loaded config from work/test/config_expanded.ini
+[2026-05-03T21:55:51+0800] [INFO] Starting script: 1_rec4dock.sh
+[2026-05-03T21:55:51+0800] [INFO] Preparing 20 receptor files into work/test/dock (copy)
+[2026-05-03T21:55:51+0800] [INFO] Converting work/test/dock/rec0.gro -> work/test/dock/rec0.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec0.gro -o work/test/dock/rec0.pdb
+
+
+Back Off! I just backed up work/test/dock/rec0.pdb to work/test/dock/#rec0.pdb.1#
+
+GROMACS reminds you: "Those people who think they know everything are a great annoyance to those of us who do." (Isaac Asimov)
+
+[2026-05-03T21:55:51+0800] [INFO] Converting work/test/dock/rec1.gro -> work/test/dock/rec1.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec1.gro -o work/test/dock/rec1.pdb
+
+
+Back Off! I just backed up work/test/dock/rec1.pdb to work/test/dock/#rec1.pdb.1#
+
+GROMACS reminds you: "Those people who think they know everything are a great annoyance to those of us who do." (Isaac Asimov)
+
+[2026-05-03T21:55:51+0800] [INFO] Converting work/test/dock/rec2.gro -> work/test/dock/rec2.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec2.gro -o work/test/dock/rec2.pdb
+
+
+Back Off! I just backed up work/test/dock/rec2.pdb to work/test/dock/#rec2.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec3.gro -> work/test/dock/rec3.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec3.gro -o work/test/dock/rec3.pdb
+
+
+Back Off! I just backed up work/test/dock/rec3.pdb to work/test/dock/#rec3.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec4.gro -> work/test/dock/rec4.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec4.gro -o work/test/dock/rec4.pdb
+
+
+Back Off! I just backed up work/test/dock/rec4.pdb to work/test/dock/#rec4.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec5.gro -> work/test/dock/rec5.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec5.gro -o work/test/dock/rec5.pdb
+
+
+Back Off! I just backed up work/test/dock/rec5.pdb to work/test/dock/#rec5.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec6.gro -> work/test/dock/rec6.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec6.gro -o work/test/dock/rec6.pdb
+
+
+Back Off! I just backed up work/test/dock/rec6.pdb to work/test/dock/#rec6.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec7.gro -> work/test/dock/rec7.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec7.gro -o work/test/dock/rec7.pdb
+
+
+Back Off! I just backed up work/test/dock/rec7.pdb to work/test/dock/#rec7.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec8.gro -> work/test/dock/rec8.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec8.gro -o work/test/dock/rec8.pdb
+
+
+Back Off! I just backed up work/test/dock/rec8.pdb to work/test/dock/#rec8.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Converting work/test/dock/rec9.gro -> work/test/dock/rec9.pdb
+              :-) GROMACS - gmx editconf, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD
+Command line:
+  gmx editconf -f work/test/dock/rec9.gro -o work/test/dock/rec9.pdb
+
+
+Back Off! I just backed up work/test/dock/rec9.pdb to work/test/dock/#rec9.pdb.1#
+
+GROMACS reminds you: "Therefore, things must be learned only to be unlearned again or, more likely, to be corrected." (Richard Feynman)
+
+[2026-05-03T21:55:52+0800] [INFO] Receptor docking preparation complete

@@ -218,6 +218,7 @@ __marimo__/
 *.xvg
 *.out
 *.cpt
+*.pdb
 slurm-*.out
 
 # Temp add session backup to gitignore
