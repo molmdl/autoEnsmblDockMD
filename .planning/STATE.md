@@ -12,11 +12,11 @@
 |-------|-------|
 | **Current Phase** | 07-first-controlled-execution (In progress) |
 | **Current Plan** | 3 of 6 in current phase |
-| **Last Activity** | 2026-05-03 - Executing 07-03-PLAN.md (checkpoint: awaiting Slurm job) |
+| **Last Activity** | 2026-05-03 16:55 - Production MD submitted (array job 95281) |
 | **Progress** | █████████░ 59/60 plans complete (98%) |
-| **Phase 7 Status** | IN PROGRESS - Stage 1 receptor prep submitted (Slurm job 95280) |
-| **Next Plan** | 07-03-PLAN.md (resume after job completion) |
-| **Checkpoint** | ⏳ Waiting for Slurm job 95280 (receptor equilibration) |
+| **Phase 7 Status** | IN PROGRESS - Stage 1 receptor production MD running (Slurm array job 95281) |
+| **Next Plan** | 07-03-PLAN.md (resume after production MD completes) |
+| **Checkpoint** | ⏳ Waiting for Slurm array job 95281 (4 × 60ns receptor production MD trials) |
 
 ---
 
@@ -124,14 +124,14 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-05-03 08:46 UTC
-Stopped at: Checkpoint - awaiting Slurm job 95280 completion
+Last session: 2026-05-03 16:55 UTC
+Stopped at: Checkpoint - awaiting Slurm array job 95281 completion (production MD)
 Resume file: `.continue-here.md`
 
 ### Next Action
 
-**AWAITING:** Slurm job 95280 must complete before continuing.
-Monitor job status: `squeue -j 95280` or `sacct -j 95280`
+**AWAITING:** Slurm array job 95281 (4 production MD trials) must complete before continuing.
+Monitor job status: `squeue -j 95281` or `sacct -j 95281`
 Resume after completion: `/gsd-execute-phase 7`
 
 ---
@@ -145,7 +145,7 @@ Resume after completion: `/gsd-execute-phase 7`
 
 *State updated: 2026-05-03*
 *Current phase: 07-first-controlled-execution*
-*Last action: 07-02 workspace initialization and preflight validation complete (2/6 plans in phase)*
+*Last action: 07-03 production MD submitted (4 × 60ns trials, job 95281)*
 
 ### Roadmap Evolution
 
