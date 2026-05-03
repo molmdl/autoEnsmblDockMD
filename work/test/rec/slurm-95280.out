@@ -1,0 +1,251 @@
+               :-) GROMACS - gmx grompp, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx grompp -v -f em.mdp -c ion.gro -p topol.top -o em.tpr
+
+Generating 1-4 interactions: fudge = 0.5
+renumbering atomtypes...
+processing index file...
+Making dummy/rest group for T-Coupling containing 98517 elements
+Making dummy/rest group for Acc. not used containing 98517 elements
+Making dummy/rest group for Freeze containing 98517 elements
+Making dummy/rest group for Energy Mon. containing 98517 elements
+Making dummy/rest group for VCM containing 98517 elements
+Number of degrees of freedom in T-Coupling group rest is 295548.00
+Making dummy/rest group for User1 containing 98517 elements
+Making dummy/rest group for User2 containing 98517 elements
+Making dummy/rest group for Compressed X containing 98517 elements
+Making dummy/rest group for Or. Res. Fit containing 98517 elements
+Making dummy/rest group for QMMM containing 98517 elements
+T-Coupling       has 1 element(s): rest
+Energy Mon.      has 1 element(s): rest
+Acc. not used    has 1 element(s): rest
+Freeze           has 1 element(s): rest
+User1            has 1 element(s): rest
+User2            has 1 element(s): rest
+VCM              has 1 element(s): rest
+Compressed X     has 1 element(s): rest
+Or. Res. Fit     has 1 element(s): rest
+QMMM             has 1 element(s): rest
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+GROMACS reminds you: "Carry Me Away" (Motors)
+
+checking input for internal consistency...
+
+Setting the LD random seed to -227803137
+
+processing topology...
+
+Generated 27028 of the 27028 non-bonded parameter combinations
+
+Generated 27028 of the 27028 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+Excluding 1 bonded neighbours molecule type 'CL'
+
+processing coordinates...
+
+double-checking input for internal consistency...
+
+converting bonded parameters...
+
+initialising group options...
+Analysing residue names:
+There are:   582    Protein residues
+There are: 29711      Water residues
+There are:   198        Ion residues
+Analysing Protein...
+
+The largest distance between excluded atoms is 0.420 nm between atom 8084 and 8085
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 96x96x96, spacing 0.118 0.118 0.118
+
+Estimate for the relative computational load of the PME mesh part: 0.32
+
+This run will generate roughly 11 Mb of data
+
+writing run input file...
+                :-) GROMACS - gmx mdrun, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx mdrun -deffnm em -ntomp 8 -ntmpi 1
+
+Reading file em.tpr, VERSION 2023.5-plumed_2.9.3 (single precision)
+1 GPU selected for this run.
+Mapping of GPU IDs to the 1 GPU task in the 1 rank on this node:
+  PP:0
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the CPU
+Using 1 MPI thread
+
+Non-default thread affinity set, disabling internal thread affinity
+
+Using 8 OpenMP threads 
+
+
+Steepest Descents:
+   Tolerance (Fmax)   =  1.00000e+01
+   Number of steps    =       500000
+
+Energy minimization has stopped, but the forces have not converged to the
+requested precision Fmax < 10 (which may not be possible for your system). It
+stopped because the algorithm tried to make a new step whose size was too
+small, or there was no change in the energy since last step. Either way, we
+regard the minimization as converged to within the available machine
+precision, given your starting configuration and EM parameters.
+
+Double precision normally gives you higher accuracy, but this is often not
+needed for preparing to run molecular dynamics.
+
+writing lowest energy coordinates.
+
+Steepest Descents converged to machine precision in 5589 steps,
+but did not reach the requested Fmax < 10.
+Potential Energy  = -1.7121830e+06
+Maximum force     =  9.1718231e+02 on atom 7321
+Norm of force     =  6.8608747e+00
+
+GROMACS reminds you: "Beware of bugs in the above code; I have only proved it correct, not tried it." (Donald Knuth)
+
+               :-) GROMACS - gmx grompp, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx grompp -v -f pr_pos.mdp -c em.gro -p topol.top -o pr_pos.tpr -r em.gro -maxwarn 3
+
+Generating 1-4 interactions: fudge = 0.5
+renumbering atomtypes...
+processing index file...
+Making dummy/rest group for Acc. not used containing 98517 elements
+Making dummy/rest group for Freeze containing 98517 elements
+Making dummy/rest group for Energy Mon. containing 98517 elements
+Number of degrees of freedom in T-Coupling group System is 201860.00
+Making dummy/rest group for User1 containing 98517 elements
+Making dummy/rest group for User2 containing 98517 elements
+Making dummy/rest group for Compressed X containing 89331 elements
+Making dummy/rest group for Or. Res. Fit containing 98517 elements
+Making dummy/rest group for QMMM containing 98517 elements
+T-Coupling       has 1 element(s): System
+Energy Mon.      has 1 element(s): rest
+Acc. not used    has 1 element(s): rest
+Freeze           has 1 element(s): rest
+User1            has 1 element(s): rest
+User2            has 1 element(s): rest
+VCM              has 1 element(s): System
+Compressed X     has 2 element(s): Protein rest
+Or. Res. Fit     has 1 element(s): rest
+QMMM             has 1 element(s): rest
+
+NOTE 1 [file pr_pos.mdp]:
+  Removing center of mass motion in the presence of position restraints
+  might cause artifacts. When you are using position restraints to
+  equilibrate a macro-molecule, the artifacts are usually negligible.
+
+
+There was 1 NOTE
+
+GROMACS reminds you: "I always think there is something foreign about jolly phrases at breakfast." (Mr. Carson in Downtown Abbey)
+
+checking input for internal consistency...
+
+Setting the LD random seed to 1778022194
+
+processing topology...
+
+Generated 27028 of the 27028 non-bonded parameter combinations
+
+Generated 27028 of the 27028 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein'
+
+turning H bonds into constraints...
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'CL'
+
+turning H bonds into constraints...
+
+processing coordinates...
+
+double-checking input for internal consistency...
+
+Reading position restraint coords from em.gro
+
+The center of mass of the position restraint coord's is  7.373  8.390  4.076
+
+The center of mass of the position restraint coord's is  7.373  8.390  4.076
+
+converting bonded parameters...
+
+initialising group options...
+Analysing residue names:
+There are:   582    Protein residues
+There are: 29711      Water residues
+There are:   198        Ion residues
+Analysing Protein...
+
+The largest distance between excluded atoms is 0.423 nm between atom 4651 and 4659
+
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 298.15 K
+
+Calculated rlist for 1x1 atom pair-list as 1.011 nm, buffer size 0.011 nm
+
+Set rlist, assuming 4x4 atom pair-list, to 1.000 nm, buffer size 0.000 nm
+
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 96x96x96, spacing 0.118 0.118 0.118
+
+Estimate for the relative computational load of the PME mesh part: 0.36
+
+This run will generate roughly 13 Mb of data
+
+writing run input file...
+                :-) GROMACS - gmx mdrun, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx mdrun -deffnm pr_pos -ntomp 8 -bonded gpu -nb gpu -update gpu -cpi 5 -ntmpi 1
+
+Reading file pr_pos.tpr, VERSION 2023.5-plumed_2.9.3 (single precision)
+Changing nstlist from 10 to 100, rlist from 1 to 1.104
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:0,PME:0
+PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
+PP task will update and constrain coordinates on the GPU
+PME tasks will do all aspects on the GPU
+Using 1 MPI thread
+
+Non-default thread affinity set, disabling internal thread affinity
+
+Using 8 OpenMP threads 
+
+starting mdrun 'Protein in water'
+100000 steps,    100.0 ps.
+
+Step 100  Warning: pressure scaling more than 1%, mu: 0.989872 0.989872 0.989872
