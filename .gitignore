@@ -216,6 +216,8 @@ __marimo__/
 *.log
 *.gro
 *.xvg
+*.out
+slurm-*.out
 
 # Temp add session backup to gitignore
 .oc_session/**
