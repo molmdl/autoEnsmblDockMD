@@ -7,6 +7,4 @@
 #source ~/scripts/miniconda_py3.env
 
 #activate conda environment
-# Skip conda activation - environment already has required tools
-# conda activate autoEnsmblDockMD
-echo "Using existing environment with gmx, gnina, and gmx_MMPBSA available"
+conda activate autoEnsmblDockMD
