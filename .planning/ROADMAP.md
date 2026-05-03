@@ -475,54 +475,61 @@ This urgent phase addresses critical findings from scancode analysis (`.planning
 
 ### Phase 7: First Controlled Execution
 
-**Goal:** Execute full targeted docking workflow (Mode A) in isolated workspace and validate outputs against expected results.
+**Goal:** Execute full targeted docking workflow (Mode A) in isolated workspace and validate outputs against expected results. PRIMARY GOAL: Test agent skills in `.opencode/skills/` to validate skill orchestration workflow.
 
 **Depends on:** Phase 6.1
 
-**Plans:** 6 plans in 6 waves
+**Plans:** 8 plans in 8 waves
 
 Plans:
 - [x] 07-01-PLAN.md — Dryrun preparation and report generation (Wave 1)
 - [x] 07-02-PLAN.md — Workspace initialization and preflight validation (Wave 2)
-- [x] 07-03-PLAN.md — Stages 0-2 execution (preflight, receptor, docking) (Wave 3) ⏸️ CHECKPOINT: Waiting for Slurm job 95280
-- [ ] 07-04-PLAN.md — Stages 3-6 execution (complex, MD, MM/PBSA, analysis) (Wave 4)
-- [ ] 07-05-PLAN.md — Output validation and comparison (Wave 5)
-- [ ] 07-06-PLAN.md — Metrics collection and final reporting (Wave 6)
+- [ ] 07-03-PLAN.md — Test aedmd-dock-run skill for targeted docking (Wave 3)
+- [ ] 07-04-PLAN.md — Test aedmd-com-setup skill for complex preparation (Wave 4)
+- [ ] 07-05-PLAN.md — Test aedmd-com-md skill for production MD (Wave 5)
+- [ ] 07-06-PLAN.md — Test aedmd-com-mmpbsa skill for MM/PBSA (Wave 6)
+- [ ] 07-07-PLAN.md — Test aedmd-com-analyze skill for trajectory analysis (Wave 7)
+- [ ] 07-08-PLAN.md — Output validation and execution reporting (Wave 8)
 
 **Details:**
 
-Perform first end-to-end execution of the targeted docking workflow using example data:
+**Phase Goal:** Test agent skills in `.opencode/skills/` to validate the skill orchestration workflow. The executor must use `skill(name="aedmd-<stage>")` to load and execute skills, NOT run pipeline scripts directly.
 
-1. **Workspace setup**
-   - Copy work/input/ files to work/run_2026-04-28/
-   - Use workspace-init plugin (from Phase 6)
-   - Configure for targeted mode with dzp or ibp ligand
+**Key Changes from Previous Plans:**
+- Each plan explicitly tests a specific agent skill
+- Skills are loaded via skill tool before execution
+- Handoff JSON creation is verified for each stage
+- Async Slurm jobs are handled with checkpoint flow
+- Success criteria include "skill orchestration tested"
 
-2. **Stage-by-stage execution** (Stages 0-6)
-   - Stage 0: Preflight validation
-   - Stage 1: Receptor ensemble generation (rec.pdb)
-   - Stage 2: Targeted docking (mode=targeted, reference_ligand=ref.pdb)
-   - Stage 3: Complex setup (AMBER topology branch)
-   - Stage 4: MD equilibration and production
-   - Stage 5: MM/PBSA binding free energy calculation
-   - Stage 6: Trajectory analysis (RMSD, RMSF, contacts, H-bonds)
+**Execution Approach:**
+1. **Skill Invocation Pattern:**
+   - Load skill: `skill(name="aedmd-<stage>")`
+   - Execute wrapper: `bash scripts/commands/aedmd-<stage>.sh --config config.ini`
+   - Verify handoff: `.handoffs/<stage_token>.json`
+   - Check status: `jq '.status' .handoffs/<stage_token>.json`
 
-3. **Output validation**
-   - Compare outputs against expected/amb/ reference
-   - Validate handoff status transitions
-   - Document actual vs expected outputs
+2. **Async Job Handling:**
+   - For Slurm stages: status="success" means "job submitted", not "job complete"
+   - Write checkpoint to `.continue-here.md` with job IDs
+   - EXIT session with instructions to wait for job completion
+   - On resume: check `sacct`, verify outputs, proceed
 
-4. **Workflow refinement**
-   - Identify pain points and documentation gaps
-   - Document token costs and automation effectiveness
-   - Create execution report with recommendations
+3. **Stage-Token Mappings:**
+   - aedmd-dock-run → docking_run
+   - aedmd-com-setup → complex_prep
+   - aedmd-com-md → complex_md
+   - aedmd-com-mmpbsa → complex_mmpbsa
+   - aedmd-com-analyze → complex_analysis
 
 **Success Criteria:**
-- [ ] Isolated workspace created and validated
-- [ ] All stages (0-6) execute without critical failures
-- [ ] Handoff status transitions are correct (success/needs_review)
+- [ ] Agent skills tested via skill tool (not bypassed)
+- [ ] All stages execute via skill interface
+- [ ] Handoff JSON files created for all stages
+- [ ] Status transitions are correct (success/needs_review)
+- [ ] Async jobs handled with checkpoint flow
 - [ ] Output artifacts match expected structure and format
-- [ ] Execution report documents workflow experience and recommendations
+- [ ] Execution report documents skill orchestration test results
 
 
 

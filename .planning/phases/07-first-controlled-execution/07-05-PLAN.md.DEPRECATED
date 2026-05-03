@@ -1,0 +1,409 @@
+---
+phase: 07-first-controlled-execution
+plan: 05
+type: execute
+wave: 5
+depends_on: [07-04]
+files_modified:
+  - scripts/phase7/07-validate-outputs.py
+  - .planning/phases/07-first-controlled-execution/07-validation-report.md
+autonomous: true
+
+must_haves:
+  truths:
+    - "Generated outputs match expected structure"
+    - "Docking scores are within tolerance ranges"
+    - "RMSD/RMSF statistics are within expected ranges"
+    - "Structure counts match exactly"
+    - "Validation report documents all comparisons"
+  artifacts:
+    - path: "scripts/phase7/07-validate-outputs.py"
+      provides: "Tolerance-based output comparator"
+      min_lines: 150
+    - path: ".planning/phases/07-first-controlled-execution/07-validation-report.md"
+      provides: "Validation comparison report"
+      contains: "Docking Scores|RMSD|RMSF"
+  key_links:
+    - from: "work/test/"
+      to: "expected/amb/"
+      via: "validation comparator"
+      pattern: "compare_outputs"
+    - from: "generated files"
+      to: "expected files"
+      via: "tolerance comparison"
+      pattern: "±\\d+%|exact"
+---
+
+<objective>
+Create output validation comparator with MD-appropriate tolerances and validate generated outputs against expected results.
+
+Purpose: Confirm pipeline produces scientifically valid outputs; identify any discrepancies
+Output: Validation comparator script and comprehensive validation report
+</objective>
+
+<execution_context>
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
+</execution_context>
+
+<context>
+@.planning/PROJECT.md
+@.planning/ROADMAP.md
+@.planning/STATE.md
+@.planning/phases/07-first-controlled-execution/07-CONTEXT.md
+@.planning/phases/07-first-controlled-execution/07-RESEARCH.md
+@.planning/phases/07-first-controlled-execution/07-04-SUMMARY.md
+</context>
+
+<tasks>
+
+<task type="auto">
+  <name>Task 1: Create validation comparator script</name>
+  <files>scripts/phase7/07-validate-outputs.py</files>
+  <action>
+Create a Python script `scripts/phase7/07-validate-outputs.py` that compares generated outputs against expected outputs with MD-appropriate tolerances:
+
+1. Accept parameters:
+   - `--workspace <path>`: Generated workspace (default: work/test)
+   - `--expected <path>`: Expected outputs directory (default: expected/amb)
+   - `--mode <blind|targeted>`: Docking mode (required)
+   - `--output <path>`: Validation report path (default: stdout)
+   - `--tolerance-level <loose|medium|strict>`: Tolerance preset (default: loose)
+
+2. Implement validation functions:
+   
+   a. **Structure validation** (exact match):
+   ```python
+   def validate_structure_counts(gen_file, exp_file):
+       # Parse GRO files
+       gen_atoms = parse_gro_atom_count(gen_file)
+       exp_atoms = parse_gro_atom_count(exp_file)
+       
+       # Parse topology for residue counts
+       gen_residues = parse_topology_residue_count(gen_file.with_suffix('.top'))
+       exp_residues = parse_topology_residue_count(exp_file.with_suffix('.top'))
+       
+       # Exact match required
+       return {
+           'atoms': gen_atoms == exp_atoms,
+           'residues': gen_residues == exp_residues,
+           'gen_atoms': gen_atoms,
+           'exp_atoms': exp_atoms
+       }
+   ```
+   
+   b. **Docking score validation** (±10% relative tolerance):
+   ```python
+   def validate_docking_scores(gen_file, exp_file, tolerance=0.10):
+       gen_scores = parse_docking_scores(gen_file)
+       exp_scores = parse_docking_scores(exp_file)
+       
+       # Compare top 10 poses
+       comparisons = []
+       for i, (gen, exp) in enumerate(zip(gen_scores[:10], exp_scores[:10])):
+           rel_diff = abs(gen - exp) / abs(exp) if exp != 0 else abs(gen - exp)
+           within_tol = rel_diff <= tolerance
+           comparisons.append({
+               'rank': i + 1,
+               'gen_score': gen,
+               'exp_score': exp,
+               'rel_diff': rel_diff,
+               'within_tolerance': within_tol
+           })
+       
+       return comparisons
+   ```
+   
+   c. **RMSD/RMSF validation** (±20% mean, ±30% std):
+   ```python
+   def validate_rmsd_stats(gen_file, exp_file, mean_tol=0.20, std_tol=0.30):
+       gen_stats = parse_xvg_statistics(gen_file)
+       exp_stats = parse_xvg_statistics(exp_file)
+       
+       # Compare mean and std
+       mean_diff = abs(gen_stats['mean'] - exp_stats['mean']) / exp_stats['mean']
+       std_diff = abs(gen_stats['std'] - exp_stats['std']) / exp_stats['std']
+       
+       return {
+           'mean_within_tol': mean_diff <= mean_tol,
+           'std_within_tol': std_diff <= std_tol,
+           'mean_diff': mean_diff,
+           'std_diff': std_diff
+       }
+   ```
+   
+   d. **File existence validation**:
+   ```python
+   def validate_file_existence(workspace, expected_files):
+       results = []
+       for exp_file in expected_files:
+           gen_path = workspace / exp_file.relative_to(expected_dir)
+           exists = gen_path.exists()
+           size_match = False
+           
+           if exists:
+               # Check approximate file size (within 2x)
+               gen_size = gen_path.stat().st_size
+               exp_size = exp_file.stat().st_size
+               size_match = 0.5 * exp_size <= gen_size <= 2.0 * exp_size
+           
+           results.append({
+               'file': str(exp_file.relative_to(expected_dir)),
+               'exists': exists,
+               'size_match': size_match
+           })
+       
+       return results
+   ```
+
+3. Define tolerance presets:
+   ```python
+   TOLERANCE_PRESETS = {
+       'loose': {
+           'docking_score': 0.10,  # ±10%
+           'rmsd_mean': 0.20,      # ±20%
+           'rmsd_std': 0.30,       # ±30%
+           'rmsf_mean': 0.20,
+           'rmsf_std': 0.30
+       },
+       'medium': {
+           'docking_score': 0.05,
+           'rmsd_mean': 0.10,
+           'rmsd_std': 0.20,
+           'rmsf_mean': 0.10,
+           'rmsf_std': 0.20
+       },
+       'strict': {
+           'docking_score': 0.02,
+           'rmsd_mean': 0.05,
+           'rmsd_std': 0.10,
+           'rmsf_mean': 0.05,
+           'rmsf_std': 0.10
+       }
+   }
+   ```
+
+4. Generate markdown report with:
+   - Summary table: Pass/fail counts for each validation category
+   - Detailed results: File-by-file comparisons with numerical values
+   - Tolerance information: What tolerances were applied
+   - Discrepancies: Clear list of items that failed validation
+
+5. Handle symlink resolution:
+   ```python
+   def resolve_expected_path(path):
+       if path.is_symlink():
+           target = path.resolve()
+           if not target.exists():
+               return None, f"Symlink target not accessible: {target}"
+           return target, None
+       return path, None
+   ```
+
+DO NOT use exact numerical comparison for MD outputs.
+DO NOT validate MM/PBSA binding energies (per CONTEXT.md).
+DO check symlink accessibility before validation.
+</action>
+  <verify>
+python scripts/phase7/07-validate-outputs.py --help && python scripts/phase7/07-validate-outputs.py --workspace work/test --expected expected/amb --mode targeted --output /tmp/test-validation.md && grep -q "Validation Summary" /tmp/test-validation.md
+</verify>
+  <done>Validation comparator script created with tolerance-based comparison for docking scores, RMSD/RMSF, and structure counts</done>
+</task>
+
+<task type="auto">
+  <name>Task 2: Check expected output accessibility</name>
+  <files>expected/amb/</files>
+  <action>
+Verify that expected output files are accessible before validation:
+
+1. Check expected directory structure:
+   ```bash
+   ls -la expected/amb/
+   ls -la expected/amb/rec/ensemble/
+   ls -la expected/amb/dock/
+   ls -la expected/amb/com_md/
+   ```
+
+2. Identify symlinks and check accessibility:
+   ```bash
+   find expected/amb/ -type l -exec sh -c '
+       target=$(readlink -f "$1")
+       if [ ! -e "$target" ]; then
+           echo "INACCESSIBLE: $1 -> $target"
+       else
+           echo "ACCESSIBLE: $1 -> $target"
+       fi
+   ' _ {} \;
+   ```
+
+3. If symlinks are inaccessible, identify required files:
+   ```bash
+   # List what we need for validation
+   echo "Required expected files for validation:"
+   echo "  - expected/amb/rec/ensemble/hsa{0..9}.gro (receptor ensemble)"
+   echo "  - expected/amb/dock/dzp/docking_scores.txt (docking scores)"
+   echo "  - expected/amb/com_md/ref/dzp/analysis/*rmsd*.xvg (RMSD data)"
+   echo "  - expected/amb/com_md/ref/dzp/analysis/*rmsf*.xvg (RMSF data)"
+   ```
+
+4. Generate accessibility report:
+   ```bash
+   cat > .planning/phases/07-first-controlled-execution/07-expected-accessibility.md << EOF
+# Expected Output Accessibility Report
+
+**Generated:** $(date -Iseconds)
+
+## Symlink Status
+
+$(find expected/amb/ -type l -exec sh -c 'target=$(readlink -f "$1"); if [ ! -e "$target" ]; then echo "- ❌ $1 -> $target (INACCESSIBLE)"; else echo "- ✓ $1 -> $target (accessible)"; fi' _ {} \;)
+
+## Required Files
+
+### Receptor Ensemble
+$(ls expected/amb/rec/ensemble/*.gro 2>/dev/null || echo "Files not accessible")
+
+### Docking Outputs
+$(ls expected/amb/dock/dzp/*.txt 2>/dev/null || echo "Files not accessible")
+
+### Analysis Outputs
+$(ls expected/amb/com_md/*/dzp/analysis/*.xvg 2>/dev/null || echo "Files not accessible")
+
+## Action Required
+
+If symlinks are inaccessible, user needs to copy actual files from source:
+\`\`\`bash
+# Example: Copy from external source
+cp -r /path/to/external/dock expected/amb/
+cp -r /path/to/external/com_md expected/amb/
+\`\`\`
+EOF
+   ```
+
+5. If critical expected files are inaccessible, document in validation report but continue with available comparisons.
+
+DO NOT fail if some expected files are missing - validate what's available.
+DO document which comparisons could not be performed.
+</action>
+  <verify>
+test -f .planning/phases/07-first-controlled-execution/07-expected-accessibility.md && grep -q "Symlink Status" .planning/phases/07-first-controlled-execution/07-expected-accessibility.md
+</verify>
+  <done>Expected output accessibility checked and documented</done>
+</task>
+
+<task type="auto">
+  <name>Task 3: Run validation comparator</name>
+  <files>.planning/phases/07-first-controlled-execution/07-validation-report.md</files>
+  <action>
+Execute validation comparator on generated outputs:
+
+1. Run validation for targeted mode:
+   ```bash
+   source scripts/setenv.sh
+   python scripts/phase7/07-validate-outputs.py \
+       --workspace work/test \
+       --expected expected/amb \
+       --mode targeted \
+       --tolerance-level loose \
+       --output .planning/phases/07-first-controlled-execution/07-validation-report.md
+   ```
+
+2. Parse validation results:
+   ```bash
+   # Extract summary statistics
+   PASS_COUNT=$(grep -c "✓ PASS" .planning/phases/07-first-controlled-execution/07-validation-report.md || echo "0")
+   FAIL_COUNT=$(grep -c "✗ FAIL" .planning/phases/07-first-controlled-execution/07-validation-report.md || echo "0")
+   SKIP_COUNT=$(grep -c "⊘ SKIP" .planning/phases/07-first-controlled-execution/07-validation-report.md || echo "0")
+   
+   echo "Validation Summary:"
+   echo "  Passed: $PASS_COUNT"
+   echo "  Failed: $FAIL_COUNT"
+   echo "  Skipped: $SKIP_COUNT"
+   ```
+
+3. Identify critical failures:
+   ```bash
+   # Check for structure count mismatches (should be exact)
+   if grep -q "atoms.*FAIL\|residues.*FAIL" .planning/phases/07-first-controlled-execution/07-validation-report.md; then
+       echo "WARNING: Structure count mismatch detected (should be exact)"
+       grep -A3 "atoms\|residues" .planning/phases/07-first-controlled-execution/07-validation-report.md | grep "FAIL"
+   fi
+   ```
+
+4. Document validation status:
+   ```bash
+   echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "---" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "**Validation completed:** $(date -Iseconds)" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "## Overall Status" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "- **Passed:** $PASS_COUNT" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "- **Failed:** $FAIL_COUNT" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   echo "- **Skipped:** $SKIP_COUNT" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   ```
+
+5. If validation fails, note that checker/debugger agents should be invoked:
+   ```bash
+   if [ $FAIL_COUNT -gt 0 ]; then
+       echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "## Next Steps" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "Validation failures detected. Recommended actions:" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "1. Review failure details in report above" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "2. Invoke checker agent for detailed validation: \`/aedmd-checker-validate\`" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+       echo "3. Invoke debugger agent for diagnosis: \`/aedmd-debugger-diagnose\`" >> .planning/phases/07-first-controlled-execution/07-validation-report.md
+   fi
+   ```
+
+DO NOT fail plan if validation has failures - document and continue.
+DO invoke checker/debugger agents separately if needed (outside this plan).
+</action>
+  <verify>
+test -f .planning/phases/07-first-controlled-execution/07-validation-report.md && grep -q "Validation Summary" .planning/phases/07-first-controlled-execution/07-validation-report.md
+</verify>
+  <done>Validation comparator executed and report generated with pass/fail/skip counts</done>
+</task>
+
+</tasks>
+
+<verification>
+After all tasks complete:
+
+1. Verify validation comparator:
+   ```bash
+   python scripts/phase7/07-validate-outputs.py --help
+   ```
+
+2. Verify accessibility report:
+   ```bash
+   test -f .planning/phases/07-first-controlled-execution/07-expected-accessibility.md
+   ```
+
+3. Verify validation report:
+   ```bash
+   test -f .planning/phases/07-first-controlled-execution/07-validation-report.md
+   grep "Overall Status" .planning/phases/07-first-controlled-execution/07-validation-report.md
+   ```
+
+4. Check validation statistics:
+   ```bash
+   PASS=$(grep -c "✓ PASS" .planning/phases/07-first-controlled-execution/07-validation-report.md || echo "0")
+   FAIL=$(grep -c "✗ FAIL" .planning/phases/07-first-controlled-execution/07-validation-report.md || echo "0")
+   echo "Passed: $PASS, Failed: $FAIL"
+   ```
+</verification>
+
+<success_criteria>
+- [x] Validation comparator script created with MD-appropriate tolerances
+- [x] Expected output accessibility checked and documented
+- [x] Validation report generated with pass/fail/skip counts
+- [x] Docking scores validated with ±10% tolerance
+- [x] RMSD/RMSF statistics validated with ±20%/±30% tolerances
+- [x] Structure counts validated with exact match
+- [x] MM/PBSA binding energies NOT validated (per CONTEXT.md)
+</success_criteria>
+
+<output>
+After completion, create `.planning/phases/07-first-controlled-execution/07-05-SUMMARY.md`
+</output>

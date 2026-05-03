@@ -1,0 +1,322 @@
+---
+phase: 07-first-controlled-execution
+plan: 03
+type: execute
+wave: 3
+depends_on: [07-02]
+files_modified:
+  - work/test/rec/
+  - work/test/dock/
+  - work/test/.handoffs/*.json
+  - .planning/phases/07-first-controlled-execution/07-execution-log.md
+autonomous: false
+
+must_haves:
+  truths:
+    - "Stages 0-2 execute without critical failures"
+    - "Handoff status transitions are correct (success/needs_review)"
+    - "Receptor ensemble outputs are generated"
+    - "Targeted docking outputs are generated"
+    - "Failures are captured and documented"
+  artifacts:
+    - path: "work/test/rec/ensemble/"
+      provides: "Receptor ensemble conformers"
+      contains: "hsa[0-9].gro"
+    - path: "work/test/dock/dzp/"
+      provides: "Docking outputs for dzp ligand"
+      contains: "dock_*.pdb"
+    - path: "work/test/dock/ibp/"
+      provides: "Docking outputs for ibp ligand"
+      contains: "dock_*.pdb"
+    - path: "work/test/.handoffs/rec_*.json"
+      provides: "Receptor stage execution records"
+      contains: '"status":'
+    - path: "work/test/.handoffs/dock_*.json"
+      provides: "Docking stage execution records"
+      contains: '"status":'
+  key_links:
+    - from: "work/test/config.ini"
+      to: "scripts/run_pipeline.sh"
+      via: "stage dispatch"
+      pattern: "--config"
+    - from: "scripts/run_pipeline.sh"
+      to: "work/test/.handoffs/"
+      via: "handoff records"
+      pattern: ".json"
+    - from: "Slurm jobs"
+      to: "stage outputs"
+      via: "asynchronous completion"
+      pattern: "squeue|sacct"
+---
+
+<objective>
+Execute Stages 0-2 of targeted docking workflow (preflight, receptor ensemble generation, targeted docking) with continuous monitoring and failure capture.
+
+Purpose: Validate early pipeline stages; capture execution metrics and failures for receptor preparation and docking
+Output: Generated artifacts from Stages 0-2, partial execution log
+</objective>
+
+<execution_context>
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
+</execution_context>
+
+<context>
+@.planning/PROJECT.md
+@.planning/ROADMAP.md
+@.planning/STATE.md
+@.planning/phases/07-first-controlled-execution/07-CONTEXT.md
+@.planning/phases/07-first-controlled-execution/07-RESEARCH.md
+@.planning/phases/07-first-controlled-execution/07-02-SUMMARY.md
+</context>
+
+<tasks>
+
+<task type="checkpoint:human-verify" gate="blocking">
+  <what-built>Dryrun report generated showing file/config/tool readiness for targeted docking mode</what-built>
+  <how-to-verify>
+Review the dryrun report at `.planning/phases/07-first-controlled-execution/07-dryrun-report-targeted.md`:
+
+1. **Check Summary Section**: Confirm all checks passed or have acceptable warnings
+2. **Review File/Config Readiness**: Verify all required inputs exist
+3. **Verify Tool Availability**: Confirm gmx, gnina, gmx_MMPBSA are accessible
+4. **Review Command Preview**: Understand what will execute
+5. **Examine Workflow Flowchart**: Understand stage sequence
+
+After reviewing, decide:
+- **Approve**: Type "approved" to proceed with real execution
+- **Reject**: Describe issues found and request fixes
+  </how-to-verify>
+  <resume-signal>Type "approved" to proceed or describe issues to address</resume-signal>
+</task>
+
+<task type="auto">
+  <name>Task 2: Execute Stage 0 - Preflight validation (runtime)</name>
+  <files>work/test/.handoffs/preflight_*.json</files>
+  <action>
+Execute runtime preflight validation through pipeline dispatcher:
+
+1. Run Stage 0:
+   ```bash
+   source scripts/setenv.sh
+   bash scripts/run_pipeline.sh \
+       --config work/test/config.ini \
+       --stage preflight \
+       2>&1 | tee -a .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ```
+
+2. Check handoff status:
+   ```bash
+   HANDOFF=$(ls -t work/test/.handoffs/preflight_*.json | head -1)
+   STATUS=$(cat "$HANDOFF" | jq -r '.status')
+   
+   if [ "$STATUS" == "failure" ]; then
+       echo "ERROR: Preflight validation failed" >&2
+       cat "$HANDOFF" | jq '.errors'
+       exit 1
+   fi
+   ```
+
+3. Log stage completion:
+   ```bash
+   echo "## Stage 0: Preflight - $(date -Iseconds)" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   echo "Status: $STATUS" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   echo "Duration: $(cat $HANDOFF | jq -r '.duration_seconds')s" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ```
+
+DO NOT skip preflight - it validates runtime environment.
+DO NOT proceed if status is "failure".
+</action>
+  <verify>
+ls work/test/.handoffs/preflight_*.json && cat work/test/.handoffs/preflight_*.json | jq -e '.status == "success" or .status == "needs_review"'
+</verify>
+  <done>Stage 0 preflight validation executed successfully with acceptable status</done>
+</task>
+
+<task type="auto">
+  <name>Task 3: Execute Stage 1 - Receptor ensemble generation</name>
+  <files>work/test/rec/, work/test/.handoffs/rec_*.json</files>
+  <action>
+Execute receptor preparation, MD sampling, clustering, and alignment:
+
+1. Run receptor preparation stages:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 1.0: Receptor preparation
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage rec_prep
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage rec_prod
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage rec_ana
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage rec_cluster
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage rec_align
+   ```
+
+2. Monitor Slurm job completion (rec_prod is asynchronous):
+   ```bash
+   # Check for submitted job
+   if ls work/test/rec/*.job 2>/dev/null; then
+       JOBID=$(basename work/test/rec/*.job .job | sed 's/.*_//')
+       echo "Waiting for receptor MD job: $JOBID"
+       
+       while squeue -j $JOBID >/dev/null 2>&1; do
+           echo "Job $JOBID still running..."
+           sleep 60
+       done
+       
+       # Check job completion
+       sacct -j $JOBID --format=JobID,State,Elapsed,ExitCode
+   fi
+   ```
+
+3. Verify ensemble generation:
+   ```bash
+   # Check for ensemble conformers
+   ls work/test/rec/ensemble/hsa{0..9}.gro 2>/dev/null || {
+       echo "ERROR: Ensemble conformers not generated"
+       exit 1
+   }
+   
+   echo "Generated $(ls work/test/rec/ensemble/hsa*.gro | wc -l) ensemble conformers"
+   ```
+
+4. Check handoff status for each sub-stage:
+   ```bash
+   for HANDOFF in work/test/.handoffs/rec_*.json; do
+       STATUS=$(cat "$HANDOFF" | jq -r '.status')
+       STAGE=$(cat "$HANDOFF" | jq -r '.stage')
+       echo "$STAGE: $STATUS"
+       
+       if [ "$STATUS" == "failure" ]; then
+           echo "ERROR in $STAGE:" >&2
+           cat "$HANDOFF" | jq '.errors'
+           # Continue to test coverage (don't exit)
+       fi
+   done
+   ```
+
+5. Log stage completion with timing and metrics.
+
+DO NOT proceed to Stage 2 if rec_align failed - docking requires aligned ensemble.
+DO monitor Slurm job completion before continuing to analysis stages.
+</action>
+  <verify>
+ls work/test/rec/ensemble/hsa{0..9}.gro && ls work/test/.handoffs/rec_*.json | wc -l | grep -q "[5-9]"
+</verify>
+  <done>Stage 1 receptor ensemble generated with 10 conformers, all sub-stages executed</done>
+</task>
+
+<task type="auto">
+  <name>Task 4: Execute Stage 2 - Targeted docking</name>
+  <files>work/test/dock/, work/test/.handoffs/dock_*.json</files>
+  <action>
+Execute targeted docking with reference ligand for pocket definition:
+
+1. Run docking stages:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 2: Docking
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage dock_prep
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage dock_run
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage dock_report
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage dock2com
+   ```
+
+2. Monitor Slurm job completion (dock_run is asynchronous):
+   ```bash
+   # Check for submitted job
+   if ls work/test/dock/*.job 2>/dev/null; then
+       JOBID=$(basename work/test/dock/*.job .job | sed 's/.*_//')
+       echo "Waiting for docking job: $JOBID"
+       
+       while squeue -j $JOBID >/dev/null 2>&1; do
+           echo "Job $JOBID still running..."
+           sleep 30
+       done
+   fi
+   ```
+
+3. Verify docking outputs:
+   ```bash
+   # Check for dzp and ibp docking results
+   for LIGAND in dzp ibp; do
+       echo "Checking $LIGAND docking outputs..."
+       ls work/test/dock/$LIGAND/dock_*.pdb 2>/dev/null || {
+           echo "WARNING: No docking outputs for $LIGAND"
+       }
+       
+       # Check docking scores
+       if [ -f work/test/dock/$LIGAND/docking_scores.txt ]; then
+           echo "Top 3 scores for $LIGAND:"
+           head -3 work/test/dock/$LIGAND/docking_scores.txt
+       fi
+   done
+   ```
+
+4. Verify dock2com outputs:
+   ```bash
+   # Check for complex-ready files
+   ls work/test/dock/dzp/com.gro work/test/dock/dzp/sys.top 2>/dev/null || {
+       echo "WARNING: Complex files not generated for dzp"
+   }
+   
+   ls work/test/dock/ibp/com.gro work/test/dock/ibp/sys.top 2>/dev/null || {
+       echo "WARNING: Complex files not generated for ibp"
+   }
+   ```
+
+5. Check handoff status and log completion.
+
+DO NOT proceed to Stage 3 if dock_run failed - complex prep requires docked poses.
+DO verify docking scores are reasonable (not all 0.0 or extreme values).
+</action>
+  <verify>
+ls work/test/dock/dzp/dock_*.pdb && ls work/test/dock/ibp/dock_*.pdb && ls work/test/.handoffs/dock_*.json | wc -l | grep -q "[3-9]"
+</verify>
+  <done>Stage 2 targeted docking completed with outputs for both dzp and ibp ligands</done>
+</task>
+
+</tasks>
+
+<verification>
+After all tasks complete:
+
+1. Verify stages executed:
+   ```bash
+   ls work/test/.handoffs/preflight_*.json
+   ls work/test/.handoffs/rec_*.json
+   ls work/test/.handoffs/dock_*.json
+   ```
+
+2. Verify key outputs exist:
+   ```bash
+   ls work/test/rec/ensemble/hsa{0..9}.gro
+   ls work/test/dock/dzp/dock_*.pdb
+   ls work/test/dock/ibp/dock_*.pdb
+   ```
+
+3. Verify execution log started:
+   ```bash
+   test -f .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ```
+
+4. Check handoff statuses:
+   ```bash
+   for HANDOFF in work/test/.handoffs/{preflight,rec_*,dock_*}.json; do
+       echo "$(basename $HANDOFF): $(cat $HANDOFF | jq -r '.status')"
+   done
+   ```
+</verification>
+
+<success_criteria>
+- [x] Stage 0 preflight executed successfully
+- [x] Stage 1 receptor ensemble generated with 10 conformers
+- [x] Stage 2 targeted docking completed for dzp and ibp
+- [x] Handoff records exist for Stages 0-2
+- [x] Execution log documents Stages 0-2
+- [x] No critical failures blocking continuation to Stages 3-6
+</success_criteria>
+
+<output>
+After completion, create `.planning/phases/07-first-controlled-execution/07-03-SUMMARY.md`
+</output>

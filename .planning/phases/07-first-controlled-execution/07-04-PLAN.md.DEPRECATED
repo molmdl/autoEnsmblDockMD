@@ -1,0 +1,495 @@
+---
+phase: 07-first-controlled-execution
+plan: 04
+type: execute
+wave: 4
+depends_on: [07-03]
+files_modified:
+  - work/test/com/
+  - work/test/.handoffs/com_*.json
+  - .planning/phases/07-first-controlled-execution/07-execution-log.md
+  - .planning/phases/07-first-controlled-execution/07-failures-report.md
+autonomous: true
+
+must_haves:
+  truths:
+    - "Stages 3-6 execute without critical failures"
+    - "Complex systems are prepared with valid topology"
+    - "MD trajectories are generated"
+    - "MM/PBSA calculations complete (energies not validated)"
+    - "Trajectory analysis generates RMSD/RMSF/contacts/H-bonds"
+    - "Failures are captured in separate report"
+  artifacts:
+    - path: "work/test/com/dzp/com.gro"
+      provides: "Complex structure for dzp"
+      contains: "AMBER|GAFF"
+    - path: "work/test/com/dzp/*.xtc"
+      provides: "MD trajectory for dzp"
+      contains: "xtc"
+    - path: "work/test/com/dzp/mmpbsa/*.dat"
+      provides: "MM/PBSA results for dzp"
+      contains: "GENERALIZED BORN"
+    - path: "work/test/com/dzp/analysis/*rmsd*.xvg"
+      provides: "RMSD analysis for dzp"
+      contains: "xvg"
+    - path: "work/test/.handoffs/com_*.json"
+      provides: "Complex stage execution records"
+      contains: '"status":'
+  key_links:
+    - from: "work/test/dock/dzp/com.gro"
+      to: "work/test/com/dzp/com.gro"
+      via: "complex preparation"
+      pattern: "com_prep"
+    - from: "work/test/com/dzp/com.gro"
+      to: "work/test/com/dzp/*.xtc"
+      via: "MD production"
+      pattern: "com_prod"
+    - from: "work/test/com/dzp/*.xtc"
+      to: "work/test/com/dzp/mmpbsa/"
+      via: "MM/PBSA"
+      pattern: "com_mmpbsa"
+    - from: "work/test/com/dzp/*.xtc"
+      to: "work/test/com/dzp/analysis/"
+      via: "trajectory analysis"
+      pattern: "com_ana"
+---
+
+<objective>
+Execute Stages 3-6 of targeted docking workflow (complex setup, MD production, MM/PBSA, trajectory analysis) with continuous monitoring and generate comprehensive execution log and failure report.
+
+Purpose: Complete pipeline execution; capture all execution metrics and failures
+Output: Generated artifacts from Stages 3-6, execution log, and failure report
+</objective>
+
+<execution_context>
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
+</execution_context>
+
+<context>
+@.planning/PROJECT.md
+@.planning/ROADMAP.md
+@.planning/STATE.md
+@.planning/phases/07-first-controlled-execution/07-CONTEXT.md
+@.planning/phases/07-first-controlled-execution/07-RESEARCH.md
+@.planning/phases/07-first-controlled-execution/07-03-SUMMARY.md
+</context>
+
+<tasks>
+
+<task type="auto">
+  <name>Task 1: Execute Stage 3 - Complex setup</name>
+  <files>work/test/com/, work/test/.handoffs/com_prep_*.json</files>
+  <action>
+Execute complex system preparation with AMBER topology:
+
+1. Run complex preparation:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 3: Complex setup
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage com_prep
+   ```
+
+2. Verify complex outputs for each ligand:
+   ```bash
+   for LIGAND in dzp ibp; do
+       echo "Checking $LIGAND complex preparation..."
+       
+       # Check required files
+       test -f work/test/com/$LIGAND/com.gro || {
+           echo "ERROR: com.gro missing for $LIGAND"
+       }
+       test -f work/test/com/$LIGAND/sys.top || {
+           echo "ERROR: sys.top missing for $LIGAND"
+       }
+       test -f work/test/com/$LIGAND/index.ndx || {
+           echo "ERROR: index.ndx missing for $LIGAND"
+       }
+       
+       # Verify topology completeness
+       if [ -f work/test/com/$LIGAND/sys.top ]; then
+           ATOMS=$(grep -c "^\\s*[0-9]" work/test/com/$LIGAND/sys.top || echo "0")
+           echo "Topology has $ATOMS atom records"
+       fi
+   done
+   ```
+
+3. Check handoff status:
+   ```bash
+   HANDOFF=$(ls -t work/test/.handoffs/com_prep_*.json | head -1)
+   STATUS=$(cat "$HANDOFF" | jq -r '.status')
+   
+   if [ "$STATUS" == "failure" ]; then
+       echo "ERROR: Complex preparation failed"
+       cat "$HANDOFF" | jq '.errors'
+       # Check for force-field issues
+       grep -i "amber\|gaff" work/test/com/*/sys.top | head -5
+   fi
+   ```
+
+4. Verify AMBER force-field usage:
+   ```bash
+   grep -l "amber19SB\|GAFF" work/test/com/*/sys.top || {
+       echo "WARNING: AMBER force field not detected in topology"
+   }
+   ```
+
+5. Log stage completion.
+
+DO NOT proceed to Stage 4 if com_prep failed - MD requires valid topology.
+DO check for AMBER-specific issues (angle type 3 bypass may be needed).
+</action>
+  <verify>
+ls work/test/com/dzp/com.gro work/test/com/dzp/sys.top work/test/com/ibp/com.gro work/test/com/ibp/sys.top && ls work/test/.handoffs/com_prep_*.json
+</verify>
+  <done>Stage 3 complex setup completed with valid topology for both ligands</done>
+</task>
+
+<task type="auto">
+  <name>Task 2: Execute Stage 4 - MD equilibration and production</name>
+  <files>work/test/com/*/pr.mdp, work/test/com/*/prod.mdp, work/test/.handoffs/com_prod_*.json</files>
+  <action>
+Execute MD equilibration and production runs:
+
+1. Run MD production stages:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 4: MD production
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage com_prod
+   ```
+
+2. Monitor Slurm job completion:
+   ```bash
+   # Production MD is asynchronous - check job status
+   for LIGAND in dzp ibp; do
+       if ls work/test/com/$LIGAND/*.job 2>/dev/null; then
+           JOBID=$(basename work/test/com/$LIGAND/*.job .job | sed 's/.*_//')
+           echo "Waiting for $LIGAND MD job: $JOBID"
+           
+           # Wait with timeout (24 hours max)
+           TIMEOUT=86400
+           ELAPSED=0
+           
+           while squeue -j $JOBID >/dev/null 2>&1 && [ $ELAPSED -lt $TIMEOUT ]; do
+               echo "Job $JOBID still running... (${ELAPSED}s elapsed)"
+               sleep 300
+               ELAPSED=$((ELAPSED + 300))
+           done
+           
+           # Check completion
+           if [ $ELAPSED -ge $TIMEOUT ]; then
+               echo "WARNING: Job $JOBID timeout after ${TIMEOUT}s"
+           else
+               sacct -j $JOBID --format=JobID,State,Elapsed,ExitCode
+           fi
+       fi
+   done
+   ```
+
+3. Verify MD outputs:
+   ```bash
+   for LIGAND in dzp ibp; do
+       echo "Checking $LIGAND MD outputs..."
+       
+       # Check trajectory
+       ls work/test/com/$LIGAND/*.xtc 2>/dev/null || {
+           echo "WARNING: No trajectory for $LIGAND"
+       }
+       
+       # Check energy file
+       ls work/test/com/$LIGAND/*.edr 2>/dev/null || {
+           echo "WARNING: No energy file for $LIGAND"
+       }
+       
+       # Check log
+       ls work/test/com/$LIGAND/*.log 2>/dev/null || {
+           echo "WARNING: No MD log for $LIGAND"
+       }
+   done
+   ```
+
+4. Check handoff status and log completion.
+
+DO NOT proceed to Stage 5 if trajectory is missing - MM/PBSA requires trajectory.
+DO monitor job completion with timeout to avoid infinite wait.
+</action>
+  <verify>
+ls work/test/com/dzp/*.xtc work/test/com/ibp/*.xtc && ls work/test/.handoffs/com_prod_*.json
+</verify>
+  <done>Stage 4 MD production completed with trajectories for both ligands</done>
+</task>
+
+<task type="auto">
+  <name>Task 3: Execute Stage 5 - MM/PBSA calculation</name>
+  <files>work/test/com/*/mmpbsa/, work/test/.handoffs/com_mmpbsa_*.json</files>
+  <action>
+Execute MM/PBSA binding free energy calculations:
+
+1. Run MM/PBSA stage:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 5: MM/PBSA
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage com_mmpbsa
+   ```
+
+2. Monitor Slurm job completion:
+   ```bash
+   # MM/PBSA is asynchronous
+   for LIGAND in dzp ibp; do
+       if ls work/test/com/$LIGAND/mmpbsa/*.job 2>/dev/null; then
+           JOBID=$(basename work/test/com/$LIGAND/mmpbsa/*.job .job | sed 's/.*_//')
+           echo "Waiting for $LIGAND MM/PBSA job: $JOBID"
+           
+           while squeue -j $JOBID >/dev/null 2>&1; do
+               echo "Job $JOBID still running..."
+               sleep 300
+           done
+       fi
+   done
+   ```
+
+3. Verify MM/PBSA outputs:
+   ```bash
+   for LIGAND in dzp ibp; do
+       echo "Checking $LIGAND MM/PBSA outputs..."
+       
+       # Check final result file
+       ls work/test/com/$LIGAND/mmpbsa/*_FINAL_RESULTS_MMPBSA.dat 2>/dev/null || {
+           echo "WARNING: No MM/PBSA results for $LIGAND"
+       }
+       
+       # Extract binding energy if available
+       if ls work/test/com/$LIGAND/mmpbsa/*_FINAL_RESULTS_MMPBSA.dat 2>/dev/null; then
+           echo "Binding energy for $LIGAND:"
+           grep -A5 "GENERALIZED BORN" work/test/com/$LIGAND/mmpbsa/*_FINAL_RESULTS_MMPBSA.dat | tail -3
+       fi
+   done
+   ```
+
+4. Check handoff status.
+
+NOTE: CONTEXT.md specifies NOT validating binding energies due to high variance - this is expected.
+
+DO NOT fail if MM/PBSA produces high variance results - this is normal.
+DO check that MM/PBSA completed without errors (status check).
+</action>
+  <verify>
+ls work/test/com/dzp/mmpbsa/*.dat work/test/com/ibp/mmpbsa/*.dat && ls work/test/.handoffs/com_mmpbsa_*.json
+</verify>
+  <done>Stage 5 MM/PBSA calculations completed (binding energies generated but not validated)</done>
+</task>
+
+<task type="auto">
+  <name>Task 4: Execute Stage 6 - Trajectory analysis</name>
+  <files>work/test/com/*/analysis/, work/test/.handoffs/com_ana_*.json</files>
+  <action>
+Execute trajectory analysis (RMSD, RMSF, contacts, H-bonds):
+
+1. Run analysis stage:
+   ```bash
+   source scripts/setenv.sh
+   
+   # Stage 6: Analysis
+   bash scripts/run_pipeline.sh --config work/test/config.ini --stage com_ana
+   ```
+
+2. Verify analysis outputs:
+   ```bash
+   for LIGAND in dzp ibp; do
+       echo "Checking $LIGAND analysis outputs..."
+       
+       # Check RMSD
+       ls work/test/com/$LIGAND/analysis/*rmsd*.xvg 2>/dev/null || {
+           echo "WARNING: No RMSD data for $LIGAND"
+       }
+       
+       # Check RMSF
+       ls work/test/com/$LIGAND/analysis/*rmsf*.xvg 2>/dev/null || {
+           echo "WARNING: No RMSF data for $LIGAND"
+       }
+       
+       # Check contacts
+       ls work/test/com/$LIGAND/analysis/*contact*.xvg 2>/dev/null || {
+           echo "WARNING: No contact data for $LIGAND"
+       }
+       
+       # Check H-bonds
+       ls work/test/com/$LIGAND/analysis/*hbond*.xvg 2>/dev/null || {
+           echo "WARNING: No H-bond data for $LIGAND"
+       }
+   done
+   ```
+
+3. Extract key metrics:
+   ```bash
+   for LIGAND in dzp ibp; do
+       echo "Key metrics for $LIGAND:"
+       
+       # Extract RMSD mean/std if available
+       if ls work/test/com/$LIGAND/analysis/*rmsd*.xvg 2>/dev/null; then
+           echo "RMSD data present"
+       fi
+       
+       # Check for analysis summary
+       if [ -f work/test/com/$LIGAND/analysis/summary.txt ]; then
+           cat work/test/com/$LIGAND/analysis/summary.txt
+       fi
+   done
+   ```
+
+4. Check handoff status and log completion.
+
+These are the key metrics that will be validated in Plan 05.
+
+DO NOT fail if analysis produces warnings - check handoff status.
+DO extract RMSD/RMSF statistics for validation comparator.
+</action>
+  <verify>
+ls work/test/com/dzp/analysis/*rmsd*.xvg work/test/com/ibp/analysis/*rmsd*.xvg && ls work/test/.handoffs/com_ana_*.json
+</verify>
+  <done>Stage 6 trajectory analysis completed with RMSD, RMSF, contacts, H-bonds data</done>
+</task>
+
+<task type="auto">
+  <name>Task 5: Generate execution log and failure report</name>
+  <files>.planning/phases/07-first-controlled-execution/07-execution-log.md, .planning/phases/07-first-controlled-execution/07-failures-report.md</files>
+  <action>
+Consolidate execution records into comprehensive reports:
+
+1. Generate execution log:
+   ```bash
+   cat > .planning/phases/07-first-controlled-execution/07-execution-log.md << 'EOF'
+# Phase 7 Execution Log
+   
+   **Workspace:** work/test
+   **Mode:** targeted
+   **Date:** $(date -Iseconds)
+   
+   ## Stage Execution Summary
+   
+   EOF
+   
+   # Add stage summaries
+   for HANDOFF in $(ls -t work/test/.handoffs/*.json); do
+       STAGE=$(cat "$HANDOFF" | jq -r '.stage')
+       STATUS=$(cat "$HANDOFF" | jq -r '.status')
+       DURATION=$(cat "$HANDOFF" | jq -r '.duration_seconds // "unknown"')
+       
+       echo "### $STAGE" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+       echo "- Status: $STATUS" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+       echo "- Duration: ${DURATION}s" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+       echo "" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   done
+   ```
+
+2. Generate failure report (separate from main log):
+   ```bash
+   cat > .planning/phases/07-first-controlled-execution/07-failures-report.md << 'EOF'
+# Phase 7 Failures Report
+   
+   **Generated:** $(date -Iseconds)
+   
+   ## Failed Stages
+   
+   EOF
+   
+   # Check for failures
+   FAILURE_COUNT=0
+   for HANDOFF in $(ls work/test/.handoffs/*.json); do
+       STATUS=$(cat "$HANDOFF" | jq -r '.status')
+       
+       if [ "$STATUS" == "failure" ]; then
+           FAILURE_COUNT=$((FAILURE_COUNT + 1))
+           STAGE=$(cat "$HANDOFF" | jq -r '.stage')
+           ERRORS=$(cat "$HANDOFF" | jq -r '.errors')
+           
+           echo "### $STAGE" >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+           echo '```json' >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+           echo "$ERRORS" >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+           echo '```' >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+           echo "" >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+       fi
+   done
+   
+   if [ $FAILURE_COUNT -eq 0 ]; then
+       echo "No critical failures detected." >> .planning/phases/07-first-controlled-execution/07-failures-report.md
+   else
+       echo "Total failures: $FAILURE_COUNT"
+   fi
+   ```
+
+3. Generate disk usage report:
+   ```bash
+   echo "## Disk Usage" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   du -sh work/test/* >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ```
+
+4. Generate artifact inventory:
+   ```bash
+   echo "## Artifact Inventory" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   echo "### Receptor Ensemble" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ls work/test/rec/ensemble/*.gro 2>/dev/null | wc -l >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   
+   echo "### Docking Outputs" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ls work/test/dock/*/dock_*.pdb 2>/dev/null | wc -l >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   
+   echo "### Complex Systems" >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ls work/test/com/*/com.gro 2>/dev/null | wc -l >> .planning/phases/07-first-controlled-execution/07-execution-log.md
+   ```
+
+DO NOT skip failure documentation - this is critical for debugging.
+DO keep failure report separate for ease of debug sessions.
+</action>
+  <verify>
+test -f .planning/phases/07-first-controlled-execution/07-execution-log.md && test -f .planning/phases/07-first-controlled-execution/07-failures-report.md && grep -q "Stage Execution Summary" .planning/phases/07-first-controlled-execution/07-execution-log.md
+</verify>
+  <done>Execution log and failure report generated with all stage records</done>
+</task>
+
+</tasks>
+
+<verification>
+After all tasks complete:
+
+1. Verify all stages executed:
+   ```bash
+   ls work/test/.handoffs/*.json | wc -l  # Should have multiple handoff records
+   ```
+
+2. Verify key outputs exist:
+   ```bash
+   ls work/test/com/dzp/com.gro work/test/com/dzp/*.xtc
+   ls work/test/com/ibp/com.gro work/test/com/ibp/*.xtc
+   ls work/test/com/dzp/mmpbsa/*.dat
+   ls work/test/com/dzp/analysis/*rmsd*.xvg
+   ```
+
+3. Verify reports generated:
+   ```bash
+   test -f .planning/phases/07-first-controlled-execution/07-execution-log.md
+   test -f .planning/phases/07-first-controlled-execution/07-failures-report.md
+   ```
+
+4. Check failure count:
+   ```bash
+   grep -c "No critical failures" .planning/phases/07-first-controlled-execution/07-failures-report.md || echo "Failures detected"
+   ```
+</verification>
+
+<success_criteria>
+- [x] Stages 3-6 executed in sequence
+- [x] Complex systems prepared with AMBER topology
+- [x] MD production trajectories generated
+- [x] MM/PBSA calculations completed
+- [x] Trajectory analysis completed (RMSD, RMSF, contacts, H-bonds)
+- [x] Handoff records exist for Stages 3-6
+- [x] Execution log documents all stages
+- [x] Failure report captures any issues (separate from main log)
+</success_criteria>
+
+<output>
+After completion, create `.planning/phases/07-first-controlled-execution/07-04-SUMMARY.md`
+</output>
