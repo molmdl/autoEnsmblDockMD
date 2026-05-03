@@ -105,6 +105,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Use three-state status system (READY, NEEDS_REVIEW, BLOCKED) | Gives clear action guidance for different validation outcomes |
 | Use workspace_init.py plugin for isolated workspace creation | Ensures security boundary enforcement and reproducible initialization |
 | Accept needs_review status from preflight validation | Non-blocking warnings don't prevent execution when files are correctly located |
+| **Use Option B: Agent skills with checkpoint flow (2026-05-03)** | Phase goal is to TEST agent skills in `.opencode/skills/`; skills submit Slurm jobs async and return immediately; checkpoint flow prevents context overflow during long jobs |
+| Create interpolated config_expanded.ini with Python ConfigParser | Bash config loader doesn't support `${section:key}` interpolation syntax |
 
 ### Known Pitfalls
 

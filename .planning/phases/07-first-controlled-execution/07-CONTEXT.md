@@ -8,6 +8,36 @@
 
 Execute full targeted docking workflow (Mode A) in isolated workspace and validate outputs against expected results. Start with read-only dryrun before real test. This is a validation phase to confirm the pipeline works end-to-end before recommending production use.
 
+## Execution Approach (DECISION: Option B)
+
+**User Decision (2026-05-03):** Use Option B - Agent Skills with Checkpoint Flow
+
+**Rationale:**
+- Phase goal is to TEST agent skills in `.opencode/skills/`, not just run pipeline scripts
+- Agent skills submit Slurm jobs asynchronously and return immediately
+- Checkpoint flow enables proper async job handling without context overflow
+
+**Implementation Pattern:**
+1. Load skill via `skill` tool (e.g., `skill(name="aedmd-rec-ensemble")`)
+2. Execute skill wrapper (submits Slurm job, returns immediately)
+3. Parse job ID from `work/test/.handoffs/*.json`
+4. Write checkpoint to `.continue-here.md` with job ID and "waiting" status
+5. EXIT session with instructions to wait for job completion
+6. On resume: check `sacct` for job status, verify outputs, proceed to next stage
+
+**Stages with async Slurm jobs (require checkpoints):**
+| Stage | Skill | Duration | Checkpoint Needed |
+|-------|-------|----------|-------------------|
+| rec_prod | aedmd-rec-ensemble | 24-48 hrs | Yes |
+| dock_run | aedmd-dock-run | 1-4 hrs | Yes |
+| com_setup (equil) | aedmd-com-setup | 1-4 hrs | Yes |
+| com_md | aedmd-com-md | 24-48 hrs | Yes |
+| com_mmpbsa | aedmd-com-mmpbsa | 2-8 hrs | Yes |
+
+**Alternative approaches NOT chosen:**
+- Option A: Replan phase with agent skills as primary interface (discards current plans)
+- Option C: Hybrid - test skills for simple stages, fall back to scripts for long jobs (inconsistent testing)
+
 </domain>
 
 <decisions>
