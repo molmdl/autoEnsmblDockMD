@@ -1,401 +1,743 @@
 # Phase 7: First Controlled Execution - Research
 
 **Researched:** 2026-05-03
-**Domain:** Workflow validation, end-to-end testing, dry-run execution
+**Domain:** Agent skill orchestration and execution patterns
 **Confidence:** HIGH
 
 ## Summary
 
-Phase 7 requires executing the full Mode A (targeted docking) workflow in an isolated workspace and validating outputs against expected results. The pipeline has comprehensive dry-run support through `scripts/run_pipeline.sh --dry-run`, and several validation plugins exist (preflight, workspace-init, handoff-inspect). However, key gaps exist: (1) expected outputs in `expected/amb/` are symbolic links to external directories that may need copying, (2) no comprehensive validation script exists for comparing generated outputs to expected outputs with MD-appropriate tolerances, and (3) token/runtime/disk metrics tracking is not built into the pipeline (external to scripts).
+This research addresses the critical failure from previous execution: the executor ran pipeline scripts directly (`run_pipeline.sh --stage X`) instead of using the agent skill interface. The phase goal is to TEST the skill orchestration workflow, not just run the pipeline.
 
-**Primary recommendation:** Build a Phase 7 execution orchestrator that wraps existing tools (preflight, workspace-init, pipeline dry-run) and adds two new components: (1) a dryrun report generator that produces the comprehensive markdown report with file/config readiness, tool availability, command preview, and text-based flowchart; (2) a validation comparator that checks generated outputs against expected with loose numerical tolerances for MD-derived values.
+Agent skills in `.opencode/skills/` provide the orchestration interface. The skill tool loads skill instructions, which guide execution through wrapper scripts, the runner agent, and finally the actual pipeline scripts. For Slurm-backed stages, jobs submit asynchronously and return immediately with status=success meaning "submission successful" (not "job complete").
+
+**Primary recommendation:** Plans must explicitly instruct executors to use `skill(name="aedmd-<name>")` to load skill instructions, then follow the skill's execution pattern. Never instruct executors to run pipeline scripts directly.
 
 ## Standard Stack
 
-The established tools for this validation phase:
+The established pattern for skill orchestration:
 
-### Core
-| Library/Tool | Version | Purpose | Why Standard |
-|--------------|---------|---------|--------------|
-| `scripts/run_pipeline.sh` | v1 | Pipeline orchestrator | Dispatches all stages with `--dry-run` support |
-| `scripts/infra/plugins/preflight.py` | v1 | Config/tool/input validation | Mode-aware preflight checks |
-| `scripts/infra/plugins/workspace_init.py` | v1 | Workspace initialization | Isolated workspace setup with security boundary |
-| `scripts/infra/plugins/handoff_inspect.py` | v1 | Handoff status triage | Normalizes stage status for decision-making |
+### Core Components
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| Skill tool | Loads skill instructions into conversation | Built-in tool: `skill(name=...)` |
+| SKILL.md files | Define execution patterns and parameters | `.opencode/skills/*/SKILL.md` |
+| Wrapper scripts | Bridge between skills and agents | `scripts/commands/aedmd-*.sh` |
+| common.sh | Shared utilities for wrappers | `scripts/commands/common.sh` |
+| Runner agent | Executes scripts and creates handoffs | `scripts/agents/runner.py` |
+| Handoff schema | Status and data exchange format | `scripts/agents/schemas/handoff.py` |
+| Checkpoint manager | State persistence for long jobs | `scripts/infra/checkpoint.py` |
 
-### Supporting
-| Library/Tool | Version | Purpose | When to Use |
-|--------------|---------|---------|-------------|
-| `scripts/agents/checker.py` | v1 | Output validation | Post-stage quality checks |
-| `scripts/agents/debugger.py` | v1 | Failure diagnosis | Error analysis and remediation suggestions |
-| `scripts/infra/plugins/group_id_check.py` | v1 | MM/PBSA group validation | Before MM/PBSA calculations |
-| `scripts/infra/plugins/conversion_cache.py` | v1 | Format conversion caching | During docking/complex prep |
+### Execution Flow
+```
+┌─────────────┐
+│ Skill Tool  │  Load skill(name="aedmd-<stage>")
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ SKILL.md    │  Provides instructions, parameters, expected outputs
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Wrapper     │  scripts/commands/aedmd-<stage>.sh
+│  (bash)     │  - Sources common.sh
+└──────┬──────┘  - Calls dispatch_agent("runner", "<stage_token>")
+       │         - Calls check_handoff_result("<stage_token>")
+       ▼
+┌─────────────┐
+│ Runner      │  scripts/agents/runner.py
+│  (python)   │  - Executes script via subprocess
+└──────┬──────┘  - Creates HandoffRecord
+       │         - Saves to .handoffs/<stage>.json
+       ▼
+┌─────────────┐
+│ Pipeline    │  scripts/rec/ | dock/ | com/*.sh
+│  Script     │  - May submit Slurm job (async)
+└──────┬──────┘  - Returns exit code
+       │
+       ▼
+┌─────────────┐
+│ Handoff     │  .handoffs/<stage>.json
+│  JSON       │  - status: success/failure/needs_review/blocked
+└─────────────┘  - data: job IDs, metrics, paths
+```
 
-### Test Inputs Available
-| Input | Location | Purpose |
-|-------|----------|---------|
-| `rec.pdb` | `work/input/` | Reference receptor for alignment target |
-| `2bxo.pdb` | `work/input/` | Starting receptor for ensemble generation |
-| `ref.pdb` | `work/input/` | Reference ligand for pocket definition |
-| `dzp/` | `work/input/dzp/` | Reference ligand with AMBER topology |
-| `ibp/` | `work/input/ibp/` | New ligand with AMBER topology |
-| `amber19SB_OL21_OL3_lipid17.ff/` | `work/input/` (symlink) | AMBER force field files |
-
-### Expected Outputs Structure (Mode A)
-| Directory | Contents | Status |
-|-----------|----------|--------|
-| `expected/amb/rec/ensemble/` | `hsa0.gro` - `hsa9.gro` (10 conformers) | Accessible |
-| `expected/amb/dock/` | Symlinks to external directory | **May need copying** |
-| `expected/amb/com_md/ref/dzp/` | Symlink to external directory | **May need copying** |
-| `expected/amb/com_md/new/dzp/`, `ibp/` | Symlinks to external directory | **May need copying** |
-
-**Critical note:** Most `expected/amb/` files are symbolic links to `/share/home/nglokwan/dparker/dp_xinyi/`. User may need to copy actual files from another computer if symlinks are inaccessible.
+### Installation
+No installation needed. Skills are loaded dynamically via the built-in `skill` tool.
 
 ## Architecture Patterns
 
-### Recommended Validation Flow
+### Pattern 1: Skill Invocation (CORRECT)
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    PHASE 7: VALIDATION FLOW                                  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  1. DRYRUN PHASE                                                             │
-│     ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                   │
-│     │ preflight   │───▶│ workspace   │───▶│ dryrun      │                   │
-│     │ validation  │    │ init        │    │ report      │                   │
-│     └─────────────┘    └─────────────┘    └─────────────┘                   │
-│            │                  │                  │                           │
-│            ▼                  ▼                  ▼                           │
-│     .handoffs/          work/test/         .planning/                       │
-│     preflight_*.json    (isolated)         07-dryrun-report.md              │
-│                                                                              │
-│     MANUAL APPROVAL GATE ←───────────────────────────────────────────────   │
-│                                                                              │
-│  2. EXECUTION PHASE                                                          │
-│     ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                   │
-│     │ run_pipeline│───▶│ stage       │───▶│ validation  │                   │
-│     │ (Mode A)    │    │ monitoring  │    │ comparator  │                   │
-│     └─────────────┘    └─────────────┘    └─────────────┘                   │
-│            │                  │                  │                           │
-│            ▼                  ▼                  ▼                           │
-│     work/test/          .handoffs/         .planning/                       │
-│     (artifacts)         stage/*.json       07-execution-report.md           │
-│                                                                              │
-│  3. FAILURE HANDLING                                                         │
-│     ┌─────────────┐    ┌─────────────┐                                       │
-│     │ checker     │◀───│ stage       │  On NEEDS_REVIEW/FAILURE             │
-│     │ validate    │    │ failure     │                                       │
-│     └─────────────┘    └─────────────┘                                       │
-│            │                                                                 │
-│            ▼                                                                 │
-│     ┌─────────────┐                                                          │
-│     │ debugger    │  Generate diagnosis, wait for user approval             │
-│     │ diagnose    │                                                          │
-│     └─────────────┘                                                          │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+**What:** Load skill instructions via skill tool, then follow the skill's guidance
 
-### Pattern 1: Dryrun Report Generation
-**What:** Generate comprehensive markdown report before real execution
-**When to use:** Before any expensive workflow execution
+**When to use:** ALWAYS for Phase 7 - this is the phase goal
+
 **Example:**
-```bash
-# Source: scripts/run_pipeline.sh --dry-run
-bash scripts/run_pipeline.sh --config config.ini --dry-run
+```
+## Task 1: Execute Receptor Ensemble Generation
 
-# Output: List of commands that would run
-[DRY-RUN] /path/to/scripts/rec/0_prep.sh --config config.ini
-[DRY-RUN] /path/to/scripts/rec/1_pr_rec.sh --config config.ini
-...
+**Action:** Load the receptor ensemble skill and execute
+
+1. Load skill instructions:
+   ```
+   Use the skill tool to load: skill(name="aedmd-rec-ensemble")
+   ```
+
+2. After skill loads, follow the instructions in the SKILL.md:
+   - Execute the wrapper: `bash scripts/commands/aedmd-rec-ensemble.sh --config config.ini`
+   - Verify handoff created: `.handoffs/receptor_prep.json`
+
+3. Verify handoff status:
+   ```bash
+   jq -r '.status' .handoffs/receptor_prep.json
+   # Expected: "success"
+   ```
+
+4. For async Slurm jobs, extract job ID:
+   ```bash
+   jq -r '.data.job_id // .metadata.job_id // empty' .handoffs/receptor_prep.json
+   ```
+
+5. Write checkpoint to `.continue-here.md`:
+   ```markdown
+   ---
+   phase: 07-first-controlled-execution
+   task: 1
+   status: waiting
+   job_id: <extracted_job_id>
+   ---
+   
+   Waiting for Slurm job <job_id> to complete.
+   Check: sacct -j <job_id>
+   ```
+
+6. EXIT session with clear instructions to wait for job completion
 ```
 
-**Gap:** Current dry-run only prints commands. Need wrapper to produce:
-1. File/config readiness status (from preflight)
-2. Tool availability check results (from preflight)
-3. Command preview (existing dry-run)
-4. Text-based flowchart showing stages/sub-steps/scripts
+**Source:** Based on `.opencode/skills/aedmd-*/SKILL.md` files and `scripts/commands/common.sh`
 
-### Pattern 2: Workspace Initialization
-**What:** Create isolated workspace from template with security boundary enforcement
-**When to use:** Before any test/production run
-**Source:** `scripts/infra/plugins/workspace_init.py`
+### Pattern 2: Direct Pipeline Invocation (WRONG - DO NOT USE)
 
-```python
-# Initialize workspace with boundary checks
-from scripts.infra.plugins.workspace_init import initialize_workspace
+**Anti-pattern:**
+```
+## Task 1: Run Receptor Ensemble
 
-record = initialize_workspace(
-    template_dir=Path("work/input"),
-    target_dir=Path("work/test"),
-    force=True,  # Overwrite existing
-)
+**Action:** Execute pipeline script directly
 
-# record.status: SUCCESS | FAILURE | BLOCKED
-# record.data["workspace_path"]: created workspace location
-# record.warnings: missing critical inputs
+1. Run: `bash scripts/run_pipeline.sh --stage rec_*`
 ```
 
-**Security boundary:** `--force` deletion restricted to `work/` directory only via `is_relative_to(work_root)` check.
+**Why it's wrong:**
+- Bypasses skill interface entirely
+- No handoff JSON created
+- Skill orchestration never tested
+- Defeats Phase 7 goal
 
-### Pattern 3: Handoff-Based Progress Tracking
-**What:** Use `.handoffs/*.json` files as canonical run-state ledger
-**When to use:** After each stage execution
-**Source:** `scripts/infra/plugins/handoff_inspect.py`
+**Source:** This is what caused the failure in the previous execution
 
-```python
-# Inspect latest handoff
-from scripts.infra.plugins.handoff_inspect import inspect_latest_handoff
+### Pattern 3: Checkpoint Flow for Async Jobs
 
-record = inspect_latest_handoff(Path("work/test"))
+**What:** Handle long-running Slurm jobs with checkpoint/resume pattern
 
-# Normalized status: SUCCESS | FAILED | NEEDS_REVIEW | BLOCKED
-# record.data["latest_stage"]: last completed stage
-# record.data["next_action"]: recommended next command
+**When to use:** For stages that submit Slurm jobs (rec_prod, dock_run, com_md, com_mmpbsa)
+
+**Example:**
+```markdown
+## Task 2: Execute Docking (Async)
+
+**Step 1: Submit Job**
+1. Load skill: `skill(name="aedmd-dock-run")`
+2. Execute wrapper: `bash scripts/commands/aedmd-dock-run.sh --config config.ini`
+3. Verify handoff: `jq '.status' .handoffs/docking_run.json`
+4. Extract job ID: `jq -r '.data.slurm_job_ids[0]' .handoffs/docking_run.json`
+
+**Step 2: Write Checkpoint**
+Create `.continue-here.md`:
+```markdown
+---
+phase: 07-first-controlled-execution
+task: 2
+status: waiting
+job_ids: [12345, 12346, 12347]
+last_updated: 2026-05-03T22:00:00+08:00
+---
+
+<current_state>
+Waiting for docking jobs to complete.
+
+Jobs: 12345, 12346, 12347
+Check: sacct -j 12345,12346,12347
+
+Expected outputs:
+- dock/dzp/docked.sdf
+- dock/ibp/docked.sdf
+</current_state>
+
+<next_action>
+Resume when jobs complete:
+1. Check job status: sacct -j 12345,12346,12347
+2. Verify outputs exist
+3. Load next skill: skill(name="aedmd-com-setup")
+</next_action>
 ```
+
+**Step 3: EXIT**
+Exit session with message: "Slurm jobs submitted. Resume after jobs complete (check with sacct)."
+
+**Step 4: Resume (in new session)**
+1. Read `.continue-here.md`
+2. Check job status: `sacct -j <job_ids>`
+3. If complete, verify outputs
+4. Proceed to next stage
+```
+
+**Source:** Derived from `.opencode/skills/aedmd-orchestrator-resume/SKILL.md` and checkpoint manager patterns
 
 ### Anti-Patterns to Avoid
-- **Assuming symlinks resolve:** Check if `expected/amb/*` symlinks point to accessible files before validation
-- **Exact numerical comparison:** MD/MM/PBSA outputs have high variance; use tolerance ranges
-- **Blocking on warnings:** `NEEDS_REVIEW` status should allow continuation after user acknowledgment
-- **Skipping preflight:** Tool availability and config validation prevents late-stage failures
+
+1. **Running pipeline scripts directly**
+   - Wrong: `run_pipeline.sh --stage X`
+   - Right: Load skill → Execute wrapper → Verify handoff
+
+2. **Ignoring handoff status**
+   - Wrong: Execute skill, assume success
+   - Right: Check `.handoffs/<stage>.json` status field
+
+3. **Treating async job completion as synchronous**
+   - Wrong: Skill returns success → assume job complete
+   - Right: Success means "submission successful" → checkpoint → wait → resume
+
+4. **Not verifying handoff JSON creation**
+   - Wrong: Execute wrapper, proceed to next task
+   - Right: Verify `.handoffs/<stage>.json` exists and has valid status
 
 ## Don't Hand-Roll
 
-Problems that look simple but have existing solutions:
+Problems that have existing solutions in the skill system:
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Config validation | Custom INI parser | `scripts/infra/plugins/preflight.py` | Mode-aware validation, tool checks |
-| Workspace setup | Manual `cp -r` | `scripts/infra/plugins/workspace_init.py` | Security boundaries, template validation |
-| Status triage | Parse handoff JSON manually | `scripts/infra/plugins/handoff_inspect.py` | Normalized status, next-action guidance |
-| Stage dispatch | Custom orchestration | `scripts/run_pipeline.sh` | Stage ordering, config section validation |
-| Failure diagnosis | Manual log inspection | `scripts/agents/debugger.py` | Known error patterns, environment capture |
+| Stage execution | Custom script invocation | Skill tool + wrapper | Tests orchestration, creates handoffs |
+| Job tracking | Manual Slurm queries | Checkpoint + handoff data | Preserves context across sessions |
+| Status checking | Ad-hoc status logic | `check_handoff_result()` in common.sh | Standardized exit codes and messages |
+| Error handling | Try-catch around scripts | Handoff status + recommendations | Structured failure reporting |
+| Session continuation | Memory-based state | `.continue-here.md` + `.checkpoints/` | Resumable across context windows |
 
-**Key insight:** The pipeline already has robust infrastructure for validation and execution. Phase 7 should wrap these tools rather than reimplement them.
+**Key insight:** The skill system provides the orchestration layer. Phase 7's goal is to TEST this layer. Don't bypass it.
 
 ## Common Pitfalls
 
-### Pitfall 1: Symlink Resolution Failure
-**What goes wrong:** Expected outputs in `expected/amb/` are symlinks to `/share/home/nglokwan/dparker/dp_xinyi/` which may not be accessible
-**Why it happens:** Expected outputs stored on different filesystem/machine
-**How to avoid:** 
-1. Check symlink accessibility with `readlink -f` before validation
-2. If inaccessible, request user to copy actual files from source
-3. Document expected file structure for user reference
-**Warning signs:** `ls: cannot access expected/amb/dock/dzp: No such file or directory`
+### Pitfall 1: Skill Tool Misunderstanding
 
-### Pitfall 2: MD Numerical Variance
-**What goes wrong:** Exact numerical comparison fails for MD-derived outputs
-**Why it happens:** MD simulations have inherent stochasticity; different random seeds, GPU nondeterminism
-**How to avoid:**
-1. Use tolerance ranges for numerical values (e.g., RMSD mean ± 2σ)
-2. Compare structure counts exactly (atom count, residue count, frame count)
-3. Do NOT validate binding energies (MM/PBSA variance too high)
-**Recommended tolerances:**
-- Docking scores: ±10% relative tolerance for top poses
-- RMSD/RMSF mean: ±20% relative tolerance
-- RMSD/RMSF std: ±30% relative tolerance
-- Structure counts: Exact match required
+**What goes wrong:** Executor thinks skill tool "runs" the skill
 
-### Pitfall 3: Asynchronous Stage Completion
-**What goes wrong:** Assuming stage completion when wrapper returns
-**Why it happens:** `rec_prod`, `com_prod`, `com_mmpbsa` submit Slurm jobs asynchronously
-**How to avoid:**
-1. Check job status with `squeue -u $USER` before advancing
-2. Use `sacct -j <jobid> --format=JobID,State,Elapsed,ExitCode` for completion verification
-3. Stage outputs not ready until Slurm job completes
-**Warning signs:** Downstream stage fails with "file not found" for trajectory files
+**Why it happens:** The skill tool is called "skill", which sounds like an action
 
-### Pitfall 4: Force-Field Incompatibility
-**What goes wrong:** AMBER protein + CGenFF ligand topology mismatch
-**Why it happens:** Mixed force-field assumptions in topology assembly
 **How to avoid:**
-1. Verify `[dock2com] ff = amber` for AMBER workflows
-2. Check ligand `.itp` file uses GAFF2 atom types for AMBER
-3. Use `scripts/com/bypass_angle_type3.py` for AMBER angle type issues
-**Warning signs:** GROMACS fatal error during `gmx grompp` with "Unknown angle type"
+- Skill tool LOADS instructions, it doesn't execute anything
+- After loading, follow the instructions in SKILL.md
+- Instructions typically say to run a wrapper script
 
-### Pitfall 5: Missing Hydrogens
-**What goes wrong:** Docking/MD/MM/PBSA fail with structure errors
-**Why it happens:** Input structures missing hydrogen atoms
+**Warning signs:**
+- Plan says "run skill X" without specifying the wrapper
+- Executor tries to call skill tool multiple times in one session
+- No wrapper script invocation mentioned
+
+**Correct pattern:**
+```
+1. Load skill: skill(name="aedmd-<stage>")
+2. Read the instructions that were loaded
+3. Execute the wrapper script mentioned in SKILL.md
+4. Verify handoff JSON
+```
+
+### Pitfall 2: Handoff Status Misinterpretation
+
+**What goes wrong:** Treating `status: success` as "job complete" for Slurm stages
+
+**Why it happens:** Success sounds like full completion
+
 **How to avoid:**
-1. Check `ref.pdb`, `rec.pdb`, ligand structures have H atoms
-2. Use `pdb2pqr` with `--keep-chain` for protonation
-3. Verify `[docking] addH = off` means input already has H (or set `addH = on`)
-**Warning signs:** gnina docking produces unrealistic poses, GROMACS crashes in minimization
+- For Slurm stages: `success` = "job submitted successfully"
+- Must check job status separately with `sacct`
+- Must verify output files exist
+- Must implement checkpoint flow
+
+**Warning signs:**
+- Plan proceeds to next stage immediately after skill execution
+- No checkpoint file created
+- No job ID extracted from handoff
+
+**Correct interpretation:**
+```json
+{
+  "status": "success",
+  "stage": "receptor_md",
+  "data": {
+    "slurm_job_ids": [12345, 12346, 12347, 12348],
+    "script_result": {
+      "returncode": 0,
+      "stdout": "Submitted batch job 12345\n..."
+    }
+  }
+}
+```
+This means: "Jobs submitted, not complete"
+
+### Pitfall 3: Missing Handoff Verification
+
+**What goes wrong:** Skill wrapper executes but no handoff JSON created
+
+**Why it happens:**
+- Wrapper script errors before reaching dispatch_agent
+- dispatch_agent fails silently
+- Wrong stage token used
+- Permission issues in .handoffs/ directory
+
+**How to avoid:**
+- Always verify `.handoffs/<stage>.json` exists after execution
+- Check handoff status with `jq '.status' .handoffs/<stage>.json`
+- Use canonical stage tokens from `scripts/agents/schemas/state.py`
+
+**Stage token mapping (canonical):**
+| Skill Name | Stage Token | Handoff File |
+|------------|-------------|--------------|
+| aedmd-rec-ensemble | receptor_prep | .handoffs/receptor_prep.json |
+| aedmd-dock-run | docking_run | .handoffs/docking_run.json |
+| aedmd-com-setup | complex_prep | .handoffs/complex_prep.json |
+| aedmd-com-md | complex_md | .handoffs/complex_md.json |
+| aedmd-com-mmpbsa | complex_mmpbsa | .handoffs/complex_mmpbsa.json |
+| aedmd-com-analyze | complex_analysis | .handoffs/complex_analysis.json |
+
+**Verification command:**
+```bash
+# After executing skill wrapper
+if [[ -f .handoffs/<stage>.json ]]; then
+  status=$(jq -r '.status' .handoffs/<stage>.json)
+  echo "Handoff status: $status"
+  
+  case "$status" in
+    success)
+      echo "✓ Stage completed successfully"
+      ;;
+    needs_review)
+      echo "⚠ Warnings detected:"
+      jq -r '.warnings[]' .handoffs/<stage>.json
+      ;;
+    failure|blocked)
+      echo "✗ Stage failed:"
+      jq -r '.errors[]' .handoffs/<stage>.json
+      exit 1
+      ;;
+  esac
+else
+  echo "✗ No handoff file created"
+  exit 1
+fi
+```
+
+### Pitfall 4: Plan-Goal Mismatch
+
+**What goes wrong:** Plan instructions contradict phase goal
+
+**Why it happens:**
+- Plan written for efficiency, not testing
+- Planner didn't understand phase goal
+- Skill interface wasn't considered during planning
+
+**How to avoid:**
+- Plans must start with phase goal reference
+- Each task must test a skill
+- Verification must check handoff files
+- Success criteria must include "skill orchestration tested"
+
+**Warning signs:**
+- Plan says "run run_pipeline.sh"
+- No mention of skill tool
+- No handoff verification steps
+- Success criteria only mention output files
 
 ## Code Examples
 
-Verified patterns from official sources:
+### Example 1: Complete Skill Invocation Pattern
 
-### Preflight Validation
-```python
-# Source: scripts/infra/plugins/preflight.py
-from scripts.infra.plugins.preflight import PreflightValidator
-
-validator = PreflightValidator(config_path=Path("config.ini"))
-validator.workspace_root = Path("work/test")
-record = validator.validate()
-
-# record.status: SUCCESS | FAILURE | NEEDS_REVIEW
-# record.errors: blocking issues
-# record.warnings: non-blocking issues
-# record.data["mode"]: targeted | blind | test
-# record.data["tools_checked"]: ["gmx", "gnina", "gmx_MMPBSA"]
-```
-
-### Pipeline Dry-Run
 ```bash
-# Source: scripts/run_pipeline.sh
-# Dry-run single stage
-bash scripts/run_pipeline.sh --config config.ini --stage rec_prep --dry-run
+# Task: Execute receptor ensemble generation via skill
 
-# Dry-run full pipeline
-bash scripts/run_pipeline.sh --config config.ini --dry-run
+# Step 1: Load skill instructions (this happens via skill tool in the conversation)
+# The skill tool will inject the contents of .opencode/skills/aedmd-rec-ensemble/SKILL.md
 
-# Output: [DRY-RUN] <command> for each stage
+# Step 2: Execute the wrapper as instructed by SKILL.md
+cd work/test
+bash ../../scripts/commands/aedmd-rec-ensemble.sh --config config.ini
+
+# Step 3: Verify handoff creation
+if [[ ! -f .handoffs/receptor_prep.json ]]; then
+  echo "ERROR: No handoff file created"
+  exit 1
+fi
+
+# Step 4: Check handoff status
+status=$(jq -r '.status' .handoffs/receptor_prep.json)
+echo "Handoff status: $status"
+
+# Step 5: Extract job IDs for async stages
+job_ids=$(jq -r '.data.slurm_job_ids[]? // .metadata.job_ids[]? // empty' .handoffs/receptor_prep.json)
+
+if [[ -n "$job_ids" ]]; then
+  echo "Slurm jobs submitted: $job_ids"
+  echo "Jobs are running asynchronously"
+  echo "Check completion: sacct -j $(echo $job_ids | tr '\n' ',')"
+fi
+
+# Step 6: Write checkpoint if async
+if [[ -n "$job_ids" ]]; then
+  cat > .continue-here.md <<EOF
+---
+phase: 07-first-controlled-execution
+task: 1
+status: waiting
+job_ids: [$(echo $job_ids | jq -R -s -c 'split("\n") | map(select(length > 0))')]
+last_updated: $(date -Iseconds)
+---
+
+<current_state>
+Waiting for receptor production MD jobs to complete.
+
+Job IDs: $(echo $job_ids)
+Check: sacct -j $(echo $job_ids | tr '\n' ',')
+
+Expected outputs:
+- rec/pr_0.xtc through rec/pr_3.xtc
+- rec/merged_fit.xtc
+</current_state>
+
+<next_action>
+Resume when jobs complete:
+1. sacct -j <job_ids> | grep COMPLETED
+2. Verify output files
+3. Load next skill: skill(name="aedmd-dock-run")
+</next_action>
+EOF
+  
+  echo "Checkpoint written to .continue-here.md"
+  echo "EXIT session now. Resume after jobs complete."
+fi
 ```
 
-### Workspace Initialization
+**Source:** Based on `scripts/commands/aedmd-rec-ensemble.sh`, `common.sh`, and skill files
+
+### Example 2: Resume Pattern for Async Jobs
+
 ```bash
-# Source: scripts/infra/plugins/workspace_init.py
-python -m scripts.infra.plugins.workspace_init \
-    --template work/input \
-    --target work/test \
-    --force
+# Task: Resume after async job completion
 
-# Output: HandoffRecord JSON with workspace_path, template_source, created_dirs
+# Step 1: Read checkpoint
+checkpoint_file=".continue-here.md"
+if [[ ! -f "$checkpoint_file" ]]; then
+  echo "No checkpoint found. Start from beginning."
+  exit 1
+fi
+
+# Step 2: Extract job IDs
+job_ids=$(grep -A1 "^job_ids:" "$checkpoint_file" | tail -1 | jq -r '.[]' | tr '\n' ',')
+job_ids=${job_ids%,}  # Remove trailing comma
+
+echo "Checking jobs: $job_ids"
+
+# Step 3: Check job status
+job_status=$(sacct -j "$job_ids" --format=State --noheader | sort -u)
+
+if echo "$job_status" | grep -q "RUNNING\|PENDING"; then
+  echo "Jobs still running. Exit and wait."
+  exit 0
+elif echo "$job_status" | grep -q "FAILED\|TIMEOUT\|CANCELLED"; then
+  echo "Jobs failed. Check logs."
+  sacct -j "$job_ids" --format=JobID,State,ExitCode,Start,End
+  exit 1
+elif echo "$job_status" | grep -q "COMPLETED"; then
+  echo "✓ All jobs completed successfully"
+else
+  echo "Unknown job status: $job_status"
+  exit 1
+fi
+
+# Step 4: Verify outputs (example for receptor_md)
+expected_outputs=(
+  "rec/pr_0.xtc"
+  "rec/pr_1.xtc"
+  "rec/pr_2.xtc"
+  "rec/pr_3.xtc"
+)
+
+for output in "${expected_outputs[@]}"; do
+  if [[ ! -f "$output" ]]; then
+    echo "ERROR: Missing expected output: $output"
+    exit 1
+  fi
+done
+
+echo "✓ All outputs verified"
+
+# Step 5: Proceed to next stage
+echo "Ready for next stage. Load skill: skill(name='aedmd-dock-run')"
 ```
 
-### Handoff Inspection
+**Source:** Derived from `aedmd-orchestrator-resume` skill and checkpoint manager
+
+### Example 3: Handoff Status Handling
+
 ```bash
-# Source: scripts/infra/plugins/handoff_inspect.py
-python -m scripts.infra.plugins.handoff_inspect --workspace work/test
+# Standard handoff status handling from common.sh
 
-# Output: HandoffRecord JSON with:
-# - latest_stage: last completed stage name
-# - latest_status: SUCCESS | FAILED | NEEDS_REVIEW | BLOCKED
-# - next_action: recommended next command
+check_handoff_result() {
+  local stage="$1"
+  local handoff_file=".handoffs/${stage}.json"
+  
+  if [[ ! -f "$handoff_file" ]]; then
+    echo "ERROR: Handoff file missing: $handoff_file"
+    return 1
+  fi
+  
+  local status
+  status=$(jq -r '.status // "unknown"' "$handoff_file")
+  echo "Handoff status for $stage: $status"
+  
+  case "$status" in
+    success)
+      echo "✓ Stage completed successfully"
+      return 0
+      ;;
+    needs_review)
+      echo "⚠ Warnings detected:"
+      jq -r '.warnings[]? // empty' "$handoff_file" | sed 's/^/  /'
+      echo ""
+      echo "Review recommended before proceeding."
+      return 2
+      ;;
+    failure|blocked)
+      echo "✗ Stage failed with status: $status"
+      echo ""
+      echo "Errors:"
+      jq -r '.errors[]? // empty' "$handoff_file" | sed 's/^/  /'
+      echo ""
+      echo "Recommendations:"
+      jq -r '.recommendations[]? // empty' "$handoff_file" | sed 's/^/  /'
+      return 1
+      ;;
+    *)
+      echo "ERROR: Unknown status: $status"
+      return 1
+      ;;
+  esac
+}
+
+# Usage after skill execution:
+# check_handoff_result "receptor_prep"
+# exit_code=$?
+# 
+# if [[ $exit_code -eq 0 ]]; then
+#   # Proceed to next stage
+# elif [[ $exit_code -eq 2 ]]; then
+#   # Review warnings, decide whether to proceed
+# else
+#   # Handle failure
+# fi
 ```
 
-### Runner Agent Execution (for reference)
-```python
-# Source: scripts/agents/runner.py
-from scripts.agents.runner import RunnerAgent
-
-runner = RunnerAgent(workspace=Path("work/test"))
-result = runner.execute({
-    "stage": "rec_prep",
-    "script": "scripts/rec/0_prep.sh",
-    "params": {"config": "config.ini"},
-})
-
-# result["status"]: success | failure
-# result["data"]["script_result"]["duration_seconds"]: execution time
-# result["data"]["metrics"]: extracted numerical values (RMSD, energy, score)
-```
+**Source:** `scripts/commands/common.sh` lines 192-235
 
 ## State of the Art
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| Manual workspace setup | `workspace_init.py` plugin | Phase 6 | Secure, reproducible isolation |
-| Ad-hoc preflight checks | `preflight.py` plugin | Phase 6 | Mode-aware validation |
-| Hand-written status parsing | `handoff_inspect.py` plugin | Phase 6 | Normalized status vocabulary |
-| No workspace boundary checks | `is_relative_to(work_root)` | Phase 6.1 | Prevents accidental deletion outside work/ |
-| No frame striding in analysis | Auto-calculated stride | Phase 6.1 | Memory-safe trajectory analysis |
+| Direct script execution | Skill orchestration | Phase 7 design | Tests agent workflow, creates handoffs |
+| Synchronous execution assumption | Async checkpoint flow | Phase 7 design | Handles long Slurm jobs |
+| No handoff tracking | JSON handoff files | Phase 7 design | Structured status, metrics, errors |
+| Memory-based state | File-based checkpoints | Phase 7 design | Resumable across sessions |
 
 **Deprecated/outdated:**
-- Manual `cp -r work/input work/test`: Use `workspace_init.py` for security
-- Direct handoff JSON parsing: Use `handoff_inspect.py` for normalized status
-- Assume all stage scripts synchronous: Check Slurm job status for async stages
+- Running `run_pipeline.sh` directly: Bypasses skill interface, defeats testing goal
+- Assuming synchronous completion: Slurm jobs are async, need checkpoint flow
+- Ad-hoc status checks: Use standardized handoff status values
 
 ## Open Questions
 
-### 1. Expected Output File Availability
-**Question:** Are the symlink targets in `expected/amb/` accessible during Phase 7 execution?
-**What we know:** 
-- Symlinks point to `/share/home/nglokwan/dparker/dp_xinyi/`
-- User mentioned "user will provide/copy from another computer if needed"
-- `expected/amb/rec/ensemble/*.gro` files exist directly (not symlinks)
-**What's unclear:** Which specific expected outputs are needed for validation
-**Recommendation:** Create checklist of required expected files; verify accessibility before execution
+### Question 1: How to handle stage dependencies in plans?
 
-### 2. Token Tracking Mechanism
-**Question:** How should token input/output counts be tracked during agent-assisted execution?
 **What we know:**
-- Runner agent tracks `duration_seconds` but not tokens
-- CONTEXT.md specifies tracking "token input count, token output count, cache usage, and LLM model used"
-- Agent execution is explicitly experimental
-**What's unclear:** Whether tokens should be tracked at wrapper level or externally via OpenCode
-**Recommendation:** Track tokens via OpenCode session metadata if agent-assisted; document manual execution separately
+- Stages have clear dependencies (rec → dock → com_setup → com_md → mmpbsa → analysis)
+- Handoff files indicate stage completion
+- Checkpoint flow handles async timing
 
-### 3. Failure Documentation Format
-**Question:** Should failures be documented in separate report or integrated into main report?
+**What's unclear:**
+- Should plans check for previous stage handoff before executing?
+- Or assume sequential execution and let wrapper fail?
+
+**Recommendation:**
+Plans should include verification of previous stage handoff:
+```bash
+# Before executing dock_run
+if [[ ! -f .handoffs/receptor_prep.json ]]; then
+  echo "ERROR: receptor_prep not complete. Run aedmd-rec-ensemble first."
+  exit 1
+fi
+
+# Then proceed to dock_run
+skill(name="aedmd-dock-run")
+```
+
+### Question 2: What to do with needs_review status?
+
 **What we know:**
-- CONTEXT.md says "OpenCode's discretion — prefer separate failure report for ease of debug sessions, but check current agent behavior for consistency"
-- Debugger agent generates `.debug_reports/{stage}_{timestamp}.json` 
-- Checker agent outputs validation reports
-**What's unclear:** Preferred consolidation format
-**Recommendation:** Separate failure reports in `.debug_reports/` with summary in main execution report; consistent with current agent behavior
+- `needs_review` means warnings detected but execution didn't fail
+- Handoff contains `.warnings[]` array with warning messages
+- Common.sh exit code 2 for needs_review
 
-### 4. Numerical Tolerance Standards
-**Question:** What are field-standard tolerances for MD/MM/PBSA numerical comparisons?
+**What's unclear:**
+- Should execution halt for needs_review?
+- Who reviews and how?
+- When is it safe to proceed?
+
+**Recommendation:**
+Plans should handle needs_review explicitly:
+```markdown
+**If handoff status is needs_review:**
+1. Display warnings to user
+2. Ask user to decide: proceed or investigate
+3. If proceed: continue to next stage
+4. If investigate: load debugger skill
+```
+
+### Question 3: How to structure multi-plan phases?
+
 **What we know:**
-- CONTEXT.md says "loose tolerances due to high degrees of freedom"
-- User specified NOT validating binding energies (MM/PBSA variance too high)
-- Structure counts should be exact
-**What's unclear:** Industry-standard tolerance ranges for RMSD/RMSF/docking scores
-**Recommendation:** 
-- Docking scores: ±10% relative (based on typical scoring function variance)
-- RMSD mean: ±20% relative (based on MD ensemble variability)
-- RMSF std: ±30% relative (higher variance in fluctuation measurements)
-- Atom/residue/frame counts: Exact match required
+- Phase 7 has multiple stages, each requiring checkpoint flow
+- Each async stage requires exit/resume cycle
+- Can't fit all stages in one plan/session
 
-## Gaps Between Current Tools and Phase 7 Requirements
+**What's unclear:**
+- One plan per stage? Or one plan covering multiple stages?
+- How to handle plan boundaries with checkpoint flow?
 
-| Requirement | Current Status | Gap | Recommended Solution |
-|-------------|---------------|-----|---------------------|
-| Comprehensive dryrun report | `--dry-run` prints commands only | No structured markdown report with file/tool checks | Create `07-dryrun-report.sh` wrapper combining preflight + dry-run + flowchart |
-| Output validation comparator | Checker validates format/existence | No comparison to expected outputs with tolerances | Create `07-validate-outputs.py` script with tolerance-based comparison |
-| Token tracking | Not implemented in scripts | No token count tracking | Track via OpenCode session metadata (external to pipeline) |
-| Runtime tracking | `duration_seconds` in runner | No cumulative runtime across stages | Sum from handoff records in execution report |
-| Disk usage tracking | Not implemented | No disk usage growth tracking | Add `du -sh` checkpoints between stages in wrapper |
-| Text-based flowchart | Not implemented | No visual workflow documentation | Generate ASCII flowchart from `run_pipeline.sh --list-stages` output |
-| Expected output verification | Manual inspection | No automated comparison | Create tolerance-based comparator for Mode A outputs |
+**Recommendation:**
+- One plan per logical checkpoint boundary
+- Example: Plan 07-03 covers receptor stages (async), ends when rec_prod jobs submitted
+- Plan 07-04 covers docking stage, ends when dock jobs submitted
+- Each plan is a single session that fits in context window
+- Checkpoint file (.continue-here.md) bridges between plans
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `scripts/run_pipeline.sh` - Pipeline orchestrator with dry-run support
-- `scripts/infra/plugins/preflight.py` - Config/tool/input validation
-- `scripts/infra/plugins/workspace_init.py` - Workspace initialization with boundary checks
-- `scripts/infra/plugins/handoff_inspect.py` - Handoff status triage
-- `scripts/agents/runner.py` - Stage execution with metrics extraction
-- `scripts/agents/checker.py` - Output validation checks
-- `scripts/agents/debugger.py` - Failure diagnosis with environment capture
-- `WORKFLOW.md` - Workflow execution reference
-- `AGENTS.md` - Agent roles and security model
+- `.opencode/skills/aedmd-rec-ensemble/SKILL.md` - Skill structure and execution pattern
+- `.opencode/skills/aedmd-dock-run/SKILL.md` - Skill structure and async job handling
+- `.opencode/skills/aedmd-com-setup/SKILL.md` - Complex preparation skill
+- `.opencode/skills/aedmd-com-md/SKILL.md` - Async MD execution pattern
+- `.opencode/skills/aedmd-orchestrator-resume/SKILL.md` - Resume pattern
+- `.opencode/skills/aedmd-status/SKILL.md` - Status checking pattern
+- `scripts/commands/common.sh` - Wrapper dispatch and handoff checking
+- `scripts/agents/runner.py` - Runner agent execution
+- `scripts/agents/schemas/handoff.py` - Handoff status values and structure
+- `scripts/agents/schemas/state.py` - WorkflowStage tokens
+- `scripts/infra/checkpoint.py` - Checkpoint management
 
 ### Secondary (MEDIUM confidence)
-- `expected/amb/README.md` - Mode A expected output structure
-- `work/input/README.md` - Test input descriptions
-- `.planning/phases/06.1-*/06.1-VERIFICATION.md` - Phase 6.1 validation patterns
-- `scripts/agents/schemas/state.py` - Workflow stage definitions
-- `scripts/agents/schemas/handoff.py` - Handoff record schema
+- `.planning/phases/07-first-controlled-execution/.continue-here.md` - Previous execution failure analysis
+- `.planning/phases/07-first-controlled-execution/07-CONTEXT.md` - Phase decisions and requirements
+- `AGENTS.md` - Agent roles and execution boundaries
 
 ### Tertiary (LOW confidence)
-- `expected/slurm-91652.out` - Sample error log (may not represent current expected outputs)
+None - all findings verified with primary sources
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH - Existing tools are well-documented and verified in Phase 6.1
-- Architecture: HIGH - Patterns derived from actual implementation code
-- Pitfalls: HIGH - Based on known issues from STATE.md and workflow documentation
-- Gaps: HIGH - Clear requirements from CONTEXT.md, clear current tool capabilities
-- Expected outputs: MEDIUM - Symlink accessibility unclear, may need user action
+- Standard stack: HIGH - Direct source from skill files, wrapper scripts, and agent code
+- Architecture: HIGH - Verified through code reading and execution flow analysis
+- Pitfalls: HIGH - Derived from actual failure case and code inspection
 
 **Research date:** 2026-05-03
-**Valid until:** 2026-06-03 (stable infrastructure, 30-day validity appropriate)
+**Valid until:** 2026-06-03 (30 days - stable patterns unlikely to change)
+
+---
+
+## Quick Reference for Planners
+
+### How to Write Plans That Test Skills
+
+**Template:**
+```markdown
+## Task X: Execute <Stage Name>
+
+**Goal:** Test the aedmd-<stage> skill orchestration
+
+**Action:**
+
+1. **Load skill instructions:**
+   ```
+   Use the skill tool: skill(name="aedmd-<stage>")
+   ```
+
+2. **Execute wrapper** (as instructed by SKILL.md):
+   ```bash
+   cd work/test
+   bash ../../scripts/commands/aedmd-<stage>.sh --config config.ini
+   ```
+
+3. **Verify handoff creation:**
+   ```bash
+   # Check handoff file exists
+   [[ -f .handoffs/<stage_token>.json ]] || exit 1
+   
+   # Check status
+   status=$(jq -r '.status' .handoffs/<stage_token>.json)
+   [[ "$status" == "success" ]] || exit 1
+   ```
+
+4. **For async stages:** Extract job ID, write checkpoint, exit
+
+5. **For sync stages:** Verify outputs, proceed to next task
+
+**Success criteria:**
+- Skill loaded via skill tool ✓
+- Wrapper executed ✓
+- Handoff JSON created ✓
+- Status verified ✓
+- Outputs verified ✓
+
+**Failure mode:**
+If executor runs pipeline scripts directly, this defeats the phase goal.
+```
+
+### Canonical Stage Mappings
+
+| Skill | Stage Token | Handoff File | Wrapper | Async? |
+|-------|-------------|--------------|---------|--------|
+| aedmd-rec-ensemble | receptor_prep | .handoffs/receptor_prep.json | scripts/commands/aedmd-rec-ensemble.sh | Yes |
+| aedmd-dock-run | docking_run | .handoffs/docking_run.json | scripts/commands/aedmd-dock-run.sh | Yes |
+| aedmd-com-setup | complex_prep | .handoffs/complex_prep.json | scripts/commands/aedmd-com-setup.sh | Yes |
+| aedmd-com-md | complex_md | .handoffs/complex_md.json | scripts/commands/aedmd-com-md.sh | Yes |
+| aedmd-com-mmpbsa | complex_mmpbsa | .handoffs/complex_mmpbsa.json | scripts/commands/aedmd-com-mmpbsa.sh | Yes |
+| aedmd-com-analyze | complex_analysis | .handoffs/complex_analysis.json | scripts/commands/aedmd-com-analyze.sh | No |
+| aedmd-preflight | preflight_validation | .handoffs/preflight_validation.json | scripts/commands/aedmd-preflight.sh | No |
+| aedmd-status | workspace_status | N/A (no agent) | scripts/commands/aedmd-status.sh | No |
+
+### Handoff Status Meanings
+
+| Status | Meaning | Action |
+|--------|---------|--------|
+| success | Stage completed successfully | Proceed to next stage |
+| needs_review | Warnings detected, review recommended | Display warnings, ask user |
+| failure | Stage failed with errors | Display errors, stop, debug |
+| blocked | External dependency missing | Display blocker, stop, fix |
+
+### Common.sh Exit Codes
+
+| Code | Meaning | Handoff Status |
+|------|---------|----------------|
+| 0 | Success | success |
+| 1 | Failure | failure or blocked |
+| 2 | Needs Review | needs_review |
