@@ -1,0 +1,8 @@
+opc      OPC       OPC 4-point, recommended
+opc3     OPC3      OPC 3-point, recommended
+tip3p    TIP3P     TIP 3-point
+tip4p    TIP4P     TIP 4-point
+tip4pew  TIP4P-Ew  TIP 4-point optimized with Ewald
+spc      SPC       simple point charge
+spce     SPC/E     extended simple point charge
+
