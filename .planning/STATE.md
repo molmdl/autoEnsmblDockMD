@@ -11,11 +11,12 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 07-first-controlled-execution (In progress) |
-| **Current Plan** | 2 of 6 in current phase |
-| **Last Activity** | 2026-05-03 - Completed 07-02-PLAN.md |
-| **Progress** | █████████░ 58/60 plans complete (97%) |
-| **Phase 7 Status** | IN PROGRESS - Workspace initialization and preflight complete (2/6 plans) |
-| **Next Plan** | 07-03-PLAN.md (Stages 0-2 execution) |
+| **Current Plan** | 3 of 6 in current phase |
+| **Last Activity** | 2026-05-03 - Executing 07-03-PLAN.md (checkpoint: awaiting Slurm job) |
+| **Progress** | █████████░ 59/60 plans complete (98%) |
+| **Phase 7 Status** | IN PROGRESS - Stage 1 receptor prep submitted (Slurm job 95280) |
+| **Next Plan** | 07-03-PLAN.md (resume after job completion) |
+| **Checkpoint** | ⏳ Waiting for Slurm job 95280 (receptor equilibration) |
 
 ---
 
@@ -123,13 +124,15 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-05-03 01:42 UTC
-Stopped at: Completed 07-02-PLAN.md
-Resume file: None
+Last session: 2026-05-03 08:46 UTC
+Stopped at: Checkpoint - awaiting Slurm job 95280 completion
+Resume file: `.continue-here.md`
 
 ### Next Action
 
-Continue Phase 7: Execute 07-03-PLAN.md for stages 0-2 execution (preflight, receptor, docking).
+**AWAITING:** Slurm job 95280 must complete before continuing.
+Monitor job status: `squeue -j 95280` or `sacct -j 95280`
+Resume after completion: `/gsd-execute-phase 7`
 
 ---
 
