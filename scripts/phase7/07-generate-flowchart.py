@@ -59,7 +59,8 @@ class FlowchartGenerator:
             self.stages[stage]["script"] = script
 
         # Parse ALL_STAGES array
-        stages_pattern = r'ALL_STAGES=\(\s*((?:\w+\s*)+)\)'
+        # Fixed: Use negated character class to avoid nested quantifiers (CWE-1333)
+        stages_pattern = r'ALL_STAGES=\(\s*([^)]+)\)'
         match = re.search(stages_pattern, content)
         if match:
             stages_str = match.group(1)
