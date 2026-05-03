@@ -7,19 +7,19 @@
     "active_profile": "balanced",
     "presets": {
       "quality": {
-        "planning": "github-copilot/claude-opus-4.6",
-        "execution": "github-copilot/gpt-5.3-codex",
-        "verification": "github-copilot/claude-sonnet-4.5"
+        "planning": "synthetic/hf:zai-org/GLM-5",
+        "execution": "synthetic/hf:zai-org/GLM-5",
+        "verification": "synthetic/hf:zai-org/GLM-5"
       },
       "balanced": {
-        "planning": "github-copilot/claude-sonnet-4.5",
-        "execution": "github-copilot/gpt-5.3-codex",
-        "verification": "github-copilot/claude-sonnet-4.5"
+        "planning": "synthetic/hf:zai-org/GLM-5",
+        "execution": "synthetic/hf:zai-org/GLM-5",
+        "verification": "synthetic/hf:zai-org/GLM-5"
       },
       "budget": {
-        "planning": "github-copilot/claude-sonnet-4.5",
-        "execution": "github-copilot/gpt-5.3-codex",
-        "verification": "github-copilot/gpt-5.4-mini"
+        "planning": "synthetic/hf:zai-org/GLM-5",
+        "execution": "synthetic/hf:zai-org/GLM-5",
+        "verification": "synthetic/hf:zai-org/GLM-5"
       }
     },
     "custom_overrides": {
