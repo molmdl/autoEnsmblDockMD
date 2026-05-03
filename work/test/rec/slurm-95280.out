@@ -249,3 +249,137 @@ starting mdrun 'Protein in water'
 100000 steps,    100.0 ps.
 
 Step 100  Warning: pressure scaling more than 1%, mu: 0.989872 0.989872 0.989872
+
+Writing final coordinates.
+
+NOTE: 13 % of the run time was spent in pair search,
+      you might want to increase nstlist (this has no effect on accuracy)
+
+               Core t (s)   Wall t (s)        (%)
+       Time:      410.849       51.361      799.9
+                 (ns/day)    (hour/ns)
+Performance:      168.222        0.143
+
+GROMACS reminds you: "This isn't right. This isn't even wrong." (Wolfgang Pauli)
+
+               :-) GROMACS - gmx grompp, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx grompp -v -f em.mdp -c pr_pos.gro -p topol.top -o pr_em.tpr -maxwarn 3
+
+Generating 1-4 interactions: fudge = 0.5
+renumbering atomtypes...
+processing index file...
+Making dummy/rest group for T-Coupling containing 98517 elements
+Making dummy/rest group for Acc. not used containing 98517 elements
+Making dummy/rest group for Freeze containing 98517 elements
+Making dummy/rest group for Energy Mon. containing 98517 elements
+Making dummy/rest group for VCM containing 98517 elements
+Number of degrees of freedom in T-Coupling group rest is 295548.00
+Making dummy/rest group for User1 containing 98517 elements
+Making dummy/rest group for User2 containing 98517 elements
+Making dummy/rest group for Compressed X containing 98517 elements
+Making dummy/rest group for Or. Res. Fit containing 98517 elements
+Making dummy/rest group for QMMM containing 98517 elements
+T-Coupling       has 1 element(s): rest
+Energy Mon.      has 1 element(s): rest
+Acc. not used    has 1 element(s): rest
+Freeze           has 1 element(s): rest
+User1            has 1 element(s): rest
+User2            has 1 element(s): rest
+VCM              has 1 element(s): rest
+Compressed X     has 1 element(s): rest
+Or. Res. Fit     has 1 element(s): rest
+QMMM             has 1 element(s): rest
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+GROMACS reminds you: "This is Tense !" (Star Wars Episode I The Phantom Menace)
+
+checking input for internal consistency...
+
+Setting the LD random seed to -402858245
+
+processing topology...
+
+Generated 27028 of the 27028 non-bonded parameter combinations
+
+Generated 27028 of the 27028 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+Excluding 1 bonded neighbours molecule type 'CL'
+
+processing coordinates...
+
+double-checking input for internal consistency...
+
+converting bonded parameters...
+
+initialising group options...
+Analysing residue names:
+There are:   582    Protein residues
+There are: 29711      Water residues
+There are:   198        Ion residues
+Analysing Protein...
+
+The largest distance between excluded atoms is 0.439 nm between atom 3878 and 3879
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 96x96x96, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.32
+
+This run will generate roughly 11 Mb of data
+
+writing run input file...
+                :-) GROMACS - gmx mdrun, 2023.5-plumed_2.9.3 (-:
+
+Executable:   /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu/bin/gmx
+Data prefix:  /data/nglokwan/ompi_plumed-gmx/plumed-gromacs2023.5-gpu
+Working dir:  /share/home/nglokwan/autoEnsmblDockMD/work/test/rec
+Command line:
+  gmx mdrun -deffnm pr_em -ntomp 8 -ntmpi 1
+
+Reading file pr_em.tpr, VERSION 2023.5-plumed_2.9.3 (single precision)
+1 GPU selected for this run.
+Mapping of GPU IDs to the 1 GPU task in the 1 rank on this node:
+  PP:0
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the CPU
+Using 1 MPI thread
+
+Non-default thread affinity set, disabling internal thread affinity
+
+Using 8 OpenMP threads 
+
+
+Steepest Descents:
+   Tolerance (Fmax)   =  1.00000e+01
+   Number of steps    =       500000
+
+Energy minimization has stopped, but the forces have not converged to the
+requested precision Fmax < 10 (which may not be possible for your system). It
+stopped because the algorithm tried to make a new step whose size was too
+small, or there was no change in the energy since last step. Either way, we
+regard the minimization as converged to within the available machine
+precision, given your starting configuration and EM parameters.
+
+Double precision normally gives you higher accuracy, but this is often not
+needed for preparing to run molecular dynamics.
+
+writing lowest energy coordinates.
+
+Steepest Descents converged to machine precision in 3588 steps,
+but did not reach the requested Fmax < 10.
+Potential Energy  = -1.7331104e+06
+Maximum force     =  1.1945480e+03 on atom 4055
+Norm of force     =  8.1318498e+00
+
+GROMACS reminds you: "Keep Your Shoes and Socks On, People" (F. Zappa)
+
