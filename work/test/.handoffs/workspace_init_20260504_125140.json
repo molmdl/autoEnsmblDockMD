@@ -1,0 +1,22 @@
+{
+  "from_agent": "workspace_init",
+  "to_agent": "runner",
+  "timestamp": "2026-05-04T04:51:18.313387Z",
+  "status": "success",
+  "stage": "workspace_init",
+  "data": {
+    "workspace_path": "/share/home/nglokwan/autoEnsmblDockMD/work/test",
+    "template_source": "/share/home/nglokwan/autoEnsmblDockMD/work/input"
+  },
+  "warnings": [],
+  "errors": [],
+  "recommendations": [],
+  "metadata": {
+    "created_dirs": [
+      "amber19SB_OL21_OL3_lipid17.ff",
+      "dzp",
+      "ibp",
+      "mdp"
+    ]
+  }
+}
