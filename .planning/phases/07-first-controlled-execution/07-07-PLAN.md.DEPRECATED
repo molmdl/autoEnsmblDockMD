@@ -1,9 +1,9 @@
 ---
 phase: 07-first-controlled-execution
-plan: 08
+plan: 07
 type: execute
-wave: 8
-depends_on: [07-07]
+wave: 7
+depends_on: [07-06]
 files_modified:
   - work/test/com/*/analysis/
   - work/test/.handoffs/complex_analysis.json
@@ -59,7 +59,7 @@ Output: RMSD, RMSF, contacts, H-bonds analysis data, handoff record
 @.planning/STATE.md
 @.planning/phases/07-first-controlled-execution/07-CONTEXT.md
 @.planning/phases/07-first-controlled-execution/07-RESEARCH.md
-@.planning/phases/07-first-controlled-execution/07-08-SUMMARY.md
+@.planning/phases/07-first-controlled-execution/07-06-SUMMARY.md
 </context>
 
 <tasks>
@@ -425,5 +425,5 @@ After all tasks complete:
 </success_criteria>
 
 <output>
-After completion, create `.planning/phases/07-first-controlled-execution/07-08-SUMMARY.md`
+After completion, create `.planning/phases/07-first-controlled-execution/07-07-SUMMARY.md`
 </output>

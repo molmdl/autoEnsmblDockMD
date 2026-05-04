@@ -479,17 +479,18 @@ This urgent phase addresses critical findings from scancode analysis (`.planning
 
 **Depends on:** Phase 6.1
 
-**Plans:** 8 plans in 8 waves
+**Plans:** 9 plans in 9 waves
 
 Plans:
 - [x] 07-01-PLAN.md — Dryrun preparation and report generation (Wave 1)
 - [x] 07-02-PLAN.md — Workspace initialization and preflight validation (Wave 2)
-- [ ] 07-03-PLAN.md — Test aedmd-dock-run skill for targeted docking (Wave 3)
-- [ ] 07-04-PLAN.md — Test aedmd-com-setup skill for complex preparation (Wave 4)
-- [ ] 07-05-PLAN.md — Test aedmd-com-md skill for production MD (Wave 5)
-- [ ] 07-06-PLAN.md — Test aedmd-com-mmpbsa skill for MM/PBSA (Wave 6)
-- [ ] 07-07-PLAN.md — Test aedmd-com-analyze skill for trajectory analysis (Wave 7)
-- [ ] 07-08-PLAN.md — Output validation and execution reporting (Wave 8)
+- [ ] 07-03-PLAN.md — Test aedmd-rec-ensemble skill for receptor ensemble preparation (Wave 3)
+- [ ] 07-04-PLAN.md — Test aedmd-dock-run skill for targeted docking (Wave 4)
+- [ ] 07-05-PLAN.md — Test aedmd-com-setup skill for complex preparation (Wave 5)
+- [ ] 07-06-PLAN.md — Test aedmd-com-md skill for production MD (Wave 6)
+- [ ] 07-07-PLAN.md — Test aedmd-com-mmpbsa skill for MM/PBSA (Wave 7)
+- [ ] 07-08-PLAN.md — Test aedmd-com-analyze skill for trajectory analysis (Wave 8)
+- [ ] 07-09-PLAN.md — Output validation and execution reporting (Wave 9)
 
 **Details:**
 
@@ -501,6 +502,17 @@ Plans:
 - Handoff JSON creation is verified for each stage
 - Async Slurm jobs are handled with checkpoint flow
 - Success criteria include "skill orchestration tested"
+
+**Correct Stage Sequence:**
+```
+Stage 0: Initialization & Preflight (Plans 07-01, 07-02) ✓
+Stage 1: Receptor Ensemble Preparation (Plan 07-03) - NEW
+Stage 2: Docking (Plan 07-04)
+Stage 3: Complex Setup (Plan 07-05)
+Stage 4: Complex MD (Plan 07-06)
+Stage 5: MM/PBSA (Plan 07-07)
+Stage 6: Analysis & Validation (Plans 07-08, 07-09)
+```
 
 **Execution Approach:**
 1. **Skill Invocation Pattern:**
@@ -516,6 +528,7 @@ Plans:
    - On resume: check `sacct`, verify outputs, proceed
 
 3. **Stage-Token Mappings:**
+   - aedmd-rec-ensemble → receptor_prep
    - aedmd-dock-run → docking_run
    - aedmd-com-setup → complex_prep
    - aedmd-com-md → complex_md
