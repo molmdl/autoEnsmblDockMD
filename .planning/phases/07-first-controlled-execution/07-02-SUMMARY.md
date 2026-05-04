@@ -1,137 +1,134 @@
 ---
 phase: 07-first-controlled-execution
 plan: 02
-subsystem: validation
-tags: [workspace, initialization, preflight, targeted-docking, configuration]
+subsystem: infra
+tags: [workspace, initialization, validation, preflight, targeted-docking]
 
 # Dependency graph
 requires:
-  - phase: 06.1
-    provides: Security, performance, and plugin fixes
   - phase: 07-01
-    provides: Dryrun report generator and flowchart generator
+    provides: Dry run validation and workspace readiness assessment
 provides:
-  - Initialized workspace at work/test/
-  - Validated configuration for targeted docking
-  - Preflight validation with tool availability checks
-  - Comprehensive workspace setup report
+  - Initialized isolated workspace at work/test/
+  - Validated configuration for targeted docking mode
+  - Preflight validation with tool availability confirmation
+  - Workspace setup report documenting readiness
 affects:
-  - Phase 7 stage execution (07-03 through 07-06)
-  - Future workspace initialization workflows
+  - Phase 7 downstream stages (docking, MD, MM/PBSA)
+  - All workflow stages requiring workspace isolation
 
 # Tech tracking
 tech-stack:
   added: []
   patterns:
-    - "Workspace initialization pattern: template copy + config setup + preflight validation"
-    - "Handoff record persistence for workspace init and preflight"
+    - Isolated workspace pattern (work/input → work/test)
+    - Handoff record pattern for stage tracking
+    - Preflight validation pattern for readiness checks
 
 key-files:
   created:
-    - work/test/config.ini
-    - work/test/config.ini.backup
     - work/test/.handoffs/workspace_init_*.json
     - work/test/.handoffs/preflight_*.json
+    - work/test/config.ini.backup
     - .planning/phases/07-first-controlled-execution/07-workspace-setup-report.md
   modified:
-    - work/input/config.ini (added to template)
-    - work/input/mdp/ (added to template)
+    - work/test/config.ini
 
 key-decisions:
-  - "Use workspace_init.py plugin for isolated workspace creation with security boundary enforcement"
-  - "Configure for targeted docking mode with reference_ligand for pocket definition"
-  - "Accept needs_review status from preflight (non-blocking warning only)"
+  - "Accept needs_review status from preflight validation"
+  - "Ignore input directory warning (files already in workspace)"
+  - "Create missing directories manually (workspace_init plugin limitation)"
 
 patterns-established:
-  - "Pattern: Isolated workspace initialization with handoff record persistence"
-  - "Pattern: Configuration setup with backup before execution"
+  - "Workspace initialization via plugin + manual directory creation"
+  - "Handoff records saved to .handoffs/ for stage tracking"
+  - "Config backup created before modifications"
 
 # Metrics
-duration: 3 min
-completed: 2026-05-03
+duration: 2 min
+completed: 2026-05-04
 ---
-# Phase 7 Plan 02: Workspace Initialization and Preflight Validation Summary
 
-**Isolated workspace initialized at work/test/ with targeted docking configuration, preflight validation passed with tool availability confirmed**
+# Phase 07 Plan 02: Workspace Setup Summary
+
+**Isolated workspace initialized with targeted docking configuration, validated tools and inputs, ready for stage execution**
 
 ## Performance
 
-- **Duration:** 3 min
-- **Started:** 2026-05-03T01:39:00Z
-- **Completed:** 2026-05-03T01:42:38Z
+- **Duration:** 2 min
+- **Started:** 2026-05-04T04:51:08Z
+- **Completed:** 2026-05-04T04:53:18Z
 - **Tasks:** 4
-- **Files modified:** 78 files (workspace + config + report)
+- **Files modified:** 5
 
 ## Accomplishments
 
-- Created isolated workspace at work/test/ from work/input/ template with all required input files
-- Configured workspace for targeted docking mode with reference ligand (ref.pdb) for pocket definition
-- Validated tool availability (gmx, gnina, gmx_MMPBSA) and configuration completeness via preflight plugin
-- Generated comprehensive workspace setup report documenting all validation results and next steps
+- Created isolated workspace at work/test/ with complete directory structure
+- Configured workspace for targeted docking mode (mode=targeted, reference_ligand=ref.pdb)
+- Executed preflight validation confirming tool availability (gmx, gnina, gmx_MMPBSA)
+- Generated comprehensive setup report documenting workspace readiness
 
 ## Task Commits
 
 Each task was committed atomically:
 
-1. **Task 1: Initialize isolated workspace** - `d7e42db` (feat)
-2. **Task 2: Configure workspace for targeted docking** - `379be5b` (feat)
-3. **Task 3: Run preflight validation** - `ccad9fa` (feat)
-4. **Task 4: Generate workspace setup report** - `b35fa38` (docs)
+1. **Task 1: Initialize isolated workspace** - `8a457c1` (feat)
+2. **Task 2: Configure workspace for targeted docking** - `28caa60` (feat)
+3. **Task 3: Run preflight validation** - `5a4ca95` (feat)
+4. **Task 4: Generate workspace setup report** - `bbca4a6` (docs)
 
-**Plan metadata:** Next commit will be docs commit for SUMMARY.md
+**Plan metadata:** (to be created after SUMMARY)
 
-_Note: All tasks were standard implementation tasks with single commits each_
+_Note: All tasks completed sequentially with atomic commits_
 
 ## Files Created/Modified
 
-- `work/input/config.ini` - Configuration template added to input directory
-- `work/input/mdp/rec/` - Receptor stage MDP files (4 files)
-- `work/input/mdp/com/` - Complex stage MDP files (4 files)
-- `work/test/` - Complete workspace directory with 78 files including:
-  - Receptor structures: `2bxo.pdb`, `rec.pdb`
-  - Reference ligand: `ref.pdb`
-  - Ligand directories: `dzp/`, `ibp/` (7 files each)
-  - Force field: `amber19SB_OL21_OL3_lipid17.ff/` (symlink)
-  - Configuration: `config.ini`, `config.ini.backup`
-  - Handoff records: `.handoffs/workspace_init_*.json`, `.handoffs/preflight_*.json`
-- `.planning/phases/07-first-controlled-execution/07-workspace-setup-report.md` - Comprehensive setup and validation report
+- `work/test/.handoffs/workspace_init_20260504_125140.json` - Workspace initialization handoff record
+- `work/test/.handoffs/preflight_20260504_125229.json` - Preflight validation handoff record
+- `work/test/config.ini` - Updated for targeted docking mode (workdir, mode, reference_ligand)
+- `work/test/config.ini.backup` - Configuration backup for recovery
+- `.planning/phases/07-first-controlled-execution/07-workspace-setup-report.md` - Comprehensive setup documentation
+- `work/test/.handoffs/` - Created directory for handoff records
+- `work/test/rec/` - Created receptor workspace directory
+- `work/test/dock/` - Created docking workspace directory
+- `work/test/com/` - Created complex MD workspace directory
+- `work/test/ref/` - Created reference ligand directory
 
 ## Decisions Made
 
-- **Workspace initialization:** Used workspace_init.py plugin with `--force` flag to create isolated workspace from template, ensuring security boundary enforcement (deletions restricted to work/ directory)
-- **Configuration setup:** Configured for targeted docking mode with `reference_ligand = ref.pdb` for pocket definition, `ligand_list = dzp, ibp` for ligands to dock
-- **Preflight validation:** Accepted `needs_review` status as valid (non-blocking warning about input directory path, but all actual files are correctly in place)
-- **Input file organization:** Added missing config.ini and MDP files to work/input/ template to satisfy workspace_init requirements
+1. **Accept needs_review status from preflight validation** - Non-blocking warning about input directory path; files already present in workspace
+2. **Create missing directories manually** - workspace_init plugin only copies template contents, doesn't create standard workspace directories
+3. **Create .handoffs directory and handoff records** - Plugin outputs to stdout, manual save to expected location for tracking
 
 ## Deviations from Plan
 
 ### Auto-fixed Issues
 
-**1. [Rule 3 - Blocking] Added missing config.ini and MDP files to template**
-- **Found during:** Task 1 (Initialize isolated workspace)
-- **Issue:** workspace_init.py failed because work/input/ was missing config.ini and mdp/ directories
-- **Fix:** Copied config.ini.template to work/input/config.ini and created mdp/rec/, mdp/com/ with MDP files from expected/amb/scripts/
-- **Files modified:** work/input/config.ini, work/input/mdp/rec/*.mdp, work/input/mdp/com/*.mdp
-- **Verification:** workspace_init.py succeeded after adding missing files
-- **Committed in:** d7e42db (Task 1 commit)
+**1. [Rule 3 - Blocking] Created missing workspace directories and handoff records**
 
-**2. [Rule 3 - Blocking] Saved handoff records manually**
-- **Found during:** Task 1 and Task 3
-- **Issue:** workspace_init.py and preflight plugins print JSON to stdout but don't save to .handoffs/ directory
-- **Fix:** Captured plugin output and saved to .handoffs/workspace_init_*.json and .handoffs/preflight_*.json manually
-- **Files modified:** work/test/.handoffs/*.json
-- **Verification:** Handoff records exist and contain correct status
-- **Committed in:** d7e42db (Task 1), ccad9fa (Task 3)
+- **Found during:** Task 1 (Initialize isolated workspace)
+- **Issue:** workspace_init plugin returned success but didn't create expected directory structure (.handoffs/, rec/, dock/, com/, ref/) or save handoff record to file
+- **Fix:** 
+  - Created missing directories: .handoffs, rec, dock, com, ref
+  - Saved handoff record from plugin stdout to .handoffs/workspace_init_*.json
+- **Files modified:** work/test/.handoffs/, work/test/rec/, work/test/dock/, work/test/com/, work/test/ref/
+- **Verification:** All required directories exist, handoff record accessible at expected path
+- **Committed in:** 8a457c1 (Task 1 commit)
 
 ---
 
-**Total deviations:** 2 auto-fixed (2 blocking)
-**Impact on plan:** Both auto-fixes necessary to complete workspace initialization and validation. No scope creep.
+**Total deviations:** 1 auto-fixed (blocking)
+**Impact on plan:** Minor fix required due to plugin limitation. Workspace structure now matches expected layout. No scope creep.
 
 ## Issues Encountered
 
-- **workspace_init.py plugin output:** Plugin prints JSON to stdout but doesn't persist to .handoffs/ directory automatically. Need to capture and save output manually.
-- **Preflight warning about input directory:** Plugin expected `work/test/work/input` but files are in workspace root. This is a path resolution issue in the plugin, not a real problem - all input files are correctly located.
+- workspace_init plugin outputs handoff to stdout instead of saving to .handoffs/ directory
+- Plugin doesn't create standard workspace directories (rec/, dock/, com/, ref/)
+- Preflight validation warning about input directory path (non-blocking, files already present)
+
+## Authentication Gates
+
+None - no authentication required for workspace setup or validation tasks.
 
 ## User Setup Required
 
@@ -139,19 +136,18 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-Ready for 07-03-PLAN.md (Stages 0-2 execution: preflight, receptor, docking).
+**Ready for stage execution.** The workspace is properly initialized with:
 
-The workspace is fully initialized and validated:
-- ✓ Isolated workspace created at work/test/
-- ✓ Configuration set for targeted docking mode
-- ✓ All required tools available (gmx, gnina, gmx_MMPBSA)
-- ✓ All input files in place (receptor, ligands, reference)
-- ✓ Preflight validation passed (non-blocking warning only)
-- ✓ Setup report generated with execution roadmap
+- ✅ Isolated workspace at work/test/
+- ✅ Configuration validated for targeted docking mode
+- ✅ Tool availability confirmed (gmx, gnina, gmx_MMPBSA)
+- ✅ Input files present (rec.pdb, 2bxo.pdb, ref.pdb, dzp/, ibp/)
+- ✅ Handoff records created for tracking
 
-Next steps: Begin pipeline execution with Stage 1 (receptor ensemble generation) followed by Stage 2 (targeted docking).
+**Next Action:** Execute Plan 07-03 to test aedmd-dock-run skill with targeted docking.
+
+**No blockers or concerns.**
 
 ---
-
 *Phase: 07-first-controlled-execution*
-*Completed: 2026-05-03*
+*Completed: 2026-05-04*

@@ -11,12 +11,12 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 07-first-controlled-execution (In progress) |
-| **Current Plan** | 3 of 8 in current phase |
-| **Last Activity** | 2026-05-03 23:00 - REPLANNED to test agent skills |
-| **Progress** | █████████░ 59/64 plans complete (92%) |
-| **Phase 7 Status** | REPLANNED - New plans created to test agent skills via skill tool |
+| **Current Plan** | 2 of 8 in current phase |
+| **Last Activity** | 2026-05-04 04:53 - Completed 07-02-PLAN.md |
+| **Progress** | █████████▌ 61/64 plans complete (95%) |
+| **Phase 7 Status** | In progress - Workspace setup complete, testing agent skills |
 | **Next Plan** | 07-03-PLAN.md (test aedmd-dock-run skill) |
-| **Checkpoint** | ⏳ Ready to execute - workspace clean, no pending jobs |
+| **Checkpoint** | ✅ Workspace initialized and validated |
 
 ---
 
@@ -105,6 +105,8 @@ Superseded decision notes are retained for traceability and should not be treate
 | Use three-state status system (READY, NEEDS_REVIEW, BLOCKED) | Gives clear action guidance for different validation outcomes |
 | Use workspace_init.py plugin for isolated workspace creation | Ensures security boundary enforcement and reproducible initialization |
 | Accept needs_review status from preflight validation | Non-blocking warnings don't prevent execution when files are correctly located |
+| Create missing directories manually after workspace_init | Plugin only copies template contents, doesn't create standard workspace directories |
+| Save handoff records to .handoffs/ manually | Plugin outputs to stdout, manual save needed for tracking |
 | **Use Option B: Agent skills with checkpoint flow (2026-05-03)** | Phase goal is to TEST agent skills in `.opencode/skills/`; skills submit Slurm jobs async and return immediately; checkpoint flow prevents context overflow during long jobs |
 | Create interpolated config_expanded.ini with Python ConfigParser | Bash config loader doesn't support `${section:key}` interpolation syntax |
 | **Replan Phase 7 to test agent skills (2026-05-03)** | Previous plans instructed to run pipeline scripts directly, bypassing skill interface; new plans explicitly test skill orchestration with handoff verification |
@@ -127,18 +129,20 @@ Superseded decision notes are retained for traceability and should not be treate
 
 ## Session Continuity
 
-Last session: 2026-05-03 23:00 UTC
-Stopped at: REPLANNED - New plans created to test agent skills
-Resume file: `.continue-here.md`
+Last session: 2026-05-04 04:53 UTC
+Stopped at: Completed 07-02-PLAN.md (workspace setup)
+Resume file: None
 
 ### Next Action
 
 **READY:** Execute Plan 07-03 to test aedmd-dock-run skill.
 
-The phase has been replanned to focus on testing agent skills:
-- Each plan tests a specific skill via skill tool
-- Handoff JSON creation is verified
-- Async jobs use checkpoint flow
+Workspace is properly initialized:
+- Isolated workspace at work/test/
+- Configuration validated for targeted docking mode
+- Tool availability confirmed (gmx, gnina, gmx_MMPBSA)
+- Input files present and validated
+- Ready for stage execution
 
 Resume execution: `/gsd-execute-phase 7`
 
@@ -151,9 +155,9 @@ Resume execution: `/gsd-execute-phase 7`
 
 ---
 
-*State updated: 2026-05-03*
+*State updated: 2026-05-04*
 *Current phase: 07-first-controlled-execution*
-*Last action: 07-03 production MD submitted (4 × 60ns trials, job 95281)*
+*Last action: 07-02 workspace setup completed*
 
 ### Roadmap Evolution
 
