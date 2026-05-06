@@ -1,38 +1,45 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # run_all_analysis.sh
 #
-# Run metal coordination geometry analysis (SAP/TSAP) for all 12 systems,
-# both solvated (solv_md) and receptor-complex (com_md) trajectories.
+# Submit metal coordination geometry analysis (v3) as individual SLURM jobs
+# for each system and trajectory type.
 #
-# Inputs per system
-# -----------------
-#   solv_md : <system>/prod_0.tpr  +  <system>/solv_all.xtc
-#   com_md  : <system>/fp/com.tpr  +  <system>/fp/v1.xtc
+# Each job analyzes one system (solv or com trajectory).
 #
-# Outputs
-# -------
-#   <system>/solv_analysis/   – Part A + Part B outputs for solvated MD
-#   <system>/com_analysis/    – Part A + Part B outputs for complex MD
+# v3 updates:
+#   - Corrected TSAP twist angle (22.5° instead of 0°)
+#   - Added twist angle classification
+#   - Added chirality determination (Δ/Λ)
+#   - Added SHAPE ChSM analysis (Part C)
 #
 # Usage
 # -----
-#   bash run_all_analysis.sh
+#   bash run_all_analysis.sh          # Submit all jobs
+#   bash run_all_analysis.sh --dry    # Print commands without submitting
 #
-# Run from the metal_geo_solv_com/ directory (where the script lives).
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+DRY_RUN=false
+if [ "${1:-}" = "--dry" ]; then
+    DRY_RUN=true
+    echo "DRY RUN - no jobs will be submitted"
+    echo ""
+fi
 
 PYTHON="${PYTHON:-python}"
-ANA="metal_geo_analysis_v2.py"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ANA="${SCRIPT_DIR}/metal_geo_analysis_v3.py"
 
 SYSTEMS=(
     me_rrrD_sap
     me_rrrL_sap
     me_sssD_sap
     me_sssL_sap
+    me_rrrD_tsap
+    me_rrrL_tsap
+    me_sssD_tsap
+    me_sssL_tsap
     phe_rrrD_sap
     phe_rrrD_tsap
     phe_rrrL_sap
@@ -43,42 +50,97 @@ SYSTEMS=(
     phe_sssL_tsap
 )
 
-# ── Build argument lists ───────────────────────────────────────────────────────
+submit_job() {
+    local sysname="$1"
+    local trjtype="$2"
+    local tpr="$3"
+    local xtc="$4"
+    local outdir="$5"
+    
+    local jobname="geo_${sysname}_${trjtype}"
+    
+    if [ "$DRY_RUN" = true ]; then
+        echo "Would submit job: $jobname"
+    else
+        mkdir -p "$outdir"
+        sbatch <<- EOF
+#!/bin/bash
+#SBATCH -J ${jobname}
+#SBATCH -p workq
+#SBATCH -c 1
+#SBATCH -o ${outdir}/analysis_%j.out
+#SBATCH -e ${outdir}/analysis_%j.err
 
-SOLV_ARGS=()
-for SYS in "${SYSTEMS[@]}"; do
-    SOLV_ARGS+=(
-        --system "$SYS"
-        --tpr    "solv_md/${SYS}/prod_0.tpr"
-        --xtc    "solv_md/${SYS}/solv_all.xtc"
-        --outdir solv_analysis
-    )
-done
-
-COM_ARGS=()
-for SYS in "${SYSTEMS[@]}"; do
-    COM_ARGS+=(
-        --system "$SYS"
-        --tpr    "com_md/${SYS}/fp/com.tpr"
-        --xtc    "com_md/${SYS}/fp/v1.xtc"
-        --outdir com_analysis
-    )
-done
-
-# ── Run ───────────────────────────────────────────────────────────────────────
+set -euo pipefail
 
 echo "========================================================"
-echo "  Running SOLV analysis (12 systems)"
+echo "  System: ${sysname}"
+echo "  Type:   ${trjtype}"
+echo "  Job ID: \$SLURM_JOB_ID"
+echo "  Date:   \$(date)"
 echo "========================================================"
-"$PYTHON" "$ANA" "${SOLV_ARGS[@]}"
+
+${PYTHON} ${ANA} \\
+    --system "${sysname}" \\
+    --tpr "${tpr}" \\
+    --xtc "${xtc}" \\
+    --skip-classification-chart \\
+    --outdir "${outdir}"
+
+echo ""
+echo "Analysis complete: \$(date)"
+echo "Output directory: ${outdir}"
+EOF
+        echo "Submitted: $jobname"
+    fi
+}
+
+echo "========================================================"
+echo "  Submitting SOLV analysis jobs (16 systems)"
+echo "========================================================"
+
+for SYS in "${SYSTEMS[@]}"; do
+    TPR="solv_md/${SYS}/prod_0.tpr"
+    XTC="solv_md/${SYS}/solv_all.xtc"
+    OUTDIR="solv_analysis/${SYS}"
+    
+    if [ -f "$TPR" ] && [ -f "$XTC" ]; then
+        submit_job "$SYS" "solv" "$TPR" "$XTC" "$OUTDIR"
+    else
+        echo "Skipping $SYS (solv): missing TPR or XTC"
+    fi
+done
 
 echo ""
 echo "========================================================"
-echo "  Running COM analysis (12 systems)"
+echo "  Submitting COM analysis jobs (16 systems)"
 echo "========================================================"
-"$PYTHON" "$ANA" "${COM_ARGS[@]}"
+
+for SYS in "${SYSTEMS[@]}"; do
+    TPR="com_md/${SYS}/fp/com.tpr"
+    XTC="com_md/${SYS}/fp/v1.xtc"
+    OUTDIR="com_analysis/${SYS}"
+    
+    if [ -f "$TPR" ] && [ -f "$XTC" ]; then
+        submit_job "$SYS" "com" "$TPR" "$XTC" "$OUTDIR"
+    else
+        echo "Skipping $SYS (com): missing TPR or XTC"
+    fi
+done
 
 echo ""
-echo "All analyses complete."
-echo "  Solvated results : <system>/solv_analysis/"
-echo "  Complex  results : <system>/com_analysis/"
+echo "========================================================"
+if [ "$DRY_RUN" = true ]; then
+    echo "  DRY RUN COMPLETE"
+    echo "  Run without --dry to submit jobs"
+else
+    echo "  All jobs submitted"
+    echo "  Check status with: squeue -u \$USER"
+fi
+echo "========================================================"
+echo ""
+echo "v3 New Features:"
+echo "  - Part C: SHAPE ChSM analysis"
+echo "  - Twist angle classification (primary geometry method)"
+echo "  - Chirality determination (Δ/Λ)"
+echo "  - Corrected TSAP definition (22.5° twist)"
