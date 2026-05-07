@@ -18,10 +18,10 @@ v3 CHANGES FROM v2:
    - Finds 9 closest N/O atoms within 3.0 Å
    - Classifies into BOTTOM/TOP/CAP using C4 frame
 
-3. Chirality determination:
-   - Δ (delta) / Λ (lambda) from twist angle sign
-   - Positive twist → Δ (right-handed)
-   - Negative twist → Λ (left-handed)
+ 3. Chirality determination:
+    - D (right-handed) / L (left-handed) from twist angle sign
+    - Positive twist → D
+    - Negative twist → L
 
 4. SHAPE integration (Part C):
    - CSAPR-9 Continuous Shape Measures (ChSM)
@@ -341,9 +341,18 @@ def get_c4_frame(coord9):
     if cap_norm > 1e-8:
         x = cap_proj / cap_norm
     else:
-        tmp = np.array([1.0, 0.0, 0.0]) if abs(z[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
-        x = np.cross(z, tmp)
-        x /= np.linalg.norm(x)
+        # CAP is exactly on axis – use first BOTTOM atom relative to centroid
+        # for a deterministic, molecule-fixed x-direction
+        tmp = coord9[BOTTOM[0]] - centroid
+        tmp -= np.dot(tmp, z) * z
+        n_tmp = np.linalg.norm(tmp)
+        if n_tmp > 1e-8:
+            x = tmp / n_tmp
+        else:
+            # Pathological: BOTTOM[0] also on axis – use a global axis cross
+            tmp2 = np.array([1.0, 0.0, 0.0]) if abs(z[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
+            x = np.cross(z, tmp2)
+            x /= np.linalg.norm(x)
     y = np.cross(z, x)
     y /= np.linalg.norm(y)
     return x, y, z
@@ -364,17 +373,22 @@ def _azimuths(vecs, x, y, z):
 def get_twist_angle(coord9):
     """
     Twist angle between TOP and BOTTOM layers, wrapped to [−90, 90].
-
-    Uses sorted-azimuth inter-layer offset to avoid the circular-mean
-    singularity that occurs when atoms lie exactly at 0/90/180/270 deg.
-
-    Fully vectorised: no Python loops over atoms.
+    
+    Computes the mean offset between corresponding TOP and BOTTOM atoms.
+    The atom ordering in TOPOLOGIES dict defines the correspondence.
     """
     x, y, z = get_c4_frame(coord9)
-    phi_bot = np.sort(_azimuths(coord9[BOTTOM], x, y, z))   # (4,)
-    phi_top = np.sort(_azimuths(coord9[TOP],    x, y, z))   # (4,)
-    offsets = (phi_top - phi_bot + 90) % 180 - 90           # (4,)
-    return float(offsets.mean())
+    phi_bot = _azimuths(coord9[BOTTOM], x, y, z)   # (4,)
+    phi_top = _azimuths(coord9[TOP],    x, y, z)   # (4,)
+    
+    # Direct offsets - atom correspondence is defined by TOPOLOGIES ordering
+    offsets = phi_top - phi_bot
+    
+    # Wrap offsets to [-90, 90]
+    offsets_wrapped = np.array([((o + 90) % 180) - 90 for o in offsets])
+    
+    # Return mean twist angle
+    return float(np.mean(offsets_wrapped))
 
 
 def build_local_ideal_directions(coord9):
@@ -522,29 +536,50 @@ def classify_by_twist_angle(twist_deg):
         return 'PRISM_EXTREME', max(0.0, 1.0 - (abs_twist - 56.25) / 33.75)
 
 
-def get_chirality(twist_angle_deg):
+def get_dl_from_twist(twist_deg):
     """
-    Determine chirality from twist angle.
-    
-    Convention (looking from CAP toward metal):
-    - Positive twist → Δ (delta, right-handed)
-    - Negative twist → Λ (lambda, left-handed)
-    
+    Determine D / L from the signed twist angle (nearest-neighbour pairing).
+
+        Positive twist  →  D
+        Negative twist  →  L
+        Near zero       →  UNKNOWN
+
     Parameters
     ----------
-    twist_angle_deg : float
-        Twist angle in degrees
-        
+    twist_deg : float
+        Signed twist angle in degrees.
+
     Returns
     -------
-    str : 'DELTA', 'LAMBDA', or 'UNKNOWN'
+    str : 'D', 'L', or 'UNKNOWN'
     """
-    if abs(twist_angle_deg) < 5:  # near-eclipsed, chirality undefined
+    if abs(twist_deg) < 5.0:
         return 'UNKNOWN'
-    elif twist_angle_deg > 0:
-        return 'DELTA'  # Δ
-    else:
-        return 'LAMBDA'  # Λ
+    return 'D' if twist_deg > 0 else 'L'
+
+
+def get_dl_from_torsion(chrom_tor):
+    """
+    Determine D / L from the chromophore torsion (Tc) sign.
+
+        Positive Tc  →  D
+        Negative Tc  →  L
+        Near zero    →  UNKNOWN
+
+    Parameters
+    ----------
+    chrom_tor : float
+        Chromophore torsion angle in degrees.
+
+    Returns
+    -------
+    str : 'D', 'L', or 'UNKNOWN'
+    """
+    if chrom_tor is None or np.isnan(chrom_tor):
+        return 'UNKNOWN'
+    if abs(chrom_tor) < 5.0:
+        return 'UNKNOWN'
+    return 'D' if chrom_tor > 0 else 'L'
 
 
 def classify_comprehensive(twist_deg, chsm_csapr9=None, ring_tors=None, chrom_tor=None):
@@ -573,7 +608,7 @@ def classify_comprehensive(twist_deg, chsm_csapr9=None, ring_tors=None, chrom_to
     """
     # Twist-based classification (primary)
     geom_twist, conf_twist = classify_by_twist_angle(twist_deg)
-    chirality = get_chirality(twist_deg)
+    chirality = get_dl_from_twist(twist_deg)
     
     # SHAPE-based classification (secondary, if available)
     if chsm_csapr9 is not None:
@@ -985,7 +1020,7 @@ def run_shape_trajectory(records, workdir):
     combined_dat = os.path.join(workdir, 'trajectory_combined.dat')
     with open(combined_dat, 'w') as f:
         f.write('$ Trajectory CSAPR-9 analysis\n')
-        f.write('  9  1\n')
+        f.write('  9 10\n')       # 9 ligand atoms + 1 metal, central atom at position 10
         f.write('  8\n')  # CSAPR-9
         
         for r in records:
@@ -1434,28 +1469,33 @@ def collect_trajectory_data(u, mol_ag, ref_pos, hmask, topo):
         tc       = float(all_tors[4])
         geom     = classify_geom(ring_t, tc)
 
-        # ── NEW in v3: Twist angle and chirality ───────────────────
+        # ── NEW in v3: Twist angle for geometry classification ───────────────────
         twist_deg = get_twist_angle(coord)
-        chirality = get_chirality(twist_deg)
         geom_twist, conf_twist = classify_by_twist_angle(twist_deg)
 
+        # D / L labels from twist sign and from chromophore torsion sign
+        dl_twist = get_dl_from_twist(twist_deg)
+        dl_torsion = get_dl_from_torsion(tc)
+
         records.append({
-            'frame'     : int(ts.frame),
-            'time'      : float(ts.time),
-            'pos'       : aln_pos.copy(),
-            'coord9'    : coord.copy(),
-            'eu'        : eu.copy(),
-            'dirs_sap'  : dirs_sap.copy(),
-            'dirs_tsap' : dirs_tsap.copy(),
-            'rmsd_sap'  : rmsd_sap,
-            'rmsd_tsap' : rmsd_tsap,
-            'ring_tors' : ring_t,
-            'chrom_tor' : tc,
-            'geom'      : geom,
-            'twist_deg' : twist_deg,      # NEW in v3
-            'chirality' : chirality,      # NEW in v3
-            'geom_twist': geom_twist,     # NEW in v3
-            'conf_twist': conf_twist,     # NEW in v3
+            'frame'           : int(ts.frame),
+            'time'            : float(ts.time),
+            'pos'             : aln_pos.copy(),
+            'coord9'          : coord.copy(),
+            'eu'              : eu.copy(),
+            'dirs_sap'        : dirs_sap.copy(),
+            'dirs_tsap'       : dirs_tsap.copy(),
+            'rmsd_sap'        : rmsd_sap,
+            'rmsd_tsap'       : rmsd_tsap,
+            'ring_tors'       : ring_t,
+            'chrom_tor'       : tc,
+            'geom'            : geom,
+            'twist_deg'       : twist_deg,       # signed twist — consistent across SAP/TSAP
+            'abs_twist_deg'   : abs(twist_deg),  # for geometry classification only
+            'geom_twist'      : geom_twist,
+            'conf_twist'      : conf_twist,
+            'dl_twist'        : dl_twist,        # D/L from twist sign
+            'dl_torsion'      : dl_torsion,      # D/L from Tc sign
         })
     
     # Add atom names for coordinating atoms (for SHAPE analysis)
@@ -1486,10 +1526,10 @@ def run_part_A(records, mol_atoms, outdir, sysname):
 
     # ── Time-series PNG ────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(10, 3.8))
-    ax.plot(times / 1000, rs_sap,  color=C_SAP,  lw=1.2, alpha=0.85,
-            label='RMSD → ideal SAP')
-    ax.plot(times / 1000, rs_tsap, color=C_TSAP, lw=1.2, alpha=0.85,
-            label='RMSD → ideal TSAP')
+    ax.plot(times / 1000, rs_sap,  color=C_SAP,  marker='o', ls='none', 
+            markersize=3, alpha=0.85, label='RMSD → ideal SAP')
+    ax.plot(times / 1000, rs_tsap, color=C_TSAP, marker='o', ls='none', 
+            markersize=3, alpha=0.85, label='RMSD → ideal TSAP')
     ax.set_xlabel('Time (ns)', fontsize=11)
     ax.set_ylabel('RMSD  (Å)', fontsize=11)
     ax.set_title(f'{sysname}  –  Coordination-sphere RMSD to ideal geometry',
@@ -1528,7 +1568,7 @@ def run_part_A(records, mol_atoms, outdir, sysname):
     ax.fill_between(ctr_tsap, frac_tsap * 100, alpha=0.25, color=C_TSAP)
     ax.set_xlabel('RMSD  (Å)', fontsize=11)
     ax.set_ylabel('Fraction of frames (%)', fontsize=11)
-    ax.set_ylim(HIST_YMIN_PCT, HIST_YMAX_PCT)
+    ax.set_ylim(HIST_YMIN_PCT, 50.0)
     ax.set_title(f'{sysname}  –  RMSD histogram', fontsize=11)
     ax.legend(framealpha=0.8)
     plt.tight_layout()
@@ -1588,19 +1628,23 @@ def run_part_B(records, outdir, sysname, write_classification_chart=True):
     ts_csv = os.path.join(outdir, 'B_torsions_timeseries.csv')
     with open(ts_csv, 'w', newline='') as f:
         w = csv.writer(f)
-        # NEW in v3: add twist angle and chirality
-        w.writerow(['frame', 'time_ps'] + tnames + ['geom', 'twist_deg', 'chirality'])
+        # Tc sign gives D/L (big D/L); twist sign now independently gives D/L for cross-check.
+        w.writerow(['frame', 'time_ps'] + tnames
+                   + ['geom', 'twist_deg', 'abs_twist_deg',
+                      'dl_twist', 'dl_torsion'])
         for i, r in enumerate(records):
             vals = [f'{v:.2f}' for v in tor_mat[:, i]]
             twist = r.get('twist_deg', 0.0)
-            chirality = r.get('chirality', 'UNKNOWN')
-            w.writerow([r['frame'], f"{r['time']:.1f}"] + vals + [geoms[i], f'{twist:.2f}', chirality])
+            w.writerow([r['frame'], f"{r['time']:.1f}"] + vals
+                       + [geoms[i], f'{twist:.2f}', f'{abs(twist):.2f}',
+                          r.get('dl_twist', 'UNK'), r.get('dl_torsion', 'UNK')])
     print(f'  [B] {ts_csv}')
 
     # ── Torsion time-series PNG  (all torsions, one overlaid plot) ──
     fig, ax = plt.subplots(figsize=(11, 4.5))
     for name, col, vals in zip(tnames, TOR_COLS, tor_mat):
-        ax.plot(times / 1000, vals, color=col, lw=1.4, alpha=0.85, label=name)
+        ax.plot(times / 1000, vals, color=col, marker='o', ls='none', 
+                markersize=2, alpha=0.85, label=name)
     ax.axhline(0, color='k', lw=0.6, ls='--', alpha=0.5)
     ax.set_xlabel('Time (ns)', fontsize=11)
     ax.set_ylabel('Torsion angle (°)', fontsize=11)
@@ -1791,37 +1835,42 @@ def run_part_B(records, outdir, sysname, write_classification_chart=True):
     print(f'  [B] {os.path.join(outdir, "B_classification_histogram.png")}')
     
     # ── NEW in v3: Twist angle analysis ─────────────────────────────
+    # Signed twist angle — now consistent across SAP and TSAP after nearest-neighbour fix.
     twist_angles = np.array([r.get('twist_deg', 0.0) for r in records])
-    chiralities = [r.get('chirality', 'UNKNOWN') for r in records]
-    
-    # Twist angle time-series CSV
+    abs_twist    = np.array([r.get('abs_twist_deg', 0.0) for r in records])
+
+    # Twist angle time-series CSV (signed value + D/L)
     twist_ts_csv = os.path.join(outdir, 'B_twist_timeseries.csv')
     with open(twist_ts_csv, 'w', newline='') as f:
         w = csv.writer(f)
-        w.writerow(['frame', 'time_ps', 'twist_deg', 'chirality', 'geometry_twist'])
+        w.writerow(['frame', 'time_ps', 'twist_deg', 'abs_twist_deg',
+                    'geometry_twist', 'dl_twist', 'dl_torsion'])
         for i, r in enumerate(records):
-            w.writerow([r['frame'], f"{r['time']:.1f}", f'{twist_angles[i]:.2f}', 
-                       chiralities[i], r.get('geom_twist', 'UNK')])
+            w.writerow([r['frame'], f"{r['time']:.1f}",
+                        f'{twist_angles[i]:.2f}', f'{abs_twist[i]:.2f}',
+                        r.get('geom_twist', 'UNK'),
+                        r.get('dl_twist', 'UNK'),
+                        r.get('dl_torsion', 'UNK')])
     print(f'  [B] {twist_ts_csv}')
-    
+
+    # Time-series plot: signed twist, colour = SAP/TSAP by |twist|
     pt_colors_twist = []
-    for t in twist_angles:
-        if abs(t) < 22.5:
+    for t in abs_twist:
+        if t < 33.75:
             pt_colors_twist.append(C_TSAP)
         else:
             pt_colors_twist.append(C_SAP)
-    
+
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.scatter(times / 1000, twist_angles, c=pt_colors_twist, s=6, alpha=0.7, linewidths=0)
-    ax.axhline(0, color='k', lw=0.6, ls='--', alpha=0.5)
-    ax.axhline(22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7, label='TSAP ideal (±22.5°)')
-    ax.axhline(-22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7)
-    ax.axhline(45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7, label='SAP ideal (±45°)')
-    ax.axhline(-45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7)
+    abs_twist_arr = np.abs(twist_angles)
+    ax.scatter(times / 1000, abs_twist_arr, c=pt_colors_twist, s=6, alpha=0.7, linewidths=0)
+    ax.axhline(22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7, label='TSAP ideal (22.5°)')
+    ax.axhline(45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7, label='SAP ideal (45°)')
+    ax.axhline(0, color='gray', lw=0.6, ls='-', alpha=0.3)
     ax.set_xlabel('Time (ns)', fontsize=11)
-    ax.set_ylabel('Twist angle (°)', fontsize=11)
-    ax.set_ylim(-60, 60)
-    ax.set_yticks([-45, -22.5, 0, 22.5, 45])
+    ax.set_ylabel('|Twist angle| (°)', fontsize=11)
+    ax.set_ylim(0, 60)
+    ax.set_yticks([0, 11.25, 22.5, 33.75, 45])
     ax.legend(fontsize=9, framealpha=0.85)
     ax.set_title(f'{sysname}  –  Twist angle time series', fontsize=11)
     ax.grid(True, alpha=0.3)
@@ -1829,37 +1878,55 @@ def run_part_B(records, outdir, sysname, write_classification_chart=True):
     fig.savefig(os.path.join(outdir, 'B_twist_timeseries.png'), dpi=150)
     plt.close(fig)
     print(f'  [B] {os.path.join(outdir, "B_twist_timeseries.png")}')
-    
-    # Twist angle histogram PNG
+
+    # Histogram: absolute twist
     fig, ax = plt.subplots(figsize=(8, 4.5))
-    n_bins = 60
-    counts, edges = np.histogram(twist_angles, bins=n_bins, range=(-90, 90))
-    centres = 0.5 * (edges[:-1] + edges[1:])
+    n_bins = 45
+    bin_edges = np.linspace(0, 90, n_bins + 1)
+    bin_ctrs  = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+
+    abs_twist_vals = np.abs(twist_angles)
+    counts, _ = np.histogram(abs_twist_vals, bins=bin_edges)
     pct = counts / nf_total * 100.0
-    
-    bar_colors = []
-    for c in centres:
-        if abs(c) < 22.5:
-            bar_colors.append(C_TSAP)
-        else:
-            bar_colors.append(C_SAP)
-    
-    for i in range(len(centres)):
-        ax.fill_between([edges[i], edges[i+1]], [0, 0], [pct[i], pct[i]], 
-                        alpha=0.4, color=bar_colors[i], linewidth=0)
-        ax.plot([edges[i], edges[i+1]], [pct[i], pct[i]], 
-                color=bar_colors[i], lw=1.5)
-    
-    ax.axvline(0, color='k', lw=0.6, ls='--', alpha=0.5)
-    ax.axvline(22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7, label='TSAP (±22.5°)')
-    ax.axvline(-22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7)
-    ax.axvline(45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7, label='SAP (±45°)')
-    ax.axvline(-45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7)
-    ax.set_xlabel('Twist angle (°)', fontsize=11)
+
+    # Colour by geometry (SAP/TSAP boundary at 33.75°)
+    tsap_mask = bin_ctrs < 33.75
+    sap_mask = ~tsap_mask
+
+    if np.any(tsap_mask):
+        ax.plot(bin_ctrs[tsap_mask], pct[tsap_mask], color=C_TSAP, lw=1.8, alpha=0.90)
+        ax.fill_between(bin_ctrs[tsap_mask], pct[tsap_mask], alpha=0.25, color=C_TSAP)
+
+    if np.any(sap_mask):
+        ax.plot(bin_ctrs[sap_mask], pct[sap_mask], color=C_SAP, lw=1.8, alpha=0.90)
+        ax.fill_between(bin_ctrs[sap_mask], pct[sap_mask], alpha=0.25, color=C_SAP)
+
+    # Annotate peak value(s)
+    peak_idx = int(np.nanargmax(pct))
+    peak_x = float(bin_ctrs[peak_idx])
+    peak_y = float(pct[peak_idx])
+    peak_color = C_TSAP if peak_x < 33.75 else C_SAP
+    ax.scatter([peak_x], [peak_y], color=peak_color, s=30, zorder=5)
+    ax.annotate(
+        f'Peak: {peak_x:.1f}° ({peak_y:.1f}%)',
+        xy=(peak_x, peak_y),
+        xytext=(10, 8),
+        textcoords='offset points',
+        fontsize=9,
+        color=peak_color,
+        ha='left',
+        va='bottom',
+        bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.75),
+    )
+
+    ax.axvline(22.5, color=C_TSAP, lw=1.5, ls=':', alpha=0.7, label='TSAP ideal (22.5°)')
+    ax.axvline(45.0, color=C_SAP, lw=1.5, ls='--', alpha=0.7, label='SAP ideal (45°)')
+    ax.axvline(33.75, color='gray', lw=0.8, ls='-', alpha=0.5, label='Boundary')
+    ax.set_xlabel('|Twist angle| (°)', fontsize=11)
     ax.set_ylabel('Fraction of frames (%)', fontsize=11)
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(HIST_YMIN_PCT, HIST_YMAX_PCT)
-    ax.set_xticks([-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90])
+    ax.set_xlim(0, 90)
+    ax.set_ylim(0, HIST_YMAX_PCT)
+    ax.set_xticks([0, 22.5, 33.75, 45, 67.5, 90])
     ax.legend(fontsize=9, framealpha=0.85)
     ax.set_title(f'{sysname}  –  Twist angle distribution', fontsize=11)
     ax.grid(True, alpha=0.3)
@@ -1928,7 +1995,8 @@ def run_part_C(records, outdir, sysname, run_shape=True):
         ax.fill_between(centres, counts / len(valid_chsm) * 100.0, alpha=0.3, color='darkgreen')
         ax.set_xlabel('ChSM (CSAPR-9)', fontsize=11)
         ax.set_ylabel('Fraction of frames (%)', fontsize=11)
-        ax.set_ylim(HIST_YMIN_PCT, HIST_YMAX_PCT)
+        ax.set_xlim(0.0, 10.0)
+        ax.set_ylim(0.0, 20.0)
         ax.set_title(f'{sysname}  –  SHAPE Continuous Shape Measure', fontsize=11)
         
         # Add vertical lines for classification thresholds
@@ -2236,7 +2304,7 @@ def main():
             metal_pos = mol_ag.positions[topo_auto['metal_idx']]
             coord9 = mol_ag.positions[topo_auto['coord_idx']] - metal_pos
             twist = get_twist_angle(coord9)
-            chirality = get_chirality(twist)
+            chirality = get_dl_from_twist(twist)
             geom, conf = classify_by_twist_angle(twist)
             print(f'    Twist angle: {twist:.2f}°')
             print(f'    Geometry: {geom} (confidence: {conf:.2f})')
@@ -2320,10 +2388,11 @@ def main():
             write_classification_chart=(not args.skip_classification_chart),
         )
         
-        # Part C output (SHAPE analysis) - NEW in v3
+        # Part C output (SHAPE analysis)
         run_shape = not (hasattr(args, 'no_shape') and args.no_shape)
         print('\n  ── Part C : SHAPE analysis ──')
         chsm_values = run_part_C(records, cfg['outdir'], sysname, run_shape=run_shape)
+
 
         # Summary
         n_sap  = geoms.count('SAP')
@@ -2331,28 +2400,39 @@ def main():
         n_unk  = geoms.count('UNK')
         nf     = len(geoms)
         
-        # NEW in v3: Twist angle and chirality statistics
-        twist_angles = np.array([r['twist_deg'] for r in records])
-        chiralities = [r['chirality'] for r in records]
-        n_delta = chiralities.count('DELTA')
-        n_lambda = chiralities.count('LAMBDA')
-        n_unknown = chiralities.count('UNKNOWN')
-        
+        # NEW in v3: Twist angle statistics (signed + D/L)
+        signed_twist = np.array([r['twist_deg'] for r in records])
+        abs_twist    = np.array([r['abs_twist_deg'] for r in records])
+
+        # Most common D/L from twist
+        from collections import Counter
+        dl_counts = Counter(r['dl_twist'] for r in records)
+        dl_most = dl_counts.most_common(1)[0][0]
+
+        # D/L from torsion for cross-check
+        dl_torsion_counts = Counter(r['dl_torsion'] for r in records)
+        dl_torsion_most = dl_torsion_counts.most_common(1)[0][0]
+
         print(f'\n  Summary  {sysname}:')
         print(f'    Geometry (torsion): SAP={n_sap} ({100*n_sap/nf:.1f}%)  '
               f'TSAP={n_tsap} ({100*n_tsap/nf:.1f}%)  UNK={n_unk} ({100*n_unk/nf:.1f}%)')
-        print(f'    Geometry (twist): mean={twist_angles.mean():.2f}° ± {twist_angles.std():.2f}°')
-        print(f'    Chirality: Δ={n_delta} ({100*n_delta/nf:.1f}%), '
-              f'Λ={n_lambda} ({100*n_lambda/nf:.1f}%), '
-              f'UNK={n_unknown} ({100*n_unknown/nf:.1f}%)')
+        print(f'    Twist (signed): mean={signed_twist.mean():+.2f}° ± {signed_twist.std():.2f}°')
+        print(f'    D/L from twist    : {dl_most}')
+        print(f'    D/L from torsion  : {dl_torsion_most}', end='')
+        if dl_most != dl_torsion_most and dl_most != 'UNKNOWN' and dl_torsion_most != 'UNKNOWN':
+            print('  <-- DISAGREEMENT')
+        else:
+            print()
+        print(f'    Twist (abs)   : mean={abs_twist.mean():.2f}°')
         print(f'    RMSD→SAP  : {rs_sap.mean():.3f} ± {rs_sap.std():.3f} Å')
         print(f'    RMSD→TSAP : {rs_tsap.mean():.3f} ± {rs_tsap.std():.3f} Å')
-        
+
         # ChSM statistics if available
         valid_chsm = [c for c in chsm_values if c is not None]
-        if valid_chsm:
+        if valid_chsm and len(valid_chsm) > 0:
             chsm_arr = np.array(valid_chsm)
-            print(f'    ChSM→CSAPR-9: {chsm_arr.mean():.3f} ± {chsm_arr.std():.3f}')
+            print(f'    ChSM→CSAPR-9: {chsm_arr.mean():.3f} ± {chsm_arr.std():.3f}  '
+                  f'(n_valid={len(valid_chsm)}/{len(chsm_values)})')
         
         # Validation check
         if validation_results is not None:
@@ -2374,7 +2454,7 @@ def main():
                     print(f"  - {issue}")
             else:
                 print(f"  ✓ Geometry: {vr['geometry']} (twist={vr['twist']:.1f}°)")
-                print(f"  ✓ Chirality: {vr['chirality']}")
+                print(f"  ✓ D/L: {vr['dl']}")
                 if vr.get('chsm'):
                     print(f"  ✓ ChSM: {vr['chsm']:.3f}")
     
@@ -2383,62 +2463,60 @@ def main():
 
 def validate_system(sysname, records):
     """
-    Validate system against expected geometry and chirality.
-    
+    Validate system against expected geometry and D/L from filename.
+
     Expected naming convention:
-    - *_sap → SAP geometry
+    - *_sap  → SAP geometry
     - *_tsap → TSAP geometry
-    - *L → LAMBDA chirality
-    - *D → DELTA chirality
+    - *[Ll]  → L
+    - *[Dd]  → D
     """
     # Parse expected values from name
     expected_geom = None
-    expected_chirality = None
-    
-    if '_sap' in sysname.lower():
+    expected_dl = None
+
+    lower = sysname.lower()
+    if '_sap' in lower:
         expected_geom = 'SAP'
-    elif '_tsap' in sysname.lower():
+    elif '_tsap' in lower:
         expected_geom = 'TSAP'
-    
-    if sysname.endswith('L') or sysname.endswith('L_'):
-        expected_chirality = 'LAMBDA'
-    elif sysname.endswith('D') or sysname.endswith('D_'):
-        expected_chirality = 'DELTA'
-    
-    if expected_geom is None and expected_chirality is None:
+
+    if lower.endswith('l') or lower.endswith('l_'):
+        expected_dl = 'L'
+    elif lower.endswith('d') or lower.endswith('d_'):
+        expected_dl = 'D'
+
+    if expected_geom is None and expected_dl is None:
         return None  # Cannot validate this system
-    
-    # Get actual values (average over trajectory)
-    twist_angles = np.array([r['twist_deg'] for r in records])
-    chiralities = [r['chirality'] for r in records]
-    
-    avg_twist = twist_angles.mean()
+
+    # Get actual geometry from average absolute twist
+    avg_twist = float(np.mean([r['twist_deg'] for r in records]))
     actual_geom, _ = classify_by_twist_angle(avg_twist)
-    
-    # Most common chirality
+
+    # Most common D/L from twist
     from collections import Counter
-    chirality_counts = Counter(chiralities)
-    actual_chirality = chirality_counts.most_common(1)[0][0]
-    
+    dl_counts = Counter(r['dl_twist'] for r in records)
+    actual_dl = dl_counts.most_common(1)[0][0]
+
     # Validate
     passed = True
     issues = []
-    
+
     if expected_geom and actual_geom != expected_geom:
         passed = False
         issues.append(f"Geometry mismatch: expected {expected_geom}, got {actual_geom} (twist={avg_twist:.1f}°)")
-    
-    if expected_chirality and actual_chirality != expected_chirality:
+
+    if expected_dl and actual_dl != expected_dl:
         passed = False
-        issues.append(f"Chirality mismatch: expected {expected_chirality}, got {actual_chirality}")
-    
+        issues.append(f"D/L mismatch: expected {expected_dl}, got {actual_dl}")
+
     return {
         'name': sysname,
         'passed': passed,
         'geometry': actual_geom,
         'twist': avg_twist,
-        'chirality': actual_chirality,
-        'chsm': records[0].get('chsm'),  # If available
+        'dl': actual_dl,
+        'chsm': records[0].get('chsm'),
         'issues': issues
     }
 
