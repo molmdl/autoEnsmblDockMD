@@ -127,11 +127,21 @@
 #	cd ..
 #done
 
-for i in sssD sssL rrrD rrrL ; do
+#for i in sssD sssL rrrD rrrL ; do
+#	cd me_${i}_tsap
+#	ln -s ../hsa?.pdb_ali.gro .
+#	cp ../../solv_md/me_${i}_tsap/me_${i}_tsap.itp .
+#	python ../../scripts/dock/dock2com_2.2.1.py -i me_${i}_tsap.itp -s hsa*-me_${i}_tsap.sdf -t me_${i}_tsap.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../amber19SB_OL21_OL3_lipid17.ff/forcefield.itp --water-itp ../../amber19SB_OL21_OL3_lipid17.ff/opc3.itp --ions-itp ../../amber19SB_OL21_OL3_lipid17.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top --metric sasa #minimizedAffinity
+#rm hsa?.pdb_ali.gro
+#	mkdir ../../com_md/me_${i}_tsap/
+#	cp sys.top rec.itp com.gro best.gro me_${i}_tsap.itp ../../rec/posre.itp  ../../com_md/me_${i}_tsap/
+#	cd ..
+#done
+for i in sssD ; do
 	cd me_${i}_tsap
 	ln -s ../hsa?.pdb_ali.gro .
 	cp ../../solv_md/me_${i}_tsap/me_${i}_tsap.itp .
-	python ../../scripts/dock/dock2com_2.2.1.py -i me_${i}_tsap.itp -s hsa*-me_${i}_tsap.sdf -t me_${i}_tsap.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../amber19SB_OL21_OL3_lipid17.ff/forcefield.itp --water-itp ../../amber19SB_OL21_OL3_lipid17.ff/opc3.itp --ions-itp ../../amber19SB_OL21_OL3_lipid17.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top --metric sasa #minimizedAffinity
+	python ../../scripts/dock/dock2com_2.2.1.py -i me_${i}_tsap.itp -s hsa*-me_${i}_tsap.sdf -t me_${i}_tsap.mol2 -r ../../rec/\#topol.top.1\# --ff-path ../../amber19SB_OL21_OL3_lipid17.ff/forcefield.itp --water-itp ../../amber19SB_OL21_OL3_lipid17.ff/opc3.itp --ions-itp ../../amber19SB_OL21_OL3_lipid17.ff/ions.itp --lig-gro best.gro --com-gro com.gro --rec-itp rec.itp --sys-top sys.top --metric minimizedAffinity
 rm hsa?.pdb_ali.gro
 	mkdir ../../com_md/me_${i}_tsap/
 	cp sys.top rec.itp com.gro best.gro me_${i}_tsap.itp ../../rec/posre.itp  ../../com_md/me_${i}_tsap/

@@ -3,6 +3,7 @@
 lig=$1 
 
 for i in {0..3} ; do
+#for i in 1 ; do
 	sbatch << EOF
 #!/bin/bash
 #SBATCH -J ${lig}_100ns_$i
