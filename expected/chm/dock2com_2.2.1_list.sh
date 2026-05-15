@@ -9,13 +9,15 @@ CWD=`pwd`
 #	cd $CWD
 #done
 #
-cd dock
+#cd dock
+cd dock_static
 
 for ligid in {1..10} ; do
         cd lig$ligid
         l=`basename *.mol2 .mol2`
 #	ln -s ../rec?.gro .
-#	cp ${CWD}/lig/lig${ligid}/${l}_gmx.itp lig.itp
+#	ln -s ../BRD4.pdb .
+	cp ${CWD}/lig/lig${ligid}/${l}_gmx.itp lig.itp
 	
 	ffbonded_src="${CWD}/lig/lig${ligid}/${l}_ffbonded.itp"
 	ffbonded_arg=""
@@ -25,7 +27,8 @@ for ligid in {1..10} ; do
 #		echo "Found ffbonded.itp: $ffbonded_src"
 #	fi
 	
-	python ${CWD}/scripts/dock/dock2com_2.2.1.py -i lig.itp -s rec?-${l}.sdf -t ${l}.mol2 --rec-gro-pattern {prefix}.gro $ffbonded_arg --list-models | grep -v '\-\-\-\-' > lig${ligid}_dock.csv
+	#python ${CWD}/scripts/dock/dock2com_2.2.1.py -i lig.itp -s rec?-${l}.sdf -t ${l}.mol2 --rec-gro-pattern {prefix}.gro $ffbonded_arg --list-models | grep -v '\-\-\-\-' > lig${ligid}_dock.csv
+	python ${CWD}/scripts/dock/dock2com_2.2.1.py -i lig.itp -s *-${l}.sdf -t ${l}.mol2 --rec-pdb ../BRD4.pdb $ffbonded_arg --list-models | grep -v '\-\-\-\-' > lig${ligid}_dock.csv
 	
 #	find . -maxdepth 1 -type l -delete
 #	mkdir -p ../../com/lig${ligid}
